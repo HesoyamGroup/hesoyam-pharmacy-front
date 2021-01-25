@@ -93,7 +93,7 @@ export default {
 
 <style scoped>
     .login-component{
-        height: 500px;
+        padding: 2rem;
         display:flex;
         align-items: center;
     }

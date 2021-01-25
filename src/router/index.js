@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
+import RegisterPage from '../views/RegisterPage.vue'
 
 import {client} from '@/client/axiosClient'
 
@@ -13,11 +14,29 @@ const routes = [
     name: 'Home',
     component: Home
   },
-  
   {
-    path: '/login', component: LoginPage,
+    path: '/login', 
+    component: LoginPage,
+    beforeEnter: function(to, from, next){
+      if(isUserLoggedIn()){
+        router.push({path: '/'});
+      }else{
+        next();
+      }
+    }
   },
-
+  {
+    path: '/register', 
+    component: RegisterPage,
+    beforeEnter: function(to, from, next){
+      console.log(isUserLoggedIn());
+      if(isUserLoggedIn()){
+        router.push({path: '/'});
+      }else{
+        next();
+      }
+    }
+  },
   {
     path: '/about',
     name: 'About',
@@ -50,6 +69,42 @@ function clearUserData(){
   localStorage.removeItem('user_role');
   localStorage.removeItem('user_token');
   localStorage.removeItem('user_token_expires');
+}
+
+
+
+
+function isUserLoggedIn(){
+    var userData = getLoggedUserData();
+    //If user token present, user is logged.
+    if(userData['userToken']) return true;
+
+    return false;
+}
+
+function getLoggedUserData(){
+    return {
+      userRole: _getUserRole(),
+      userToken: _getUserToken(),
+      userTokenExpiryDate: _getUserTokenExpiryDate()
+    }
+}
+
+function _getUserRole(){
+  var userRole = localStorage.getItem('user_role');
+  if(userRole != null){
+      userRole = userRole.substring(userRole.indexOf('_') + 1);
+  }
+
+  return userRole;
+}
+
+function _getUserToken(){
+  return localStorage.getItem('user_token');
+}
+
+function _getUserTokenExpiryDate(){
+  return localStorage.getItem('user_token_expires');
 }
 
 async function validateAuthentication() {
