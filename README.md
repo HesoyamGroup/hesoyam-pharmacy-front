@@ -1,5 +1,8 @@
 # hesoyam-pharmacy-front
 
+## Environment variables
+`VUE_APP_API_BASE_URL` - Axios BASE URL (Local dev: http://localhost:55555/)
+
 ## Project setup
 ```
 npm install
