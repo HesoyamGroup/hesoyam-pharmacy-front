@@ -7,21 +7,22 @@
                     <v-toolbar dark color="primary">
                         <v-toolbar-title>Login form</v-toolbar-title>
                     </v-toolbar>
+                    <v-card-text>
+                        <v-form v-model="form.isFormValid">
+                            <v-text-field v-model="form.email" :rules="rules.emailRules" prepend-icon="mdi-email" name="email" label="Email" type="text">
+                            </v-text-field>
+                            <v-text-field v-model="form.password" :rules="rules.passwordRules" prepend-icon="mdi-lock" name="password" label="Password" type="password">
+                            </v-text-field>
+                        </v-form>
+                    </v-card-text>
+
+                    <v-card-actions>
+                        <v-spacer> </v-spacer>
+                        <v-subheader v-if="form.login.unsuccessful" class="red--text">Invalid username/password</v-subheader>
+                        <v-subheader v-if="form.login.successful" class="green--text">Login successful. You will be redirected in a second.</v-subheader>
+                        <v-btn :disabled="!form.isFormValid" @click="sendLoginRequest" color="primary">Login</v-btn>
+                    </v-card-actions>
                 </v-card>
-
-                <v-card-text>
-                    <v-form v-model="form.isFormValid">
-                        <v-text-field v-model="form.email" :rules="rules.emailRules" prepend-icon="mdi-email" name="email" label="Email" type="text">
-                        </v-text-field>
-                        <v-text-field v-model="form.password" :rules="rules.passwordRules" prepend-icon="mdi-lock" name="password" label="Password" type="password">
-                        </v-text-field>
-                    </v-form>
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer> </v-spacer>
-                    <v-btn :disabled="!form.isFormValid" @click="sendLoginRequest" color="primary">Login</v-btn>
-                </v-card-actions>
             </v-flex>
         </v-layout>
     </v-container>
@@ -31,6 +32,8 @@
 
 <script>
 
+import {client} from '@/client/axiosClient';
+
 export default {
     name: 'Login',
     data: function(){
@@ -38,7 +41,11 @@ export default {
             form: {
                 email: '',
                 password: '',
-                isFormValid: false
+                isFormValid: false,
+                login: {
+                    successful: false,
+                    unsuccessful: false
+                }
             },
             rules: {
                 emailRules: [
@@ -54,18 +61,30 @@ export default {
     },
     methods: {
         sendLoginRequest: function(){
-            this.axios({
+            this.resetLoginStatus();
+            client({
                 method: 'post',
-                url: 'http://localhost:55555/auth/login',
+                url: 'auth/login',
                 data: {
                     email: this.form.email,
                     password: this.form.password
                 }
             }).then( (response) => {
-                console.log(response);
+                this.saveTokenDataToLocalStorage(response.data);
+                this.form.login.successful = true;
+                setTimeout(() => { this.$router.push({path: '/'})}, 2000);
             }, (error) => {
-                console.log(error);
+                this.form.login.unsuccessful = true;
             })
+        },
+        saveTokenDataToLocalStorage: function(response){
+            localStorage.user_role = response.data.role;
+            localStorage.user_token = response.data.token;
+            localStorage.user_token_expires = response.data.expiresIn;
+        },
+        resetLoginStatus: function(){
+            this.form.login.successful = false;
+            this.form.login.unsuccessful = false;
         }
     }
 }
