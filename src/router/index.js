@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
+import RegisterPage from '../views/RegisterPage.vue'
 
 import {client} from '@/client/axiosClient'
 
@@ -13,11 +14,12 @@ const routes = [
     name: 'Home',
     component: Home
   },
-  
   {
     path: '/login', component: LoginPage,
   },
-
+  {
+    path: '/register', component: RegisterPage
+  },
   {
     path: '/about',
     name: 'About',
