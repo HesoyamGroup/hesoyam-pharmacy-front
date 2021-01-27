@@ -43,6 +43,14 @@ const routes = [
   {
     path: '/profile', 
     component: ProfilePage,
+    beforeEnter: function(to, from, next){
+      if(!isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        next();
+      }
+    }
   },
 
   {
