@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
+import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 
 import {client} from '@/client/axiosClient'
@@ -25,6 +26,7 @@ const routes = [
       }
     }
   },
+
   {
     path: '/register', 
     component: RegisterPage,
@@ -37,6 +39,12 @@ const routes = [
       }
     }
   },
+
+  {
+    path: '/profile', 
+    component: ProfilePage,
+  },
+
   {
     path: '/about',
     name: 'About',
