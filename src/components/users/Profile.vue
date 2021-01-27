@@ -83,20 +83,50 @@
                     <v-col cols="4" class="d-flex">
                         <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
                             <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Password</v-toolbar-title>
+                                <v-toolbar-title>Change Password</v-toolbar-title>
                             </v-toolbar>
                             <v-card-text>
                                 <v-text-field
-                                        label="e-Mail:"
-                                        readonly
-                                        outlined>
+                                    label="Enter New Password:"
+                                    :rules="rules.passwordRules"
+                                    outlined 
+                                    v-model="newPassword"
+                                    type="password">
                                 </v-text-field>
                                 <v-text-field
-                                        label="e-Mail:"
-                                        readonly
-                                        outlined
-                                        >
-                                    </v-text-field>
+                                    label="Confirm Password:"
+                                    :rules='rules.confirmPasswordRules'
+                                    outlined
+                                    v-model="confirmNewPassword"
+                                    type="password"
+                                >
+                                </v-text-field>
+                                <v-text-field
+                                    label='Enter Old Password:'
+                                    :rules='rules.passwordRules'
+                                    outlined
+                                    v-model="oldPassword"
+                                    type="password"
+                                    >
+                                </v-text-field>
+                                <div class="text-center">
+                                        <v-btn 
+                                        rounded 
+                                        color="success" 
+                                        dark 
+                                        @click="changePassword"
+                                        class='mr-6'>
+                                            Save
+                                        </v-btn>
+                                        <v-btn 
+                                        rounded 
+                                        color="error" 
+                                        dark 
+                                        class="ml-6"
+                                        @click="resetPasswordForm">
+                                            Clear All
+                                        </v-btn>
+                                    </div>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -284,6 +314,11 @@ export default {
                 },
                 infoOverlay: true,
                 genders: ['MALE', 'FEMALE', 'OTHER', 'DONT_SAY'],
+                //Password changing
+                newPassword: '',
+                confirmNewPassword: '',
+                oldPassword: '',
+                //Allergies
                 headers: [
                 {
                     text: 'Dessert (100g serving)',
@@ -300,6 +335,7 @@ export default {
                 desserts: [
                 
                 ],
+                //Loyalty Program
                 value:69,
                 
                 //Rules
@@ -313,7 +349,7 @@ export default {
                         pw => /^.{8,64}$/.test(pw) || 'Password should have between 8 and 64 characters.',
                     ],
                     confirmPasswordRules: [
-                        pw => this.form.password === pw || "Passwords must match",
+                        pw => this.newPassword === pw || "Passwords must match",
                     ],
                     firstNameRules: [
                         fn => !!fn || 'First name is required.',
@@ -380,6 +416,7 @@ export default {
             })
         },
         methods:{
+            //Get all cities in selected country
             getCities: function(){
                 const vm = this;
                 var selectedCityId = this.selectedCountry.id;
@@ -394,6 +431,8 @@ export default {
 
                 })
             },
+
+            //Update address information about user
             saveAddress: function(){
                 client({
                     method: 'POST',
@@ -416,6 +455,7 @@ export default {
                 })
 
             },
+            //Update basic information about user
             saveUser: function(){
                 client({
                     method: 'POST',
@@ -435,6 +475,26 @@ export default {
 
                 })
             },
+            //Change password
+            changePassword: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'profile/change-password',
+                    data:{
+                        password: this.newPassword,
+                        confirmPassword: this.confirmNewPassword,
+                        oldPassword: this.oldPassword
+                    }
+                })
+                .then((response) => {
+                    console.log('password changed');
+                    
+                },(error)=>{
+
+                })
+                
+            },            
             cancelAddressSave: function()
             {
                 this.overlay = !this.overlay;
@@ -442,11 +502,11 @@ export default {
                 this.selectedCountry = null;
                 this.addressLine = '';
             },
-            isDifferent: function()
+            resetPasswordForm: function()
             {
-                if(this.userDTO.firstName != this.form.userEdit.firstName || this.userDTO.lastName != this.form.userEdit.lastName || this.userDTO.gender != this.form.userEdit.gender || this.userDTO.telephone != this.form.userEdit.telephone)
-                    return true;
-                return false;
+                this.newPassword='';
+                this.confirmNewPassword='';
+                this.oldPassword='';
             }
         }
         
