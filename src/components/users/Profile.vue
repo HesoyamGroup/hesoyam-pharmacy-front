@@ -22,11 +22,12 @@
                                 </v-text-field>
                                 <div class="text-center">
                                     <v-btn rounded color="primary" dark @click="overlay = !overlay">
-                                        Change Address
+                                        Edit Address
                                     </v-btn>
                                 </div>
                             </v-card-text>
                         </v-card>
+
                         <v-card v-if="!overlay" class='elevation-12 ma-4 flex-grow-1' shaped>
                             <v-toolbar dark color = 'primary'>
                                 <v-toolbar-title>Change Address</v-toolbar-title>
@@ -54,10 +55,25 @@
                                 <v-text-field
                                     v-model="addressLine"
                                     label="Address Line:"
+                                    :rules="rules.addressLineRules"
                                     outlined>
                                 </v-text-field>
                                 <div class="text-center">
-                                    <v-btn rounded color="primary" dark @click="saveAddress">
+                                    <v-btn 
+                                    v-if='this.selectedCity != null && this.selectedCountry != null && this.addressLine.length >=3 ' 
+                                    rounded 
+                                    color="success" 
+                                    dark 
+                                    @click="saveAddress"
+                                    class='mr-6'>
+                                        Save
+                                    </v-btn>
+                                    <v-btn 
+                                    rounded 
+                                    color='error' 
+                                    dark 
+                                    @click='cancelAddressSave'
+                                    class='ml-6'>
                                         Cancel
                                     </v-btn>
                                 </div>
@@ -115,7 +131,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="4" class="d-flex">
-                        <v-card class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
+                        <v-card v-if="infoOverlay" class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
                             <v-toolbar dark color = 'primary'>
                                 <v-toolbar-title>Profile Information</v-toolbar-title>
                             </v-toolbar>
@@ -123,11 +139,13 @@
                                     <v-text-field
                                         label='First Name:'
                                         outlined
+                                        readonly
                                         v-model = userDTO.firstName>
                                     </v-text-field>
                                     <v-text-field
                                         label="Last Name:"
                                         outlined
+                                        readonly
                                         v-model = userDTO.lastName>
                                     </v-text-field>
                                     <v-text-field
@@ -144,9 +162,67 @@
                                     </v-text-field>
                                     <v-text-field
                                         label="Phone Number:"
+                                        readonly
                                         outlined
                                         v-model = userDTO.telephone>                               >
                                     </v-text-field>
+                                    <div class="text-center">
+                                        <v-btn rounded color="primary" dark @click="infoOverlay = !infoOverlay">
+                                            Edit Info
+                                        </v-btn>
+                                    </div>
+                            </v-card-text>
+                        </v-card>
+                        <v-card v-if="!infoOverlay" class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
+                            <v-toolbar dark color = 'primary'>
+                                <v-toolbar-title>Edit Information</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-form v-model='form.isInfoFormValid'>
+                                    <v-text-field
+                                        label='First Name:'
+                                        outlined
+                                        :rules="rules.firstNameRules"
+                                        v-model = form.userEdit.firstName>
+                                    </v-text-field>
+                                    <v-text-field
+                                        label="Last Name:"
+                                        outlined
+                                        :rules="rules.lastNameRules"
+                                        v-model = form.userEdit.lastName>
+                                    </v-text-field>
+                                    <v-select
+                                        v-model="form.userEdit.gender"
+                                        :items="genders"
+                                        label="Gender:"
+                                        outlined
+                                        return-object>
+                                    </v-select>
+                                    <v-text-field
+                                        label="Phone Number:"
+                                        outlined
+                                        :rules="rules.phoneNumberRules"
+                                        v-model = form.userEdit.telephone>
+                                    </v-text-field>
+                                    <div class="text-center">
+                                        <v-btn 
+                                        v-if='form.isInfoFormValid' 
+                                        rounded 
+                                        color="success" 
+                                        dark 
+                                        @click="saveUser"
+                                        class='mr-6'>
+                                            Save
+                                        </v-btn>
+                                        <v-btn 
+                                        rounded 
+                                        color="error" 
+                                        dark 
+                                        @click="infoOverlay = !infoOverlay">
+                                            Cancel
+                                        </v-btn>
+                                    </div>
+                                </v-form>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -178,6 +254,18 @@ export default {
         name: 'Profile',
         data(){
             return {
+                //User Addres and Editing
+                address:{
+                    city:{
+                        cityName:''}
+                },
+                selectedCountry: null,
+                selectedCity: null,
+                addressLine:'',
+                countries:[],
+                citiesInCountry:[],
+                overlay: true,
+                //User Information and Editing
                 userDTO:{
                     firstName: '',
                     lastName: '',
@@ -185,6 +273,17 @@ export default {
                     email: '',
                     telephone: ''
                 },
+                form:{
+                    userEdit:{
+                        firstName: '',
+                        lastName: '',
+                        gender: '',
+                        telephone: ''
+                    },
+                    isInfoFormValid: false,
+                },
+                infoOverlay: true,
+                genders: ['MALE', 'FEMALE', 'OTHER', 'DONT_SAY'],
                 headers: [
                 {
                     text: 'Dessert (100g serving)',
@@ -202,16 +301,48 @@ export default {
                 
                 ],
                 value:69,
-                address:{
-                },
-                selectedCountry:{},
-                selectedCity:{},
-                addressLine:'',
-                countries:[],
-                citiesInCountry:[],
-                absolute: true,
-                opacity: 0.5,
-                overlay: true,
+                
+                //Rules
+                rules: {
+                    emailRules: [
+                        em => !!em || 'E-mail is required.',
+                        em => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(em) || 'E-mail must be valid',
+                    ],
+                    passwordRules: [
+                        pw => !!pw || 'Password is required.',
+                        pw => /^.{8,64}$/.test(pw) || 'Password should have between 8 and 64 characters.',
+                    ],
+                    confirmPasswordRules: [
+                        pw => this.form.password === pw || "Passwords must match",
+                    ],
+                    firstNameRules: [
+                        fn => !!fn || 'First name is required.',
+                        fn => /^[a-z A-Z\.-]{3,75}$/.test(fn) || "First name should have between 2 and 75 characters."
+                    ],
+                    lastNameRules: [
+                        fn => !!fn || 'Last name is required.',
+                        fn => /^[a-z A-Z\.-]{3,100}$/.test(fn) || "Last name should have between 3 and 100 characters."
+                    ],
+                    phoneNumberRules: [
+                        num => !!num || 'Phone number is mandatory.',
+                        value => (/^\d{10}$/.test(value) || /^(\d{3}[- .]?){2}\d{4}$/.test(value) 
+                        || /^((\(\d{3}\))|\d{3})[- .]?\d{3}[- .]?\d{4}$/.test(value)
+                        || /^(\+\d{1,3}( )?)?((\(\d{3}\))|\d{3})[- .]?\d{3}[- .]?\d{4}$/.test(value)) || 'Phone number format is not valid.'
+                    ],
+                    addressLineRules: [
+                        add => !!add || 'Address line is mandatory',
+                        add => /^.{3,150}$/.test(add) || 'Address line should have between 3 and 15 characters'
+                    ],
+                    latitudeRule: [
+                        v => (!isNaN(parseFloat(v)) && v >= -90 && v <= 90) || 'Latitude has to be between -90 and 90'
+                    ],
+                    longitudeRule: [
+                        v => (!isNaN(parseFloat(v)) && v >= -180 && v <= 180) || 'Longitude has to be between -180 and 180'
+                    ],
+                    genderRules: [
+                        gender => this.form.genders.includes(gender) || 'You must choose a gender'
+                    ]
+                }
             }
         },
         mounted(){
@@ -222,6 +353,7 @@ export default {
                 })
                 .then( (response) => {
                     vm.userDTO = response.data;
+                    vm.form.userEdit = response.data;
                     console.log(vm.userDTO.firstName)
                 }, (error) => {
 
@@ -264,7 +396,7 @@ export default {
             },
             saveAddress: function(){
                 client({
-                    method: 'post',
+                    method: 'POST',
                     url: 'profile/change-address',
                     data:{
                         city: this.selectedCity,
@@ -276,10 +408,45 @@ export default {
                     this.address.city = this.selectedCity;
                     this.address.addressLine = this.addressLine;
                     this.overlay = !this.overlay;
+                    this.selectedCity = null;
+                    this.selectedCountry = null;
+                    this.addressLine = '';
                 }, (error) => {
 
                 })
 
+            },
+            saveUser: function(){
+                client({
+                    method: 'POST',
+                    url: 'profile/change-user-basic-info',
+                    data:{
+                        firstName: this.form.userEdit.firstName,
+                        lastName: this.form.userEdit.lastName,
+                        gender: this.form.userEdit.gender,
+                        telephone: this.form.userEdit.telephone
+                    }
+                })
+                .then((response)=>{
+                    console.log('ok');
+                    this.form.userEdit = this.userDTO;
+                    this.infoOverlay = !this.infoOverlay;
+                }, (error)=>{
+
+                })
+            },
+            cancelAddressSave: function()
+            {
+                this.overlay = !this.overlay;
+                this.selectedCity = null;
+                this.selectedCountry = null;
+                this.addressLine = '';
+            },
+            isDifferent: function()
+            {
+                if(this.userDTO.firstName != this.form.userEdit.firstName || this.userDTO.lastName != this.form.userEdit.lastName || this.userDTO.gender != this.form.userEdit.gender || this.userDTO.telephone != this.form.userEdit.telephone)
+                    return true;
+                return false;
             }
         }
         
