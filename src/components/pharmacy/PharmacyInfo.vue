@@ -1,11 +1,11 @@
 <template>
     <v-card>
         <v-card-title class="d-flex mb-3">
-            <v-progress-circular :rotate="-90" :size="50" :value="value.rating * 20" color="teal">
-                {{ value.rating }}
+            <v-progress-circular :rotate="-90" :size="50" :value="localPharmacy.rating * 20" color="teal">
+                {{ localPharmacy.rating }}
             </v-progress-circular>
             <div class="ml-2">
-                {{value.name}}
+                {{localPharmacy.name}}
             </div>
             <template v-if="isPatient">
                 <v-btn v-if="!subscribed"
@@ -23,14 +23,12 @@
             </template>
 
         </v-card-title>
-        <v-card-subtitle>{{value.description}}</v-card-subtitle>
+        <v-card-subtitle>{{localPharmacy.description}}</v-card-subtitle>
 
-        <v-card-text>{{value.address.addressLine}}, {{value.address.city.cityName}}</v-card-text>
+        <v-card-text>{{localPharmacy.address.addressLine}}, {{localPharmacy.address.city.cityName}}</v-card-text>
         <v-row>
             <v-col class="ma-5">
-                <div id="pharmacyMap">
-                    Ovde ide mapa Lat {{value.address.latitude}} Lon {{value.address.longitude}}
-                </div>
+                <leaflet-map mode="display" v-model="latlng" height="300" ></leaflet-map>
             </v-col>
         </v-row>
     </v-card>
@@ -38,20 +36,24 @@
 
 <script>
 import {client} from '@/client/axiosClient';
+import LeafletMap from '../location/LeafletMap.vue';
 
 export default {
+  components: { LeafletMap },
     props: ['value'],
     name: 'PharmacyInfo',
     data: function(){
         return {
             userRole: 'ROLE_ADMIN',
             userId: 15,
-            subscribed: false
+            subscribed: false,
+            latlng: null
 
         }
     },
     mounted(){
         this.userRole = localStorage.getItem('user_role');
+
         if(this.isPatient){
             //TODO: load logged in user ID
             //client(...)
@@ -80,9 +82,20 @@ export default {
         }
     },
     computed:{
+        localPharmacy: function(){
+            if(this.value){
+                this.latlng = {lat: this.value.address.latitude, lng: this.value.address.longitude};
+                return this.value;
+            }
+            else{
+                return {address: {city: {}}};
+            }
+        },
         isPatient: function(){
             return this.userRole == 'ROLE_PATIENT';
-        }
-    }
+        },
+
+    },
+
 }
 </script>

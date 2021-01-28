@@ -1,4 +1,5 @@
 <template>
+
     <div class="ma-2">
         <v-row>
             <v-col>
@@ -12,7 +13,6 @@
             </v-col>
         </v-row>
     </div>
-
 </template>
 
 
@@ -28,12 +28,11 @@ export default {
     components: {
         PharmacyInfo,
         PharmacyMedicineList,
-        PharmacyEmployeeList
-
+        PharmacyEmployeeList,
     },
     data: function(){
         return {
-            pharmacy: {address: {city:{}}},
+            pharmacy: null,
             userRole: 'ROLE_PATIENT'
         }
     },
