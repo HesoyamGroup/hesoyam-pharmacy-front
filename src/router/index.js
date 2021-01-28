@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
+import MedicineSearchPage from '../views/MedicineSearchPage.vue'
 
 import {client} from '@/client/axiosClient'
 
@@ -51,6 +52,11 @@ const routes = [
         next();
       }
     }
+  },
+
+  {
+    path: '/medicine-search',
+    component: MedicineSearchPage,
   },
 
   {
