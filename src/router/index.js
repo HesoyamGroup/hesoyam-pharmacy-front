@@ -65,7 +65,15 @@ const routes = [
   },
   {
     path: '/pharmacist',
-    component: PharmacistPage
+    component: PharmacistPage,
+    beforeEnter: function(to, from, next){
+      if(!isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        next();
+      }
+    }
   },
   {
     path: '/dermatologist',

@@ -12,7 +12,7 @@
                 <v-btn plain @click="togglePersonalEditing()" color="indigo">Edit information</v-btn>
                 <v-text-field
                     ref="name"
-                    v-model="name"
+                    v-model="user.name"
                     :rules="[() => !!name || 'This field is required']"
                     :error-messages="errorMessages"
                     label="First Name"
@@ -23,7 +23,7 @@
                 ></v-text-field>
                 <v-text-field
                     ref="surname"
-                    v-model="surname"
+                    v-model="user.surname"
                     :rules="[() => !!name || 'This field is required']"
                     :error-messages="errorMessages"
                     label="Last Name"
@@ -34,7 +34,7 @@
                 ></v-text-field>
                 <v-text-field
                   ref="phone"
-                  v-model="phone"
+                  v-model="user.phone"
                   :rules="[() => !!phone || 'This field is required!',
                   () => /^.{0,1}\d{10,15}$/.test(phone) || 'Phone number format is not valid.']"
                   :error-messages="errorMessages"
@@ -47,7 +47,7 @@
                 
                 <v-autocomplete
                     ref="country"
-                    v-model="country"
+                    v-model="user.country"
                     :rules="[() => !!country || 'This field is required']"
                     :items="countries"
                     label="Country"
@@ -55,11 +55,12 @@
                     required
                     prepend-icon="mdi-map-marker"
                     :disabled="personalEditingDisabled"
+                    item-text="countryName"
                 ></v-autocomplete>
 
                 <v-autocomplete
                     ref="city"
-                    v-model="city"
+                    v-model="user.city"
                     :items="cities"
                     :rules="[() => !!city || 'This field is required', addressCheck]"
                     label="City"
@@ -71,7 +72,7 @@
 
                 <v-text-field
                     ref="address"
-                    v-model="address"
+                    v-model="user.address"
                     :rules="[
                     () => !!address || 'This field is required',
                     () => !!address && address.length <= 25 || 'Address must be less than 25 characters',
@@ -85,9 +86,11 @@
                     :disabled="personalEditingDisabled"
                 ></v-text-field>
                 </v-card-text>
-                <v-divider class="mt-12"></v-divider>
+                <v-divider class="mt-12"
+                v-if="!personalEditingDisabled"></v-divider>
                 <v-card-actions>
-                <v-btn text @click="resetPersonalForm">
+                <v-btn text @click="resetPersonalForm"
+                v-if="!personalEditingDisabled">
                     Cancel
                 </v-btn>
                 <v-spacer></v-spacer>
@@ -113,7 +116,8 @@
                 <v-btn
                     color="primary"
                     text
-                    @click="submit"
+                    @click="submitPersonal"
+                    v-if="!personalEditingDisabled"
                 >
                     Submit
                 </v-btn>
@@ -133,7 +137,7 @@
             <v-card ref="form" id='personal-card' class="form-card">
                 <v-card-text>
                 <v-btn plain @click="toggleEditing()" color="indigo">Edit information</v-btn>
-                <v-text-field :disabled="accountEditingEnabled" v-model="email" :rules="rules.emailRules" name="email" label="Email address" type="text" prepend-icon="mdi-email"> </v-text-field>
+                <v-text-field :disabled="accountEditingEnabled" v-model="user.email" :rules="rules.emailRules" name="email" label="Email address" type="text" prepend-icon="mdi-email"> </v-text-field>
                 <v-text-field :disabled="accountEditingEnabled && !oldPasswordEditingEnabled" v-model="oldPassword" :rules="rules.passwordRules" name="oldPassword" label="Enter Old Password" type="password" prepend-icon="mdi-lock"> </v-text-field>
                 <v-btn plain @click="testPassword()" v-if="!accountEditingEnabled && !oldPasswordEditingEnabled" color="indigo">Test password</v-btn>
                 <v-btn plain @click="lockPassword()" v-if="!accountEditingEnabled && oldPasswordEditingEnabled">Cancel editing password</v-btn>
@@ -149,9 +153,11 @@
                 </template>
                 <v-text-field :disabled="passwordEditingEnabled" v-model="confirmPassword" :rules="rules.confirmPasswordRules" name="confirmPassword" label="Confirm password" type="password" prepend-icon="mdi-lock"> </v-text-field>
                 </v-card-text>
-                <v-divider class="mt-12"></v-divider>
+                <v-divider class="mt-12"
+                v-if="!accountEditingEnabled"></v-divider>
                 <v-card-actions>
-                <v-btn text @click="resetAccountForm()">
+                <v-btn text @click="resetAccountForm()"
+                v-if="!accountEditingEnabled">
                     Cancel
                 </v-btn>
                 <v-spacer></v-spacer>
@@ -177,7 +183,8 @@
                 <v-btn
                     color="primary"
                     text
-                    @click="submit"
+                    @click="submitAccount"
+                    v-if="!accountEditingEnabled"
                 >
                     Submit
                 </v-btn>
@@ -227,18 +234,37 @@
 
 
 <script>
+
+import {client} from '@/client/axiosClient';
+
   export default {
     data: () => ({
       countries: ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Anguilla', 'Antigua &amp; Barbuda', 'Argentina', 'Armenia', 'Aruba', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bermuda', 'Bhutan', 'Bolivia', 'Bosnia &amp; Herzegovina', 'Botswana', 'Brazil', 'British Virgin Islands', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia', 'Cameroon', 'Cape Verde', 'Cayman Islands', 'Chad', 'Chile', 'China', 'Colombia', 'Congo', 'Cook Islands', 'Costa Rica', 'Cote D Ivoire', 'Croatia', 'Cruise Ship', 'Cuba', 'Cyprus', 'Czech Republic', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Estonia', 'Ethiopia', 'Falkland Islands', 'Faroe Islands', 'Fiji', 'Finland', 'France', 'French Polynesia', 'French West Indies', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Gibraltar', 'Greece', 'Greenland', 'Grenada', 'Guam', 'Guatemala', 'Guernsey', 'Guinea', 'Guinea Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hong Kong', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Isle of Man', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jersey', 'Jordan', 'Kazakhstan', 'Kenya', 'Kuwait', 'Kyrgyz Republic', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Macau', 'Macedonia', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Mauritania', 'Mauritius', 'Mexico', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Montserrat', 'Morocco', 'Mozambique', 'Namibia', 'Nepal', 'Netherlands', 'Netherlands Antilles', 'New Caledonia', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'Norway', 'Oman', 'Pakistan', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Puerto Rico', 'Qatar', 'Reunion', 'Romania', 'Russia', 'Rwanda', 'Saint Pierre &amp; Miquelon', 'Samoa', 'San Marino', 'Satellite', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'St Kitts &amp; Nevis', 'St Lucia', 'St Vincent', 'St. Lucia', 'Sudan', 'Suriname', 'Swaziland', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', `Timor L'Este`, 'Togo', 'Tonga', 'Trinidad &amp; Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Turks &amp; Caicos', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Venezuela', 'Vietnam', 'Virgin Islands (US)', 'Yemen', 'Zambia', 'Zimbabwe'],
+      countriesFromServer: [],
       errorMessages: '',
       navigation: 'account',
-      name: null,
-      surname: null,
-      address: null,
-      city: null,
+      user:{
+        name: null,
+        surname: null,
+        address: null,
+        city: null,
+        phone: null,
+        country: null,
+        email: null,
+      },
+      userDto:{
+        firstName: '',
+        lastName: '',
+        gender: '',
+        email: '',
+        telephone: '',
+        address:{
+          city:{
+            cityName:''
+            },
+          },
+      },
       cities: ['Novi Sad', 'Beograd'],
-      phone: null,
-      country: null,
       nameBackup: null,
       surnameBackup: null,
       addressBackup: null,
@@ -255,7 +281,6 @@
       activePasswordBackup: null,
       newPassword: null,
       confirmPassword: null,
-      email: 'test123@gmail.com',
       emailBackup: null,
       snackbar: false,
       snackbarText: null,
@@ -299,6 +324,35 @@
 
     }),
 
+    mounted() {
+      client({
+        method: 'GET',
+        url: 'profile/user-information'
+        })
+      .then( (response) => {
+        this.userDto = response.data;
+        this.user.name = this.userDto.firstName;
+        this.user.surname = this.userDto.lastName;
+        this.user.gender = this.userDto.gender;
+        this.user.phone = this.userDto.telephone;
+        this.user.email = this.userDto.email;
+        this.user.city = this.userDto.cityName;
+        console.log(this.user.name);
+        }, (error) => {
+
+        })
+
+        client({
+            method:'GET',
+            url:'countries/getAll'
+        }).then( (response) => {
+            this.countriesFromServer = response.data;
+            this.countries = this.countriesFromServer;
+        }, (error) => {
+
+        })
+    },
+
     computed: {
       form () {
         return {
@@ -333,6 +387,7 @@
         this.errorMessages = ''
       },
     },
+
 
     methods: {
       backupData: function(){
@@ -369,14 +424,20 @@
           this.oldPassword = null;
       },
       testPassword: function(){
-          if(this.oldPassword === this.activePassword){
-              this.passwordEditingEnabled = false;
+          client({
+            method: 'POST',
+            url:'profile/test-password',
+            data: {
+              password: this.oldPassword
+            },
+          }).then((response) => {
+            if(response.data !== "matches"){
+              this.snack("Password is incorrect!");
+            } else {
               this.oldPasswordEditingEnabled = true;
-              
-          } else {
-              this.snackbarText = "Password is incorrect!";
-              this.snackbar = true;
-          }
+              this.passwordEditingEnabled = false;
+            }
+          })    
       },
       resetAccountForm: function() {
         this.errorMessages = []
@@ -420,14 +481,88 @@
         this.shouldBackup = false;
       },
 
-      submit () {
+      snack: function(text){
+        this.snackbar = true;
+        this.snackbarText = text;
+      },
+
+      submitPersonal() {
+        this.formHasErrors = false;
+        client({
+                    method: 'POST',
+                    url: 'profile/change-user-basic-info',
+                    data:{
+                        firstName: this.user.name,
+                        lastName: this.user.surname,
+                        gender: this.user.gender,
+                        telephone: this.user.phone
+                    }
+                })
+                .then((response)=>{
+                    this.snack("Personal information changed!");
+                    
+                    this.personalEditingDisabled = true;
+                }, (error)=>{
+
+                })
+      },
+      submitAccount () {
         this.formHasErrors = false
+        
+        if(!this.newPassword && !this.confirmPassword){
+          client({
+            method: 'POST',
+            url: 'profile/change-email',
+            data:{
+              email: this.user.email,
+              }
+            })
+            .then((response) => {
+              this.snack('Email changed!');
+                      
+            },(error)=>{
 
-        Object.keys(this.form).forEach(f => {
-          if (!this.form[f]) this.formHasErrors = true
+          })  
+        }
+        
 
-          this.$refs[f].validate(true)
-        })
+        if(this.user.email !== this.emailBackup){
+          client({
+            method: 'POST',
+            url: 'profile/change-account-information',
+            data:{
+              email: this.user.email,
+              password: this.newPassword,
+              confirmPassword: this.confirmPassword,
+              oldPassword: this.oldPassword
+              }
+            })
+            .then((response) => {
+              this.snack('Information changed!');
+                      
+            },(error)=>{
+
+          })  
+        }
+        else {
+          client({
+            method: 'POST',
+            url: 'profile/change-password',
+            data:{
+              password: this.newPassword,
+              confirmPassword: this.confirmPassword,
+              oldPassword: this.oldPassword
+              }
+            })
+            .then((response) => {
+              this.snack('Password changed!');
+                      
+            },(error)=>{
+
+          })
+        }
+        
+
       },
     },
   }
