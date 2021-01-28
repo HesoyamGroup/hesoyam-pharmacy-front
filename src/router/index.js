@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
+import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
 import DermatologistPage from '../views/Dermatologist1Page.vue'
@@ -27,6 +28,7 @@ const routes = [
       }
     }
   },
+
   {
     path: '/register', 
     component: RegisterPage,
@@ -39,6 +41,20 @@ const routes = [
       }
     }
   },
+
+  {
+    path: '/profile', 
+    component: ProfilePage,
+    beforeEnter: function(to, from, next){
+      if(!isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        next();
+      }
+    }
+  },
+
   {
     path: '/about',
     name: 'About',
