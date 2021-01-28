@@ -28,7 +28,7 @@
         <v-card-text>{{localPharmacy.address.addressLine}}, {{localPharmacy.address.city.cityName}}</v-card-text>
         <v-row>
             <v-col class="ma-5">
-                <leaflet-map mode="display" v-model="latlng" height="300" ></leaflet-map>
+                <leaflet-map id="pharmacymap" mode="display" v-model="latlng" height="300" ></leaflet-map>
             </v-col>
         </v-row>
     </v-card>

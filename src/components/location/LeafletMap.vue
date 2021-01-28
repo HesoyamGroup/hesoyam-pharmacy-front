@@ -1,6 +1,6 @@
 <template>
     <div>
-    <div :id="mapid" v-bind:style="mapStyle">
+    <div :id="id" v-bind:style="mapStyle">
 
     </div>
   
@@ -20,9 +20,10 @@ import L from "leaflet";
 //      mode: [input, display, input-display]
 //      value: Object{lat, lng}
 //      height: map height in px
+//      id: id of map container
 export default {
     name: 'LeafletMap',
-    props: ['mode', 'value', 'height'],
+    props: ['mode', 'value', 'height', 'id'],
     data: function(){
         return {
             map : {},
@@ -32,7 +33,7 @@ export default {
             marker: undefined,
             popupMessage: "Apartment's location",
             loading: false,
-            mapid: 'leafletmap'
+            //mapid: 'leafletmap'
         }
     },
     methods:{
@@ -90,14 +91,14 @@ export default {
         });
         
         if(this.mode == "input"){
-            this.map = L.map(this.mapid).setView([45.2009537, 20.5291344], 8);
+            this.map = L.map(this.id).setView([45.2009537, 20.5291344], 8);
         }
         else if(this.mode == 'display'){
-            this.map = L.map(this.mapid, {closePopupOnClick : false, center:[this.latlng.lat, this.latlng.lng], zoom:15}).setView([this.latlng.lat, this.latlng.lng], 15);
+            this.map = L.map(this.id, {closePopupOnClick : false, center:[this.latlng.lat, this.latlng.lng], zoom:15}).setView([this.latlng.lat, this.latlng.lng], 15);
             this.setMarker(this.latlng);
         }
         else{ // mode == 'input-display'
-            this.map = L.map(this.mapid).setView([this.latlng.lat, this.latlng.lng], 15);
+            this.map = L.map(this.id).setView([this.latlng.lat, this.latlng.lng], 15);
             this.setMarker(this.latlng);
         }
 
