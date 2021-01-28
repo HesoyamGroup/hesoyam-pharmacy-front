@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
+import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 
 import {client} from '@/client/axiosClient'
 
@@ -52,7 +53,10 @@ const routes = [
       }
     }
   },
-
+  {
+    path: '/sys-profile',
+    component: SysAdminProfilePage
+  },
   {
     path: '/about',
     name: 'About',
