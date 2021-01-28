@@ -9,9 +9,6 @@
                 <v-list-item-content>
                     <v-list-item-title v-text="item.text"></v-list-item-title>
                 </v-list-item-content>
-                <v-list-item-action>
-                    <v-btn color="primary" to="/login">{{item.text}}</v-btn>
-                </v-list-item-action>
             </v-list-item>
       </v-list-item-group>
     </v-list>

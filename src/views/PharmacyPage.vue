@@ -4,12 +4,10 @@
         <v-row>
             <v-col>
                 <pharmacy-info v-model="pharmacy" />
+                <pharmacy-employee-tabs></pharmacy-employee-tabs>
             </v-col>
             <v-col>
                 <pharmacy-medicine-list v-model="pharmacy"/>
-            </v-col>
-            <v-col>
-                <pharmacy-employee-list></pharmacy-employee-list>
             </v-col>
         </v-row>
     </div>
@@ -17,10 +15,10 @@
 
 
 <script>
+import {client} from '@/client/axiosClient';
 import PharmacyInfo from '@/components/pharmacy/PharmacyInfo.vue';
 import PharmacyMedicineList from '@/components/pharmacy/PharmacyMedicineList.vue';
-import PharmacyEmployeeList from '@/components/pharmacy/PharmacyEmployeeList.vue';
-import {client} from '@/client/axiosClient';
+import PharmacyEmployeeTabs from '../components/pharmacy/PharmacyEmployeeTabs.vue';
 
 
 export default {
@@ -28,7 +26,7 @@ export default {
     components: {
         PharmacyInfo,
         PharmacyMedicineList,
-        PharmacyEmployeeList,
+        PharmacyEmployeeTabs,
     },
     data: function(){
         return {
