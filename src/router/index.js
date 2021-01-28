@@ -3,6 +3,8 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
+import PharmacistPage from '../views/PharmacistPage.vue'
+import DermatologistPage from '../views/Dermatologist1Page.vue'
 
 import {client} from '@/client/axiosClient'
 
@@ -44,6 +46,14 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+  },
+  {
+    path: '/pharmacist',
+    component: PharmacistPage
+  },
+  {
+    path: '/dermatologist',
+    component: DermatologistPage
   }
 ]
 
