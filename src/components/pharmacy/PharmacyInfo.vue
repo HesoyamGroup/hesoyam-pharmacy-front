@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title class="d-flex mb-3">
-            <v-progress-circular :rotate="-90" :size="50" :value="localPharmacy.rating * 20" color="teal">
+            <v-progress-circular :rotate="-90" :size="50" :value="localPharmacy.rating * 20" :color="getColor(localPharmacy.rating)">
                 {{ localPharmacy.rating }}
             </v-progress-circular>
             <div class="ml-2">
@@ -79,6 +79,11 @@ export default {
             //client(...)
             this.subscribed = false;
 
+        },
+        getColor(rating){
+            if(rating >= 4) return 'green';
+            else if(rating >= 2) return 'orange';
+            else return 'red';
         }
     },
     computed:{

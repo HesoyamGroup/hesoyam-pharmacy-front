@@ -5,6 +5,8 @@ import LoginPage from '../views/LoginPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import PharmacyPage from '../views/PharmacyPage.vue'
+import PharmacistsPage from '../views/PharmacistsPage.vue'
+import DermatologistsPage from '../views/DermatologistsPage.vue'
 
 import {client} from '@/client/axiosClient'
 
@@ -66,6 +68,34 @@ const routes = [
     path: '/pharmacy/:id',
     name: 'Pharmacy',
     component: PharmacyPage
+  },
+  {
+    path: '/pharmacists',
+    name: 'Pharmacists',
+    component: PharmacistsPage,
+    beforeEnter: function(to, from, next){
+        let user = getLoggedUserData();
+        if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+    }
+  },
+  {
+    path: '/dermatologists',
+    name: 'Dermatologists',
+    component: DermatologistsPage,
+    beforeEnter: function(to, from, next){
+      let user = getLoggedUserData();
+      if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
   }
 ]
 
