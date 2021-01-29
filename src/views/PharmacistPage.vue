@@ -36,10 +36,10 @@
           color="basil"
           flat
         >
-        <div id="work-calendar-container" v-if="tab == '1'">
+        <div id="work-calendar-container" v-if="tab == '0'">
             <WorkCalendar />
         </div>
-        <div v-else-if="tab ==2">
+        <div v-else-if="tab ==1">
             <div id="update-employee-information-container">
                 <EmployeeUpdateInformation />
             </div>
@@ -56,6 +56,7 @@
 <script>
     import WorkCalendar from '@/components/employee/WorkCalendar.vue';
     import EmployeeUpdateInformation from '@/components/users/EmployeeUpdateInformation.vue';
+    import {client} from '@/client/axiosClient';
 
     export default {
         name: 'WorkCalendarPage',
@@ -73,8 +74,17 @@
                 mode: 'calendar',
                 tab: 1,
         items: [
-          'Search Users', 'Calendar', 'Edit Profile',
+        'Calendar', 'Edit Profile',
         ],
+        mounted(){
+          client({
+            method: 'GET',
+            url: 'pharmacist/pharmacist-workplace'
+          }).then((response) => {
+            this.user.pharmacyName = response.data;
+          })
+        },
+
             }
         }
     }
