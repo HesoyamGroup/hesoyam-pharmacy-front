@@ -6,6 +6,8 @@ import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
 import DermatologistPage from '../views/Dermatologist1Page.vue'
+import PharmacyPage from '../views/PharmacyPage.vue'
+
 
 import {client} from '@/client/axiosClient'
 
@@ -78,6 +80,11 @@ const routes = [
   {
     path: '/dermatologist',
     component: DermatologistPage
+  },
+  {
+    path: '/pharmacy/:id',
+    name: 'Pharmacy',
+    component: PharmacyPage
   }
 ]
 
