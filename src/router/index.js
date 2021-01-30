@@ -6,6 +6,7 @@ import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
 import DermatologistPage from '../views/Dermatologist1Page.vue'
+import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 import PharmacyPage from '../views/PharmacyPage.vue'
 
 
@@ -56,7 +57,17 @@ const routes = [
       }
     }
   },
-
+  {
+    path: '/sys-profile',
+    component: SysAdminProfilePage,
+    beforeEnter: function(to, from, next){
+      if(isSysAdmin()){
+        next();
+        return;
+      }
+      router.push({path:'/login'});
+    }
+  },
   {
     path: '/about',
     name: 'About',
@@ -85,6 +96,34 @@ const routes = [
     path: '/pharmacy/:id',
     name: 'Pharmacy',
     component: PharmacyPage
+  },
+  {
+    path: '/pharmacists',
+    name: 'Pharmacists',
+    component: PharmacistsPage,
+    beforeEnter: function(to, from, next){
+        let user = getLoggedUserData();
+        if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+    }
+  },
+  {
+    path: '/dermatologists',
+    name: 'Dermatologists',
+    component: DermatologistsPage,
+    beforeEnter: function(to, from, next){
+      let user = getLoggedUserData();
+      if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
   }
 ]
 
@@ -105,6 +144,18 @@ router.beforeEach( async (to, from, next) => {
       next();
   });
 });
+
+
+
+//Perform check if specific roles
+function isSysAdmin(){
+    var userRole = getLoggedUserData().userRole;
+    if(userRole != 'SYS_ADMIN'){
+      return false;
+    }
+
+    return true;
+}
 
 function clearUserData(){
   localStorage.removeItem('user_role');
