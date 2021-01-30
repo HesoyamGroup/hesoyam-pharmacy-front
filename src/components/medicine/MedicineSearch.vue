@@ -51,7 +51,7 @@
                                 </v-data-table>
                                 <v-card-actions class="justify-center">
                                     <v-btn
-                                    v-if='selectedPharmacy[0] != undefined && userLoggedIn'
+                                    v-if='selectedPharmacy[0] != null && userLoggedIn'
                                     color="primary"
                                     @click="reserveMedicineDialog">
                                         Reserve
@@ -178,7 +178,7 @@ export default {
             })
             .then((response) => {
                 vm.pharmacies = response.data;
-                this.selectedPharmacy=[];
+                //this.selectedPharmacy=[];
                 vm.show = true;
             }, (error) => {
 
@@ -204,8 +204,24 @@ export default {
                 }
             })
             .then((response)=>{
-                console.log('uspesno dodat')
-                this.showAlert=true;
+
+            }, (error) => {
+
+            })
+
+            console.log(this.selectedPharmacy[0].id);
+            console.log(this.selectedMedicine.id);
+
+            client({
+                method: 'POST',
+                url: 'inventory-item/reserve-inventory-item',
+                data:{
+                    pharmacyId: this.selectedPharmacy[0].id,
+                    medicineId: this.selectedMedicine.id
+                }
+            })
+            .then((response)=>{
+                console.log('ladno radi sve jeote')
             }, (error) => {
 
             })
