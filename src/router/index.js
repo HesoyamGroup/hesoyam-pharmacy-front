@@ -7,7 +7,10 @@ import RegisterPage from '../views/RegisterPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
 import DermatologistPage from '../views/Dermatologist1Page.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
+
 import PharmacyPage from '../views/PharmacyPage.vue'
+import PharmacistsPage from '../views/PharmacistsPage.vue'
+import DermatologistsPage from '../views/DermatologistsPage.vue'
 
 
 import {client} from '@/client/axiosClient'
