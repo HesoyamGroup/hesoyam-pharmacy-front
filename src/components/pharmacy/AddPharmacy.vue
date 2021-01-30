@@ -1,6 +1,6 @@
 <template>
     <div class="add-pharmacy">
-        <v-container fill-height class="spacing-playground pa-6">
+        <v-container fill-height>
             <v-row>
                 <v-col>
                     <v-card>
@@ -25,6 +25,7 @@
 
                                             <v-row>
                                                 <v-subheader v-if="pharmacy_form.formErrorOccured" class="red--text">{{this.pharmacy_form.errorMessage}}</v-subheader>
+                                                <v-subheader v-if="pharmacy_form.requestSuccessful" class="green-text">Successfully created pharmacy. </v-subheader>
                                             </v-row>
 
                                             <v-row>
@@ -43,7 +44,20 @@
                                             <v-container>
                                                 <v-row justify-middle>
                                                     <v-layout justify-center>
-                                                        <v-data-table :headers="admin_form.headers" :items="admin_form.admins" :items-per-page="3"></v-data-table>
+                                                        <v-data-table :headers="admin_form.headers" :items="admin_form.admins" :items-per-page="3">
+                                                        <template v-slot:item="row">
+                                                            <tr>
+                                                                <td>{{row.item.firstName}}</td>
+                                                                <td>{{row.item.lastName}}</td>
+                                                                <td>{{row.item.telephone}}</td>
+                                                                <td>{{row.item.email}}</td>
+                                                                <td>{{row.item.gender}}</td>
+                                                                <td> 
+                                                                    <v-btn color="primary" @click="deleteAdmin(row.item)">X</v-btn>
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                        </v-data-table>
                                                     </v-layout>
                                                     
                                                 </v-row>
@@ -92,6 +106,7 @@
 
 
 <script>
+    import {client} from '@/client/axiosClient';
     export default{
         name: 'add-pharmacy',
         data(){
@@ -99,6 +114,7 @@
                 pharmacy_form: {
                     isFormValid: false,
                     formErrorOccured: false,
+                    requestSuccessful: false,
                     errorMessage: '',
                     name: '',
                     description: '',
@@ -249,6 +265,8 @@
             addPharmacy: function(){
                 this.pharmacy_form.errorMessage = "";
                 this.pharmacy_form.formErrorOccured = false;
+                this.pharmacy_form.requestSuccessful = false;
+                
 
                 if(!this.isAddPharmacyRequestValid()){
                     this.pharmacy_form.errorMessage = "Make sure you've added at least one administrator";
@@ -256,8 +274,28 @@
                     return;
                 }
 
-                this.resetWholeForm();
-                
+                client({
+                    method: 'post',
+                    url: 'pharmacy/create',
+                    data: {
+                        name: this.pharmacy_form.name,
+                        description: this.pharmacy_form.description,
+                        address: this.getAddress(),
+                        administrators: this.admin_form.admins
+                    }
+                }).then( (response) => {
+                    this.pharmacy_form.requestSuccessful = true;
+                    this.resetWholeForm();
+                }, (error) => {
+                    this.pharmacy_form.formErrorOccured = true;
+                    let errorStatus = error.response.status;
+                    if(errorStatus == '400'){
+                        this.pharmacy_form.errorMessage = 'Invalid request.';
+                    }else if(errorStatus == '409'){
+                        this.pharmacy_form.errorMessage = 'Administrator emails are not unique.';
+                    }
+                });
+ 
             },
             resetWholeForm: function(){
                 this.resetAdminForm();
@@ -275,6 +313,15 @@
                     return true;
                 }
                 return false;
+            },
+            deleteAdmin: function(item){
+                let newAdmins = [];
+                for(const admin of this.admin_form.admins){
+                    if(admin.email != item.email){
+                        newAdmins.push(admin);
+                    }
+                }
+                this.admin_form.admins = newAdmins;
             }
         }
     }

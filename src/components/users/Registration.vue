@@ -57,11 +57,11 @@
 
                             <v-row>
                                 <v-col>
-                                    <v-select :disabled="form.disableUserInteraction" item-text="countryName" item-value="id" @change="onCountryChanged()" v-model="form.selectedCountry" :items="form.countries" label="Country" prepend-icon="mdi-map-marker"></v-select>
+                                    <v-select :disabled="form.disableUserInteraction" :rules="form.rules.countryRules" item-text="countryName" item-value="id" @change="onCountryChanged()" v-model="form.selectedCountry" :items="form.countries" label="Country" prepend-icon="mdi-map-marker"></v-select>
                                 </v-col>
 
                                 <v-col>
-                                    <v-select v-model="form.selectedCity" item-text="cityName" item-value="id" :disabled="form.forbidCitySelection || form.disableUserInteraction"  :items="form.cities"  label="City" prepend-icon="mdi-city"> </v-select>
+                                    <v-select v-model="form.selectedCity" item-text="cityName" item-value="id" :rules="form.rules.cityRules" :disabled="form.forbidCitySelection || form.disableUserInteraction"  :items="form.cities"  label="City" prepend-icon="mdi-city"> </v-select>
                                 </v-col>
                             </v-row>
 
@@ -190,6 +190,12 @@ export default {
                     ],
                     genderRules: [
                         gender => this.form.genders.includes(gender) || 'You must choose a gender'
+                    ],
+                    countryRules:[
+                        country => !!country || "You must select a country."
+                    ],
+                    cityRules: [
+                        city => !!city || "You must select a city."
                     ]
                 },
                 action: {

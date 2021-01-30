@@ -55,7 +55,14 @@ const routes = [
   },
   {
     path: '/sys-profile',
-    component: SysAdminProfilePage
+    component: SysAdminProfilePage,
+    beforeEnter: function(to, from, next){
+      if(isSysAdmin()){
+        next();
+        return;
+      }
+      router.push({path:'/login'});
+    }
   },
   {
     path: '/about',
@@ -84,6 +91,18 @@ router.beforeEach( async (to, from, next) => {
       next();
   });
 });
+
+
+
+//Perform check if specific roles
+function isSysAdmin(){
+    var userRole = getLoggedUserData().userRole;
+    if(userRole != 'SYS_ADMIN'){
+      return false;
+    }
+
+    return true;
+}
 
 function clearUserData(){
   localStorage.removeItem('user_role');
