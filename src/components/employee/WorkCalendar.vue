@@ -134,6 +134,9 @@
 </template>
 
 <script>
+
+import {client} from '@/client/axiosClient';
+
   export default {
     data: () => ({
       focus: '',
@@ -148,6 +151,7 @@
       selectedElement: null,
       selectedOpen: false,
       events: [],
+      eventsFromServer: [],
       colors: ['indigo lighten-1'],
       names: ['Checkup'],
       patient_name: 'Name',
@@ -194,29 +198,38 @@
       updateRange ({ start, end }) {
         const events = []
 
-        const min = new Date(`${start.date}T00:00:00`)
-        const max = new Date(`${end.date}T23:59:59`)
-        const days = (max.getTime() - min.getTime()) / 86400000
-        const eventCount = this.rnd(days, days + 20)
+        const min = new Date(`${start.date}T00:00:00`).toISOString();
+        const max = new Date(`${end.date}T23:59:59`).toISOString();
 
-        for (let i = 0; i < eventCount; i++) {
-          const allDay = this.rnd(0, 3) === 0
-          const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-          const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-          const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-          const second = new Date(first.getTime() + secondTimestamp)
+        const searchParams = new URLSearchParams();
+        searchParams.append('from', min);
+        searchParams.append('to', max);
 
+
+        client({
+          method: 'GET',
+          url: 'appointment/appointments-for-pharmacist/' + min + '!' + max,
+        })
+        .then((response) => {
+          this.eventsFromServer = response.data;
+        })
+
+        for(var ev in this.eventsFromServer){
           events.push({
-            name: this.names[this.rnd(0, this.names.length - 1)] + ' ' + this.patient_name + ' ' + this.patient_surname,
-            start: first,
-            end: second,
+            name: 'Counseling' + ' ' + ev.patientFirstName + ' ' + ev.patientLastName,
+            start: ev.from,
+            end: ev.to,
             color: this.colors[this.rnd(0, this.colors.length - 1)],
-            timed: !allDay,
-            details: this.patient_name + ' ' + this.patient_surname,
-          })
+            details: ev.patientFirstName + ' ' + ev.patientLastName,
+            
+        })
         }
-
-        this.events = events
+        console.log(events);
+        this.events = events;
+          
+      },
+      getEventColor (event) {
+        return event.color
       },
       rnd (a, b) {
         return Math.floor((b - a + 1) * Math.random()) + a

@@ -4,13 +4,13 @@
         <v-card color="basil">
     <v-card-title class="text-center justify-center py-6">
       <h1 class="font-weight-bold display-3 basil--text">
-        {{user.name}} {{user.surname}}
+        {{userDTO.firstName}} {{userDTO.lastName}}
       </h1>
 
     </v-card-title>
     <v-row justify="center">
       <h2 class="display-1 basil2--text" id="pharmacy-text">
-        {{user.pharmacyName}}
+        {{userDTO.pharmacyName}}
       </h2>
     </v-row>
     <v-tabs
@@ -66,27 +66,28 @@
         },
         data: function(){
             return{
-                user:{
-                    name: 'Name',
-                    surname: 'Surname',
-                    pharmacyName: 'Hesoyam Pharmacy'
+                userDTO:{
+                    firstName: '',
+                    lastName: '',
+                    pharmacyName: ''
                 },
                 mode: 'calendar',
-                tab: 1,
+                tab: 0,
         items: [
         'Calendar', 'Edit Profile',
         ],
+
+
+            }
+        },
         mounted(){
           client({
             method: 'GET',
-            url: 'pharmacist/pharmacist-workplace'
+            url: 'pharmacist/pharmacist-information'
           }).then((response) => {
-            this.user.pharmacyName = response.data;
+            this.userDTO = response.data;
           })
         },
-
-            }
-        }
     }
 </script>
 
