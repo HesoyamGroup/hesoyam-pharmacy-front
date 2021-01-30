@@ -57,7 +57,9 @@
 
                             <v-row>
                                 <v-col>
-                                    <v-select :disabled="form.disableUserInteraction" :rules="form.rules.countryRules" item-text="countryName" item-value="id" @change="onCountryChanged()" v-model="form.selectedCountry" :items="form.countries" label="Country" prepend-icon="mdi-map-marker"></v-select>
+
+                                        <v-select :disabled="form.disableUserInteraction" item-value="id" @change="onCountryChanged()" v-model="form.selectedCountry" :items="form.countries" label="Country" prepend-icon="mdi-map-marker"></v-select>
+
                                 </v-col>
 
                                 <v-col>
