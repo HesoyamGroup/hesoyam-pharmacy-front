@@ -105,7 +105,6 @@
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
-              
               <v-spacer></v-spacer>
               <v-btn icon>
                 <v-icon>mdi-heart</v-icon>
@@ -140,7 +139,7 @@ import {client} from '@/client/axiosClient';
   export default {
     data: () => ({
       focus: '',
-      type: 'day',
+      type: 'month',
       typeToLabel: {
         month: 'Month',
         week: 'Week',
@@ -151,11 +150,8 @@ import {client} from '@/client/axiosClient';
       selectedElement: null,
       selectedOpen: false,
       events: [],
-      eventsFromServer: [],
-      colors: ['indigo lighten-1'],
-      names: ['Checkup'],
-      patient_name: 'Name',
-      patient_surname: 'Surname',
+      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
+      names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
     }),
     mounted () {
       this.$refs.calendar.checkChange()
@@ -197,51 +193,54 @@ import {client} from '@/client/axiosClient';
       },
       updateRange ({ start, end }) {
         const events = []
+        var fromServer = []
 
         const min = new Date(`${start.date}T00:00:00`).toISOString();
         const max = new Date(`${end.date}T23:59:59`).toISOString();
+        // const days = (max.getTime() - min.getTime()) / 86400000
+        // const eventCount = this.rnd(days, days + 20)
 
-        const searchParams = new URLSearchParams();
-        searchParams.append('from', min);
-        searchParams.append('to', max);
-
+        // for (let i = 0; i < eventCount; i++) {
+        //   const allDay = this.rnd(0, 3) === 0
+        //   const firstTimestamp = this.rnd(min.getTime(), max.getTime())
+        //   const first = new Date(firstTimestamp - (firstTimestamp % 900000))
+        //   const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
+        //   const second = new Date(first.getTime() + secondTimestamp)
 
         client({
           method: 'GET',
-          url: 'appointment/appointments-for-pharmacist/' + min + '!' + max,
+          url: 'appointment/appointments-for-pharmacist/' + min + "!" + max,
         })
         .then((response) => {
-          this.eventsFromServer = response.data;
+          fromServer = response.data;
+          console.log(response.data)
+          for(var event of response.data){
+            events.push({
+              name: event.patientFirstName + ' ' + event.patientLastName,
+              start: this.convertToDate(event.from),
+              end: this.convertToDate(event.to),
+              color: 'indigo',
+              timed: null,
+            })
+          }
+          this.events = events;
+          console.log(this.events)
         })
 
-        for(var ev in this.eventsFromServer){
-          events.push({
-            name: 'Counseling' + ' ' + ev.patientFirstName + ' ' + ev.patientLastName,
-            start: ev.from,
-            end: ev.to,
-            color: this.colors[this.rnd(0, this.colors.length - 1)],
-            details: ev.patientFirstName + ' ' + ev.patientLastName,
-            
-        })
-        }
-        console.log(events);
-        this.events = events;
           
-      },
-      getEventColor (event) {
-        return event.color
-      },
+        },
+
+        // this.events = events
       rnd (a, b) {
         return Math.floor((b - a + 1) * Math.random()) + a
       },
-    },
+
+      convertToDate(dateElements){
+        const delimiter = "-";
+        return dateElements[0] + delimiter + dateElements[1] + delimiter + dateElements[2] + " " + dateElements[3]
+          + ":" + dateElements[4]; 
+      }
+    
+    }
   }
 </script>
-
-<style scoped>
-    .work-calendar-component{
-        padding: 2rem;
-        display:flex;
-        align-items: center;
-    }
-</style>
