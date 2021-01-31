@@ -5,6 +5,14 @@ import LoginPage from '../views/LoginPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import MedicineSearchPage from '../views/MedicineSearchPage.vue'
+import PharmacistPage from '../views/PharmacistPage.vue'
+import DermatologistPage from '../views/Dermatologist1Page.vue'
+import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
+
+import PharmacyPage from '../views/PharmacyPage.vue'
+import PharmacistsPage from '../views/PharmacistsPage.vue'
+import DermatologistsPage from '../views/DermatologistsPage.vue'
+
 
 import {client} from '@/client/axiosClient'
 
@@ -53,7 +61,17 @@ const routes = [
       }
     }
   },
-
+  {
+    path: '/sys-profile',
+    component: SysAdminProfilePage,
+    beforeEnter: function(to, from, next){
+      if(isSysAdmin()){
+        next();
+        return;
+      }
+      router.push({path:'/login'});
+    }
+  },
   {
     path: '/medicine-search',
     component: MedicineSearchPage,
@@ -66,6 +84,55 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+  },
+  {
+    path: '/pharmacist',
+    component: PharmacistPage,
+    beforeEnter: function(to, from, next){
+      if(!isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        next();
+      }
+    }
+  },
+  {
+    path: '/dermatologist',
+    component: DermatologistPage
+  },
+  {
+    path: '/pharmacy/:id',
+    name: 'Pharmacy',
+    component: PharmacyPage
+  },
+  {
+    path: '/pharmacists',
+    name: 'Pharmacists',
+    component: PharmacistsPage,
+    beforeEnter: function(to, from, next){
+        let user = getLoggedUserData();
+        if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+    }
+  },
+  {
+    path: '/dermatologists',
+    name: 'Dermatologists',
+    component: DermatologistsPage,
+    beforeEnter: function(to, from, next){
+      let user = getLoggedUserData();
+      if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
   }
 ]
 
@@ -86,6 +153,18 @@ router.beforeEach( async (to, from, next) => {
       next();
   });
 });
+
+
+
+//Perform check if specific roles
+function isSysAdmin(){
+    var userRole = getLoggedUserData().userRole;
+    if(userRole != 'SYS_ADMIN'){
+      return false;
+    }
+
+    return true;
+}
 
 function clearUserData(){
   localStorage.removeItem('user_role');
