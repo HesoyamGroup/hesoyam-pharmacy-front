@@ -181,7 +181,24 @@
                             <v-toolbar dark color='primary'>
                                 <v-toolbar-title>Reserved Medicine</v-toolbar-title>
                             </v-toolbar>
-
+                            <v-card-title>
+                                    Pharmacies
+                                    <v-spacer></v-spacer>
+                                    <v-text-field
+                                        v-model="searchMedicine"
+                                        append-icon="mdi-magnify"
+                                        label="Search"
+                                        single-line
+                                        hide-details
+                                    ></v-text-field>
+                                </v-card-title>
+                            <v-data-table
+                            :headers='medicineHeaders'
+                            :items='reservedMedicine'
+                            :items-per-page="5"
+                            :search="searchMedicine"
+                            no-data-text="You have no reserved medicine!">
+                            </v-data-table>
                         </v-card>
                     </v-col>
                 </v-row>
@@ -360,8 +377,16 @@ export default {
                 { text: 'Iron (%)', value: 'iron' },
                 ],
                 desserts: [
-                
                 ],
+                //Reserved medicine
+                medicineHeaders:[
+                { text: 'Medicine:', value:'iteratorMedicineReservationItem[0].medicine.name'},
+                { text: 'Status:', value:'medicineReservationStatus'},
+                { text: 'Pick Up Date:', value:'pickUpDate'},                
+                ],
+                reservedMedicine:[],
+                searchMedicine: '',
+
                 //Loyalty Program
                 value:69,
                 
@@ -441,6 +466,17 @@ export default {
             }, (error) => {
 
             })
+
+            client({
+                method: 'GET',
+                url: 'medicine-reservation/get-reservations'
+            })
+            .then((response) => {
+                vm.reservedMedicine = response.data;
+            }, (error) => {
+
+            })
+
         },
         methods:{
             //Get all cities in selected country

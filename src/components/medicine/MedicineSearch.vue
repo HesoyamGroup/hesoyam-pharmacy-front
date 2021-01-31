@@ -239,7 +239,7 @@ export default {
         {
             this.dialog = false;
             this.show = false;
-            this.selectedDate=null;
+            this.selectedDate=this.currentDate;
             this.selectedMedicine=null;
             this.selectedPharmacy=[]
         }
