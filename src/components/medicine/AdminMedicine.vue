@@ -211,7 +211,6 @@
         methods: {
             sendCreateMedicineRequest: function(){
 
-                console.log(this.getMedicineRequestData());
                 client({
                     method: 'POST',
                     url: '/medicine/create',
