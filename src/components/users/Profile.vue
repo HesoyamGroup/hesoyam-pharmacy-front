@@ -182,7 +182,7 @@
                                 <v-toolbar-title>Reserved Medicine</v-toolbar-title>
                             </v-toolbar>
                             <v-card-title>
-                                    Pharmacies
+                                    Reserved Medicine
                                     <v-spacer></v-spacer>
                                     <v-text-field
                                         v-model="searchMedicine"
@@ -192,13 +192,6 @@
                                         hide-details
                                     ></v-text-field>
                                 </v-card-title>
-                            <v-data-table
-                            :headers='medicineHeaders'
-                            :items='medicineList'
-                            :items-per-page="5"
-                            :search="searchMedicine"
-                            no-data-text="You have no reserved medicine!">
-                            </v-data-table>
                             <v-card-actions class='justify-center'>
                                 <v-btn
                                 color='primary'
@@ -227,6 +220,22 @@
                                 rounded
                                 @click="getCompletedMedicine">
                                     Completed
+                                </v-btn>
+                            </v-card-actions>
+                            <v-data-table
+                            :headers='medicineHeaders'
+                            :items='medicineList'
+                            :items-per-page="5"
+                            :search="searchMedicine"
+                            no-data-text="You have no reserved medicine!">
+                            </v-data-table>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                color='error    '
+                                class='ma-1'
+                                rounded
+                                @click="showCancelDialog = !showCancelDialog">
+                                    Cancel Reservation
                                 </v-btn>
                             </v-card-actions>
                         </v-card>
@@ -341,6 +350,40 @@
                         </v-card>
                     </v-form>
                 </v-dialog>
+                <v-dialog v-model="showCancelDialog" max-width="33%">
+                    <v-card shaped>
+                            <v-toolbar dark color='primary'>
+                                <v-toolbar-title>Reserved Medicine</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-title>
+                                    <v-text-field
+                                        v-model="searchMedicineCancelDialog"
+                                        append-icon="mdi-magnify"
+                                        label="Search"
+                                        single-line
+                                        hide-details
+                                    ></v-text-field>
+                                </v-card-title>
+                            <v-data-table
+                            :headers='medicineHeaders'
+                            :items='cancelableMedicine'
+                            :items-per-page="5"
+                            :search="searchMedicineCancelDialog"
+                            show-select
+                            v-model='selectedCancelReservationList'
+                            no-data-text="You have no reserved medicine!">
+                            </v-data-table>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                color='error    '
+                                class='ma-1'
+                                rounded
+                                @click="showCancelDialog = !showCancelDialog">
+                                    Cancel Reservation
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                </v-dialog>
     </v-container>
     
 </div>
@@ -420,7 +463,11 @@ export default {
                 cancelledMedicine: [],
                 completedMedicine: [], 
                 searchMedicine: '',
-
+                //Cancellation dialog
+                showCancelDialog: false,
+                searchMedicineCancelDialog: '',
+                cancelableMedicine: [],
+                selectedCancelReservationList:[],
                 //Loyalty Program
                 value:69,
                 
@@ -508,6 +555,7 @@ export default {
             .then((response) => {
                 vm.medicineList = response.data;
                 vm.allMedicine = response.data;
+                vm.cancelableMedicine = response.data.filter(obj=>obj.medicineReservationStatus==='CREATED')
             }, (error) => {
 
             })
