@@ -84,8 +84,17 @@
 
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
-                                            <v-btn color="blue darken-1" text @click="closeDialog">Cancel</v-btn>
-                                            <v-btn color="blue darken-1" text @click='reserveMedicine' >Confirm</v-btn>
+                                            <v-btn 
+                                                color="blue darken-1" 
+                                                text 
+                                                @click="closeDialog">
+                                                Cancel</v-btn>
+                                            <v-btn 
+                                                color="blue darken-1" 
+                                                text 
+                                                @click='reserveMedicine'>
+                                                Confirm
+                                            </v-btn>
                                             <v-spacer></v-spacer>
                                         </v-card-actions>
                                     </v-card>
@@ -150,7 +159,6 @@ export default {
         this.maxDate = yyyy+1+"-"+mm+"-"+dd;
 
         this.userLoggedIn = this.isLoggedin();
-        console.log(this.userLoggedIn)
     },
     computed: {
         filteredKeys () {
@@ -209,9 +217,6 @@ export default {
 
             })
 
-            console.log(this.selectedPharmacy[0].id);
-            console.log(this.selectedMedicine.id);
-
             client({
                 method: 'POST',
                 url: 'inventory-item/reserve-inventory-item',
@@ -221,7 +226,6 @@ export default {
                 }
             })
             .then((response)=>{
-                console.log('ladno radi sve jeote')
             }, (error) => {
 
             })
@@ -233,6 +237,8 @@ export default {
         {
             this.dialog = false;
             this.show = false;
+            this.selectedDate=null;
+            this.selectedMedicine=null;
             this.selectedPharmacy=[]
         }
     }
