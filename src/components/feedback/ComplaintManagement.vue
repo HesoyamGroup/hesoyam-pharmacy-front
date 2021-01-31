@@ -209,13 +209,16 @@
                                     </v-row>
 
                                     <v-row>
-                                        <v-textarea v-model="complaints.text" no-resize :rules="complaints.rules.replyRules">
+                                        <v-textarea :disabled="complaints.inProgress" v-model="complaints.text" no-resize :rules="complaints.rules.replyRules">
 
                                         </v-textarea>
                                     </v-row>
 
                                     <v-row rows="2" justify="end">
-                                        <v-btn @click="reply()" :disabled="!complaints.selected" color="primary"> 
+                                        <v-subheader v-if="complaints.inProgress">
+                                            Replying...
+                                        </v-subheader>
+                                        <v-btn @click="reply()" :disabled="!complaints.selected || complaints.inProgress" color="primary"> 
                                             Send reply.
                                         </v-btn>
                                     </v-row>
@@ -253,6 +256,7 @@
         data(){
             return {
                 complaints: {
+                    inProgress: false,
                     showDialog: false,
                     selected: null,
                     items: [],
@@ -285,6 +289,7 @@
         },
         methods:{
             reply: function(){
+                this.complaints.inProgress = true;
                 client({
                     method: 'POST',
                     url: '/complaint/reply',
@@ -292,8 +297,9 @@
                 }).then((response) => {
                     this.removeSelectedComplaint(this.complaints.selected);
                     this.complaints.text = '';
+                    this.inProgress = false;
                 }, (error) => {
-                    
+                    this.inProgress = false;
                 });
             },
             getReplyData: function(){
