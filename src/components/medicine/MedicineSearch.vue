@@ -69,36 +69,37 @@
                     </v-row>
             </v-card>
             <v-dialog v-model="dialog" width="350px">
-                                    <v-card>
-                                        <v-card-title class="headline justify-center">Select Pick-Up Date</v-card-title>
+                <v-card>
+                    <v-card-title class="headline justify-center">Select Pick-Up Date</v-card-title>
                                         
-                                        <v-card-actions class='justify-center'>
-                                            <v-date-picker
-                                            v-model='selectedDate'
-                                            elevation="12"
-                                            color='primary'
-                                            :min='currentDate'
-                                            :max='maxDate'>
-                                            </v-date-picker>
-                                        </v-card-actions>
+                    <v-card-actions class='justify-center'>
+                        <v-date-picker
+                        v-model='selectedDate'
+                        elevation="12"
+                        color='primary'
+                        :min='currentDate'
+                        :max='maxDate'>
+                        </v-date-picker>
+                    </v-card-actions>
 
-                                        <v-card-actions>
-                                            <v-spacer></v-spacer>
-                                            <v-btn 
-                                                color="blue darken-1" 
-                                                text 
-                                                @click="closeDialog">
-                                                Cancel</v-btn>
-                                            <v-btn 
-                                                color="blue darken-1" 
-                                                text 
-                                                @click='reserveMedicine'>
-                                                Confirm
-                                            </v-btn>
-                                            <v-spacer></v-spacer>
-                                        </v-card-actions>
-                                    </v-card>
-                                </v-dialog>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn 
+                        color="blue darken-1" 
+                        text 
+                        @click="closeDialog">
+                            Cancel
+                        </v-btn>
+                        <v-btn 
+                        color="blue darken-1" 
+                        text 
+                        @click='reserveMedicine'>
+                            Confirm
+                        </v-btn>
+                        <v-spacer></v-spacer>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
     </v-container>
 </div>
 </template>
@@ -156,6 +157,7 @@ export default {
         var yyyy = today.getFullYear();
 
         this.currentDate = yyyy+"-"+mm+"-"+dd;
+        this.selectedDate = this.currentDate;
         this.maxDate = yyyy+1+"-"+mm+"-"+dd;
 
         this.userLoggedIn = this.isLoggedin();
