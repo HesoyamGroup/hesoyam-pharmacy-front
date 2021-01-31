@@ -194,7 +194,7 @@
                                 </v-card-title>
                             <v-data-table
                             :headers='medicineHeaders'
-                            :items='reservedMedicine'
+                            :items='medicineList'
                             :items-per-page="5"
                             :search="searchMedicine"
                             no-data-text="You have no reserved medicine!">
@@ -414,7 +414,11 @@ export default {
                 { text: 'Status:', value:'medicineReservationStatus'},
                 { text: 'Pick Up Date:', value:'pickUpDate'},                
                 ],
-                reservedMedicine:[],
+                medicineList:[],
+                allMedicine: [],
+                createdMedicine: [],
+                cancelledMedicine: [],
+                completedMedicine: [], 
                 searchMedicine: '',
 
                 //Loyalty Program
@@ -502,7 +506,8 @@ export default {
                 url: 'medicine-reservation/get-reservations'
             })
             .then((response) => {
-                vm.reservedMedicine = response.data;
+                vm.medicineList = response.data;
+                vm.allMedicine = response.data;
             }, (error) => {
 
             })
@@ -604,10 +609,23 @@ export default {
                 this.oldPassword='';
                 this.showPasswordCard=false;
             },
+            //Medicine reservation filters
+            getAllMedicine: function()
+            {
+                this.medicineList = this.allMedicine;
+            },
             getCreatedMedicine: function()
             {
-                this.reservedMedicine = this.reservedMedicine.filter(obj=>obj.medicineReservationStatus==='CREATED');
-            }
+                this.medicineList = this.allMedicine.filter(obj=>obj.medicineReservationStatus==='CREATED');
+            },
+            getCancelledMedicine: function()
+            {
+                this.medicineList = this.allMedicine.filter(obj=>obj.medicineReservationStatus==='CANCELLED');
+            },
+            getCompletedMedicine: function()
+            {
+                this.medicineList = this.allMedicine.filter(obj=>obj.medicineReservationStatus==='COMPLETED');
+            },
         }
         
 
