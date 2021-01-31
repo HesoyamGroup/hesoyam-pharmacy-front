@@ -5,7 +5,7 @@ import LoginPage from '../views/LoginPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
-import DermatologistPage from '../views/Dermatologist1Page.vue'
+import DermatologistPage from '../views/DermatologistPage.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 
 import PharmacyPage from '../views/PharmacyPage.vue'
@@ -93,7 +93,15 @@ const routes = [
   },
   {
     path: '/dermatologist',
-    component: DermatologistPage
+    component: DermatologistPage,
+    beforeEnter: function(to, from, next){
+      if(!isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        next();
+      }
+    }
   },
   {
     path: '/pharmacy/:id',
