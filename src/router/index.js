@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
+import MedicineSearchPage from '../views/MedicineSearchPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
 import DermatologistPage from '../views/Dermatologist1Page.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
@@ -71,6 +72,11 @@ const routes = [
       router.push({path:'/login'});
     }
   },
+  {
+    path: '/medicine-search',
+    component: MedicineSearchPage,
+  },
+
   {
     path: '/about',
     name: 'About',
