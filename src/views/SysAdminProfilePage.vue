@@ -4,6 +4,7 @@
         <register-user></register-user>
         <admin-medicine></admin-medicine>
         <complaint-management> </complaint-management>
+        <loyalty-management> </loyalty-management>
     </div>
 </template>
 
@@ -13,6 +14,7 @@
     import RegisterUser from '@/components/users/RegisterUser.vue';
     import AdminMedicine from '@/components/medicine/AdminMedicine.vue';
     import ComplaintManagement from '@/components/feedback/ComplaintManagement.vue';
+    import LoyaltyManagement from '@/components/users/LoyaltyManagement.vue';
 
     export default {
         name: 'sys-admin-profile-page',
@@ -20,7 +22,8 @@
             AddPharmacy,
             RegisterUser,
             AdminMedicine,
-            ComplaintManagement
+            ComplaintManagement,
+            LoyaltyManagement
         }
     }
 </script>
