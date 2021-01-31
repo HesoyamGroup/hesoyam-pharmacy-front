@@ -199,6 +199,36 @@
                             :search="searchMedicine"
                             no-data-text="You have no reserved medicine!">
                             </v-data-table>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click='getAllMedicine'>
+                                    All
+                                </v-btn>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click="getCreatedMedicine">
+                                    Created
+                                </v-btn>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click="getCancelledMedicine">
+                                    Cancelled
+                                </v-btn>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click="getCompletedMedicine">
+                                    Completed
+                                </v-btn>
+                            </v-card-actions>
                         </v-card>
                     </v-col>
                 </v-row>
@@ -573,6 +603,10 @@ export default {
                 this.confirmNewPassword='';
                 this.oldPassword='';
                 this.showPasswordCard=false;
+            },
+            getCreatedMedicine: function()
+            {
+                this.reservedMedicine = this.reservedMedicine.filter(obj=>obj.medicineReservationStatus==='CREATED');
             }
         }
         
