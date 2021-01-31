@@ -13,6 +13,7 @@
         {{userDTO.pharmacyName}}
       </h2>
     </v-row>
+    <v-btn plain @click="logout()">Logout</v-btn>
     <v-tabs
       v-model="tab"
       background-color="transparent"
@@ -87,6 +88,14 @@
           }).then((response) => {
             this.userDTO = response.data;
           })
+        },
+        methods:{
+          logout: function(){
+            localStorage.user_role = null;
+            localStorage.user_token = null;
+            localStorage.user_token_expires = null;
+            setTimeout(() => { this.$router.push({path: '/login'})}, 2000);
+        },
         },
     }
 </script>
