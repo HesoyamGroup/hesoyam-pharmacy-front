@@ -60,7 +60,7 @@
                                 </v-text-field>
                                 <div class="text-center">
                                     <v-btn 
-                                    v-if='this.selectedCity != null && this.selectedCountry != null && this.addressLine.length >=3 ' 
+                                    v-if='this.selectedCity != null && this.selectedCountry != null && this.addressLine.length >=3' 
                                     rounded 
                                     color="success" 
                                     dark 

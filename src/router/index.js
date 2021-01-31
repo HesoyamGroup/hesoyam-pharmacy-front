@@ -4,10 +4,15 @@ import Home from '../views/Home.vue'
 import LoginPage from '../views/LoginPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
+import MedicineSearchPage from '../views/MedicineSearchPage.vue'
+import PharmacistPage from '../views/PharmacistPage.vue'
+import DermatologistPage from '../views/Dermatologist1Page.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
+
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
+
 
 import {client} from '@/client/axiosClient'
 
@@ -68,12 +73,33 @@ const routes = [
     }
   },
   {
+    path: '/medicine-search',
+    component: MedicineSearchPage,
+  },
+
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+  },
+  {
+    path: '/pharmacist',
+    component: PharmacistPage,
+    beforeEnter: function(to, from, next){
+      if(!isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        next();
+      }
+    }
+  },
+  {
+    path: '/dermatologist',
+    component: DermatologistPage
   },
   {
     path: '/pharmacy/:id',
