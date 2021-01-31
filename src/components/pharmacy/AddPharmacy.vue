@@ -244,6 +244,7 @@
                 return false;
             },
             resetAdminForm: function(){
+
                 this.admin_form.isFormValid= false;
                 this.admin_form.formErrorOccured= false;
                 this.admin_form.firstName= '';
@@ -286,6 +287,7 @@
                 }).then( (response) => {
                     this.pharmacy_form.requestSuccessful = true;
                     this.resetWholeForm();
+                    this.admin_form.admins=[];
                 }, (error) => {
                     this.pharmacy_form.formErrorOccured = true;
                     let errorStatus = error.response.status;
