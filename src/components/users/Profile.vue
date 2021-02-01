@@ -370,15 +370,18 @@
                             :items-per-page="5"
                             :search="searchMedicineCancelDialog"
                             show-select
+                            :single-select='singleSelectCancellation'
                             v-model='selectedCancelReservationList'
-                            no-data-text="You have no reserved medicine!">
+                            no-data-text="You have no reserved medicine!"
+                            return-object>
                             </v-data-table>
                             <v-card-actions class='justify-center'>
                                 <v-btn
-                                color='error    '
+                                v-if='selectedCancelReservationList.length > 0'
+                                color='error'
                                 class='ma-1'
                                 rounded
-                                @click="showCancelDialog = !showCancelDialog">
+                                @click="cancelReservation">
                                     Cancel Reservation
                                 </v-btn>
                             </v-card-actions>
@@ -468,6 +471,7 @@ export default {
                 searchMedicineCancelDialog: '',
                 cancelableMedicine: [],
                 selectedCancelReservationList:[],
+                singleSelectCancellation: true,
                 //Loyalty Program
                 value:69,
                 
@@ -657,6 +661,7 @@ export default {
                 this.oldPassword='';
                 this.showPasswordCard=false;
             },
+            // Medicine reservation cancellation
             //Medicine reservation filters
             getAllMedicine: function()
             {
@@ -674,6 +679,31 @@ export default {
             {
                 this.medicineList = this.allMedicine.filter(obj=>obj.medicineReservationStatus==='COMPLETED');
             },
+            cancelReservation: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'medicine-reservation/cancel-reservation',
+                    data:{
+                        id: this.selectedCancelReservationList[0].id
+                    }
+                })
+                .then((response) => {
+                    for (var i in this.allMedicine) 
+                    {
+                        if (this.allMedicine[i].id == response.data) 
+                        {
+                            this.allMedicine[i].medicineReservationStatus = 'CANCELLED';
+                            break;
+                        }
+                    }
+                    this.getAllMedicine();
+                    this.selectedCancelReservationList = [];
+                    this.showCancelDialog = false;                 
+                },(error)=>{
+
+                })
+            }
         }
         
 
