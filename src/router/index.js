@@ -11,6 +11,7 @@ import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
+import SearchUsersPage from '../views/SearchUsersPage.vue'
 
 
 import {client} from '@/client/axiosClient'
@@ -87,7 +88,13 @@ const routes = [
         router.push({path: '/login'});
       }
       else{
-        next();
+        let user = getLoggedUserData();
+        if(user.userRole == 'PHARMACIST'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
       }
     }
   },
@@ -95,11 +102,18 @@ const routes = [
     path: '/dermatologist',
     component: DermatologistPage,
     beforeEnter: function(to, from, next){
+
       if(!isUserLoggedIn()){
         router.push({path: '/login'});
       }
       else{
-        next();
+        let user = getLoggedUserData();
+        if(user.userRole == 'DERMATOLOGIST'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
       }
     }
   },
@@ -122,6 +136,22 @@ const routes = [
         }
     }
   },
+
+  {
+    path: '/searchusers',
+    name: 'SearchUsers',
+    component: SearchUsersPage,
+    beforeEnter: function(to, from, next){
+      let user = getLoggedUserData();
+      if(user.userRole == 'PHARMACIST' || user.userRole == 'DERMATOLOGIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+
   {
     path: '/dermatologists',
     name: 'Dermatologists',
