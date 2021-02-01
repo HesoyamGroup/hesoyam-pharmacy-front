@@ -3,164 +3,6 @@
     <v-container fluid fill-height class="spacing-playground pa-6">
                 <v-row>
                     <v-col cols="4" class="d-flex">
-                        <v-card v-if="overlay" class='elevation-12 ma-4 flex-grow-1' shaped>
-                            <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Address</v-toolbar-title>
-                            </v-toolbar>
-                            <v-card-text>
-                                <v-text-field
-                                        label='City:'
-                                        outlined
-                                        v-model = address.city.cityName
-                                        readonly>
-                                </v-text-field>
-                                <v-text-field
-                                        label='Address:'
-                                        outlined
-                                        v-model = address.addressLine
-                                        readonly>
-                                </v-text-field>
-                                <div class="text-center">
-                                    <v-btn rounded color="primary" dark @click="overlay = !overlay">
-                                        Edit Address
-                                    </v-btn>
-                                </div>
-                            </v-card-text>
-                        </v-card>
-
-                        <v-card v-if="!overlay" class='elevation-12 ma-4 flex-grow-1' shaped>
-                            <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Change Address</v-toolbar-title>
-                            </v-toolbar>
-                            <v-card-text>
-                                <v-select
-                                    v-model="selectedCountry"
-                                    v-on:change="getCities"
-                                    :items="countries"
-                                    item-text="countryName"
-                                    item-value="id"
-                                    label="Country:"
-                                    outlined
-                                    return-object>
-                                </v-select>
-                                <v-select
-                                    v-model="selectedCity"
-                                    :items="citiesInCountry"
-                                    item-text="cityName"
-                                    item-value="id"
-                                    label="City:"
-                                    outlined
-                                    return-object>
-                                </v-select>
-                                <v-text-field
-                                    v-model="addressLine"
-                                    label="Address Line:"
-                                    :rules="rules.addressLineRules"
-                                    outlined>
-                                </v-text-field>
-                                <div class="text-center">
-                                    <v-btn 
-                                    v-if='this.selectedCity != null && this.selectedCountry != null && this.addressLine.length >=3' 
-                                    rounded 
-                                    color="success" 
-                                    dark 
-                                    @click="saveAddress"
-                                    class='mr-6'>
-                                        Save
-                                    </v-btn>
-                                    <v-btn 
-                                    rounded 
-                                    color='error' 
-                                    dark 
-                                    @click='cancelAddressSave'
-                                    class='ml-6'>
-                                        Cancel
-                                    </v-btn>
-                                </div>
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                    <v-col cols="4" class="d-flex">
-                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
-                            <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Change Password</v-toolbar-title>
-                            </v-toolbar>
-                            <v-card-text>
-                                <v-text-field
-                                    label="Enter New Password:"
-                                    :rules="rules.passwordRules"
-                                    outlined 
-                                    v-model="newPassword"
-                                    type="password">
-                                </v-text-field>
-                                <v-text-field
-                                    label="Confirm Password:"
-                                    :rules='rules.confirmPasswordRules'
-                                    outlined
-                                    v-model="confirmNewPassword"
-                                    type="password"
-                                >
-                                </v-text-field>
-                                <v-text-field
-                                    label='Enter Old Password:'
-                                    :rules='rules.passwordRules'
-                                    outlined
-                                    v-model="oldPassword"
-                                    type="password"
-                                    >
-                                </v-text-field>
-                                <div class="text-center">
-                                        <v-btn 
-                                        rounded 
-                                        color="success" 
-                                        dark 
-                                        @click="changePassword"
-                                        class='mr-6'>
-                                            Save
-                                        </v-btn>
-                                        <v-btn 
-                                        rounded 
-                                        color="error" 
-                                        dark 
-                                        class="ml-6"
-                                        @click="resetPasswordForm">
-                                            Clear All
-                                        </v-btn>
-                                    </div>
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                    <v-col class="d-flex">
-                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped > 
-                            <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Loyalty Program - Drug dealer</v-toolbar-title>
-                            </v-toolbar>
-                                <v-container >
-                                    <v-row
-                                        class="fill-height"
-                                        align-content="center"
-                                        justify="center"
-                                    >
-                                        <v-col class="subtitle-1 text-center" cols="12">
-                                        You are 150 points away from getting to next level
-                                        </v-col>
-                                        <v-col cols="5">
-                                        <v-progress-circular
-                                            :rotate="90"
-                                            :size="150"
-                                            :width="30"
-                                            :value="value"
-                                            color="red"
-                                            >    
-                                        </v-progress-circular>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                        </v-card>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="4" class="d-flex">
                         <v-card v-if="infoOverlay" class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
                             <v-toolbar dark color = 'primary'>
                                 <v-toolbar-title>Profile Information</v-toolbar-title>
@@ -196,9 +38,44 @@
                                         outlined
                                         v-model = userDTO.telephone>                               >
                                     </v-text-field>
+                                    <v-text-field
+                                        label='City:'
+                                        outlined
+                                        v-model = address.city.cityName
+                                        readonly>
+                                    </v-text-field>
+                                    <v-text-field
+                                        label='Address:'
+                                        outlined
+                                        v-model = address.addressLine
+                                        readonly>
+                                    </v-text-field>
                                     <div class="text-center">
-                                        <v-btn rounded color="primary" dark @click="infoOverlay = !infoOverlay">
+                                        <v-btn 
+                                        class='ma-2'
+                                        rounded 
+                                        color="primary" 
+                                        dark 
+                                        @click="infoOverlay = !infoOverlay">
                                             Edit Info
+                                        </v-btn>
+                                        
+                                        <v-btn
+                                        class='ma-2'
+                                        rounded
+                                        color='primary'
+                                        dark
+                                        @click="showPasswordCard = !showPasswordCard">
+                                            Change Password
+                                        </v-btn>
+
+                                        <v-btn
+                                        class='ma-2'
+                                        rounded
+                                        color='primary'
+                                        dark
+                                        @click="showAddressCard = !showAddressCard">
+                                            Change Address
                                         </v-btn>
                                     </div>
                             </v-card-text>
@@ -256,7 +133,37 @@
                             </v-card-text>
                         </v-card>
                     </v-col>
-                    <v-col cols="4" class="d-flex">
+                    
+                    
+                    <v-col v-if='false' class="d-flex">
+                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped > 
+                            <v-toolbar dark color = 'primary'>
+                                <v-toolbar-title>Loyalty Program - Drug dealer</v-toolbar-title>
+                            </v-toolbar>
+                                <v-container >
+                                    <v-row
+                                        class="fill-height"
+                                        align-content="center"
+                                        justify="center"
+                                    >
+                                        <v-col class="subtitle-1 text-center" cols="12">
+                                        You are 150 points away from getting to next level
+                                        </v-col>
+                                        <v-col cols="5">
+                                        <v-progress-circular
+                                            :rotate="90"
+                                            :size="150"
+                                            :width="30"
+                                            :value="value"
+                                            color="red"
+                                            >    
+                                        </v-progress-circular>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                        </v-card>
+                    </v-col>
+                    <v-col v-if='false' cols="4" class="d-flex">
                         <v-card class="elevation-12 ma-4 mb-1 flex-grow-1" shaped>
                             <v-toolbar dark color = 'primary'>
                                 <v-toolbar-title>Allergies</v-toolbar-title>
@@ -269,7 +176,217 @@
                             ></v-data-table>
                         </v-card>
                     </v-col>
+                    <v-col cols='4'>
+                        <v-card class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
+                            <v-toolbar dark color='primary'>
+                                <v-toolbar-title>Reserved Medicine</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-title>
+                                    Reserved Medicine
+                                    <v-spacer></v-spacer>
+                                    <v-text-field
+                                        v-model="searchMedicine"
+                                        append-icon="mdi-magnify"
+                                        label="Search"
+                                        single-line
+                                        hide-details
+                                    ></v-text-field>
+                                </v-card-title>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click='getAllMedicine'>
+                                    All
+                                </v-btn>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click="getCreatedMedicine">
+                                    Created
+                                </v-btn>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click="getCancelledMedicine">
+                                    Cancelled
+                                </v-btn>
+                                <v-btn
+                                color='primary'
+                                class='ma-1'
+                                rounded
+                                @click="getCompletedMedicine">
+                                    Completed
+                                </v-btn>
+                            </v-card-actions>
+                            <v-data-table
+                            :headers='medicineHeaders'
+                            :items='medicineList'
+                            :items-per-page="5"
+                            :search="searchMedicine"
+                            no-data-text="You have no reserved medicine!">
+                            </v-data-table>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                color='error    '
+                                class='ma-1'
+                                rounded
+                                @click="showCancelDialog = !showCancelDialog">
+                                    Cancel Reservation
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
                 </v-row>
+
+                <v-dialog v-model='showAddressCard' max-width="20%">
+                    <v-card shaped>
+                            <v-toolbar dark color = 'primary'>
+                                <v-toolbar-title>Change Address</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-select
+                                    class='mt-4'
+                                    v-model="selectedCountry"
+                                    v-on:change="getCities"
+                                    :items="countries"
+                                    item-text="countryName"
+                                    item-value="id"
+                                    label="Country:"
+                                    outlined
+                                    return-object>
+                                </v-select>
+                                <v-select
+                                    v-model="selectedCity"
+                                    :items="citiesInCountry"
+                                    item-text="cityName"
+                                    item-value="id"
+                                    label="City:"
+                                    outlined
+                                    return-object>
+                                </v-select>
+                                <v-text-field
+                                    v-model="addressLine"
+                                    label="Address Line:"
+                                    :rules="rules.addressLineRules"
+                                    outlined>
+                                </v-text-field>
+                                <div class="text-center">
+                                    <v-btn 
+                                    v-if='this.selectedCity != null && this.selectedCountry != null && this.addressLine.length >=3' 
+                                    rounded 
+                                    color="success" 
+                                    dark 
+                                    @click="saveAddress"
+                                    class='mr-6'>
+                                        Save
+                                    </v-btn>
+                                    <v-btn 
+                                    rounded 
+                                    color='error' 
+                                    dark 
+                                    @click='cancelAddressSave'
+                                    class='ml-6'>
+                                        Cancel
+                                    </v-btn>
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                </v-dialog>
+                <v-dialog v-model='showPasswordCard' max-width="20%">
+                    <v-form v-model='isFormValid'>
+                        <v-card shaped>
+                            <v-toolbar dark color = 'primary'>
+                                <v-toolbar-title>Change Password</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-text-field
+                                    class='mt-4'
+                                    label="Enter New Password:"
+                                    :rules="rules.passwordRules"
+                                    outlined 
+                                    v-model="newPassword"
+                                    type="password">
+                                </v-text-field>
+                                <v-text-field
+                                    label="Confirm Password:"
+                                    :rules='rules.confirmPasswordRules'
+                                    outlined
+                                    v-model="confirmNewPassword"
+                                    type="password"
+                                >
+                                </v-text-field>
+                                <v-text-field
+                                    label='Enter Old Password:'
+                                    :rules='rules.passwordRules'
+                                    outlined
+                                    v-model="oldPassword"
+                                    type="password"
+                                    >
+                                </v-text-field>
+                                <div class="text-center">
+                                        <v-btn 
+                                        rounded 
+                                        color="success"
+                                        v-if='isFormValid' 
+                                        dark
+                                        @click="changePassword"
+                                        class='mr-6'>
+                                            Save
+                                        </v-btn>
+                                        <v-btn 
+                                        rounded 
+                                        color="error" 
+                                        dark 
+                                        class="ml-6"
+                                        @click="resetPasswordForm">
+                                            Cancel
+                                        </v-btn>
+                                    </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-form>
+                </v-dialog>
+                <v-dialog v-model="showCancelDialog" max-width="33%">
+                    <v-card shaped>
+                            <v-toolbar dark color='primary'>
+                                <v-toolbar-title>Reserved Medicine</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-title>
+                                    <v-text-field
+                                        v-model="searchMedicineCancelDialog"
+                                        append-icon="mdi-magnify"
+                                        label="Search"
+                                        single-line
+                                        hide-details
+                                    ></v-text-field>
+                                </v-card-title>
+                            <v-data-table
+                            :headers='medicineHeaders'
+                            :items='cancelableMedicine'
+                            :items-per-page="5"
+                            :search="searchMedicineCancelDialog"
+                            show-select
+                            :single-select='singleSelectCancellation'
+                            v-model='selectedCancelReservationList'
+                            no-data-text="You have no reserved medicine!"
+                            return-object>
+                            </v-data-table>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                v-if='selectedCancelReservationList.length > 0'
+                                color='error'
+                                class='ma-1'
+                                rounded
+                                @click="cancelReservation">
+                                    Cancel Reservation
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                </v-dialog>
     </v-container>
     
 </div>
@@ -295,6 +412,7 @@ export default {
                 countries:[],
                 citiesInCountry:[],
                 overlay: true,
+                showAddressCard: false,
                 //User Information and Editing
                 userDTO:{
                     firstName: '',
@@ -318,6 +436,8 @@ export default {
                 newPassword: '',
                 confirmNewPassword: '',
                 oldPassword: '',
+                showPasswordCard: false,
+                isFormValid: false,
                 //Allergies
                 headers: [
                 {
@@ -333,8 +453,25 @@ export default {
                 { text: 'Iron (%)', value: 'iron' },
                 ],
                 desserts: [
-                
                 ],
+                //Reserved medicine
+                medicineHeaders:[
+                { text: 'Medicine:', value:'iteratorMedicineReservationItem[0].medicine.name'},
+                { text: 'Status:', value:'medicineReservationStatus'},
+                { text: 'Pick Up Date:', value:'pickUpDate'},                
+                ],
+                medicineList:[],
+                allMedicine: [],
+                createdMedicine: [],
+                cancelledMedicine: [],
+                completedMedicine: [], 
+                searchMedicine: '',
+                //Cancellation dialog
+                showCancelDialog: false,
+                searchMedicineCancelDialog: '',
+                cancelableMedicine: [],
+                selectedCancelReservationList:[],
+                singleSelectCancellation: true,
                 //Loyalty Program
                 value:69,
                 
@@ -414,6 +551,19 @@ export default {
             }, (error) => {
 
             })
+
+            client({
+                method: 'GET',
+                url: 'medicine-reservation/get-reservations'
+            })
+            .then((response) => {
+                vm.medicineList = response.data;
+                vm.allMedicine = response.data;
+                vm.cancelableMedicine = response.data.filter(obj=>obj.medicineReservationStatus==='CREATED')
+            }, (error) => {
+
+            })
+
         },
         methods:{
             //Get all cities in selected country
@@ -450,6 +600,7 @@ export default {
                     this.selectedCity = null;
                     this.selectedCountry = null;
                     this.addressLine = '';
+                    this.showAddressCard = false;
                 }, (error) => {
 
                 })
@@ -501,12 +652,57 @@ export default {
                 this.selectedCity = null;
                 this.selectedCountry = null;
                 this.addressLine = '';
+                this.showAddressCard=false;
             },
             resetPasswordForm: function()
             {
                 this.newPassword='';
                 this.confirmNewPassword='';
                 this.oldPassword='';
+                this.showPasswordCard=false;
+            },
+            // Medicine reservation cancellation
+            //Medicine reservation filters
+            getAllMedicine: function()
+            {
+                this.medicineList = this.allMedicine;
+            },
+            getCreatedMedicine: function()
+            {
+                this.medicineList = this.allMedicine.filter(obj=>obj.medicineReservationStatus==='CREATED');
+            },
+            getCancelledMedicine: function()
+            {
+                this.medicineList = this.allMedicine.filter(obj=>obj.medicineReservationStatus==='CANCELLED');
+            },
+            getCompletedMedicine: function()
+            {
+                this.medicineList = this.allMedicine.filter(obj=>obj.medicineReservationStatus==='COMPLETED');
+            },
+            cancelReservation: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'medicine-reservation/cancel-reservation',
+                    data:{
+                        id: this.selectedCancelReservationList[0].id
+                    }
+                })
+                .then((response) => {
+                    for (var i in this.allMedicine) 
+                    {
+                        if (this.allMedicine[i].id == response.data) 
+                        {
+                            this.allMedicine[i].medicineReservationStatus = 'CANCELLED';
+                            break;
+                        }
+                    }
+                    this.getAllMedicine();
+                    this.selectedCancelReservationList = [];
+                    this.showCancelDialog = false;                 
+                },(error)=>{
+
+                })
             }
         }
         
