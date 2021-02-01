@@ -13,6 +13,7 @@ import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
 
+import * as UserService from '../service/UserService.js';
 
 import {client} from '@/client/axiosClient'
 
@@ -28,7 +29,7 @@ const routes = [
     path: '/login', 
     component: LoginPage,
     beforeEnter: function(to, from, next){
-      if(isUserLoggedIn()){
+      if(UserService.isUserLoggedIn()){
         router.push({path: '/'});
       }else{
         next();
@@ -40,8 +41,7 @@ const routes = [
     path: '/register', 
     component: RegisterPage,
     beforeEnter: function(to, from, next){
-      console.log(isUserLoggedIn());
-      if(isUserLoggedIn()){
+      if(UserService.isUserLoggedIn()){
         router.push({path: '/'});
       }else{
         next();
@@ -53,7 +53,7 @@ const routes = [
     path: '/profile', 
     component: ProfilePage,
     beforeEnter: function(to, from, next){
-      if(!isUserLoggedIn()){
+      if(!UserService.isUserLoggedIn()){
         router.push({path: '/login'});
       }
       else{
@@ -65,7 +65,7 @@ const routes = [
     path: '/sys-profile',
     component: SysAdminProfilePage,
     beforeEnter: function(to, from, next){
-      if(isSysAdmin()){
+      if(UserService.isSysAdmin()){
         next();
         return;
       }
@@ -89,7 +89,7 @@ const routes = [
     path: '/pharmacist',
     component: PharmacistPage,
     beforeEnter: function(to, from, next){
-      if(!isUserLoggedIn()){
+      if(!UserService.isUserLoggedIn()){
         router.push({path: '/login'});
       }
       else{
@@ -111,7 +111,7 @@ const routes = [
     name: 'Pharmacists',
     component: PharmacistsPage,
     beforeEnter: function(to, from, next){
-        let user = getLoggedUserData();
+        let user = UserService.getLoggedUserData();
         if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
           next();
         }
@@ -125,7 +125,7 @@ const routes = [
     name: 'Dermatologists',
     component: DermatologistsPage,
     beforeEnter: function(to, from, next){
-      let user = getLoggedUserData();
+      let user = UserService.getLoggedUserData();
       if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
         next();
       }
@@ -139,7 +139,7 @@ const routes = [
     name: 'MyPharmacy',
     component: PharmacyPage,
     beforeEnter: function(to, from, next){
-      let user = getLoggedUserData();
+      let user = UserService.getLoggedUserData();
       if(user.userRole == 'ADMINISTRATOR'){
         client({
           method: 'GET',
@@ -162,81 +162,15 @@ const router = new VueRouter({
   routes
 })
 
-
-
 router.beforeEach( async (to, from, next) => {
   //Before each routing, check user authentication (token)
-  validateAuthentication().then( (isAuthenticationValid) => {
+  UserService.validateAuthentication().then( (isAuthenticationValid) => {
       if(!isAuthenticationValid){
-        clearUserData();
+        UserService.clearUserData();
       }
       next();
   });
 });
 
-
-
-//Perform check if specific roles
-function isSysAdmin(){
-    var userRole = getLoggedUserData().userRole;
-    if(userRole != 'SYS_ADMIN'){
-      return false;
-    }
-
-    return true;
-}
-
-function clearUserData(){
-  localStorage.removeItem('user_role');
-  localStorage.removeItem('user_token');
-  localStorage.removeItem('user_token_expires');
-}
-
-
-
-
-function isUserLoggedIn(){
-    var userData = getLoggedUserData();
-    //If user token present, user is logged.
-    if(userData['userToken']) return true;
-
-    return false;
-}
-
-function getLoggedUserData(){
-    return {
-      userRole: _getUserRole(),
-      userToken: _getUserToken(),
-      userTokenExpiryDate: _getUserTokenExpiryDate()
-    }
-}
-
-function _getUserRole(){
-  var userRole = localStorage.getItem('user_role');
-  if(userRole != null){
-      userRole = userRole.substring(userRole.indexOf('_') + 1);
-  }
-
-  return userRole;
-}
-
-function _getUserToken(){
-  return localStorage.getItem('user_token');
-}
-
-function _getUserTokenExpiryDate(){
-  return localStorage.getItem('user_token_expires');
-}
-
-async function validateAuthentication() {
-    return await client({
-      method: 'GET',
-      url: 'auth/validate-token'
-    }).then( (response) => {
-      return true;
-    }, (error) => {
-      return false;
-    })
-}
 
 export default router
