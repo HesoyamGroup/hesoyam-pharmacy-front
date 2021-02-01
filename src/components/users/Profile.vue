@@ -182,7 +182,6 @@
                                 <v-toolbar-title>Reserved Medicine</v-toolbar-title>
                             </v-toolbar>
                             <v-card-title>
-                                    Reserved Medicine
                                     <v-spacer></v-spacer>
                                     <v-text-field
                                         v-model="searchMedicine"
@@ -190,6 +189,7 @@
                                         label="Search"
                                         single-line
                                         hide-details
+                                        outlined
                                     ></v-text-field>
                                 </v-card-title>
                             <v-card-actions class='justify-center'>
