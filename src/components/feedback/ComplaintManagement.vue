@@ -297,9 +297,9 @@
                 }).then((response) => {
                     this.removeSelectedComplaint(this.complaints.selected);
                     this.complaints.text = '';
-                    this.inProgress = false;
+                    this.complaints.inProgress = false;
                 }, (error) => {
-                    this.inProgress = false;
+                    this.complaints.inProgress = false;
                 });
             },
             getReplyData: function(){
