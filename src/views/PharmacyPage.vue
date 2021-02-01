@@ -22,6 +22,8 @@ import PharmacyMedicineList from '@/components/pharmacy/PharmacyMedicineList.vue
 import PharmacyEmployeeTabs from '../components/pharmacy/PharmacyEmployeeTabs.vue';
 import PharmacyInventory from '../components/pharmacy/PharmacyInventory.vue';
 
+import * as UserService from '@/service/UserService';
+
 
 export default {
     name: 'PharmacyPage',
@@ -34,11 +36,12 @@ export default {
     data: function(){
         return {
             pharmacy: null,
-            userRole: 'ADMINISTRATOR'
+            userRole: ''
         }
     },
     mounted(){
         this.$on('price-updated', this.fetchPharmacy);
+        this.userRole = UserService._getUserRole();
         this.fetchPharmacy();
     },
     methods:{
