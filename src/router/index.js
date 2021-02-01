@@ -9,7 +9,8 @@ import PharmacistPage from '../views/PharmacistPage.vue'
 import DermatologistPage from '../views/Dermatologist1Page.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 import SupplierPage from '../views/SupplierPage.vue'
-import BrowseMedicinePage from '../views/BrowseMedicinePage.vue';
+import BrowseMedicinePage from '../views/BrowseMedicinePage.vue'
+import AllPharmaciesPage from '../views/AllPharmaciesPage.vue'
 
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
@@ -107,6 +108,11 @@ const routes = [
         next();
       }
     }
+  },
+  {
+    path: '/pharmacy/all',
+    name: 'AllPharmacies',
+    component: AllPharmaciesPage
   },
   {
     path: '/dermatologist',
