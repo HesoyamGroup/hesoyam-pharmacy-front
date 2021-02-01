@@ -133,6 +133,26 @@ const routes = [
         router.push({path: '/'});
       }
     }
+  },
+  {
+    path: '/my-pharmacy',
+    name: 'MyPharmacy',
+    component: PharmacyPage,
+    beforeEnter: function(to, from, next){
+      let user = getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        client({
+          method: 'GET',
+          url: 'administrator/pharmacy/id'
+        }).then((response) => {
+          let pharmacyId = response.data;
+          router.push({path: '/pharmacy/' + pharmacyId});
+        }, (error) => {});
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
   }
 ]
 
