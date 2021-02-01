@@ -8,10 +8,13 @@ import MedicineSearchPage from '../views/MedicineSearchPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
 import DermatologistPage from '../views/Dermatologist1Page.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
+import SupplierPage from '../views/SupplierPage.vue'
+import BrowseMedicinePage from '../views/BrowseMedicinePage.vue';
 
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
+
 
 
 import {client} from '@/client/axiosClient'
@@ -71,6 +74,14 @@ const routes = [
       }
       router.push({path:'/login'});
     }
+  },
+  {
+    path:'/supplier-profile',
+    component: SupplierPage
+  },
+  {
+    path:'/browse-medicine',
+    component: BrowseMedicinePage
   },
   {
     path: '/medicine-search',
