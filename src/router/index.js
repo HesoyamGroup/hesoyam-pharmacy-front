@@ -6,7 +6,7 @@ import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import MedicineSearchPage from '../views/MedicineSearchPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
-import DermatologistPage from '../views/Dermatologist1Page.vue'
+import DermatologistPage from '../views/DermatologistPage.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 import SupplierPage from '../views/SupplierPage.vue'
 import BrowseMedicinePage from '../views/BrowseMedicinePage.vue';
@@ -14,6 +14,7 @@ import BrowseMedicinePage from '../views/BrowseMedicinePage.vue';
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
+import SearchUsersPage from '../views/SearchUsersPage.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -104,13 +105,34 @@ const routes = [
         router.push({path: '/login'});
       }
       else{
-        next();
+        let user = getLoggedUserData();
+        if(user.userRole == 'PHARMACIST'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
       }
     }
   },
   {
     path: '/dermatologist',
-    component: DermatologistPage
+    component: DermatologistPage,
+    beforeEnter: function(to, from, next){
+
+      if(!isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        let user = getLoggedUserData();
+        if(user.userRole == 'DERMATOLOGIST'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+      }
+    }
   },
   {
     path: '/pharmacy/:id',
@@ -131,6 +153,22 @@ const routes = [
         }
     }
   },
+
+  {
+    path: '/searchusers',
+    name: 'SearchUsers',
+    component: SearchUsersPage,
+    beforeEnter: function(to, from, next){
+      let user = getLoggedUserData();
+      if(user.userRole == 'PHARMACIST' || user.userRole == 'DERMATOLOGIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+
   {
     path: '/dermatologists',
     name: 'Dermatologists',

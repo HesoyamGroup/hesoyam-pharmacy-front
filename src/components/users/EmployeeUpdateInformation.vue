@@ -327,29 +327,43 @@ import {client} from '@/client/axiosClient';
     mounted() {
       client({
         method: 'GET',
-        url: 'profile/user-information'
-        })
-      .then( (response) => {
-        this.userDto = response.data;
-        this.user.name = this.userDto.firstName;
-        this.user.surname = this.userDto.lastName;
-        this.user.gender = this.userDto.gender;
-        this.user.phone = this.userDto.telephone;
-        this.user.email = this.userDto.email;
-        this.user.city = this.userDto.cityName;
-        console.log(this.user.name);
-        }, (error) => {
-
-        })
+        url: 'profile/check-role'
+      })
+      .then((request) => {
+        var link = ''
+        if(request.data.toLowerCase() === 'pharmacist'){
+          link = 'profile/user-information';
+        } else {
+          link = 'dermatologist/dermatologist-information-edit';
+        }
+        
 
         client({
-            method:'GET',
-            url:'countries/getAll'
-        }).then( (response) => {
-            this.countriesFromServer = response.data;
-            this.countries = this.countriesFromServer;
-        }, (error) => {
+          method: 'GET',
+          url: link
+          })
+        .then( (response) => {
+          this.userDto = response.data;
+          this.user.name = this.userDto.firstName;
+          this.user.surname = this.userDto.lastName;
+          this.user.gender = this.userDto.gender;
+          this.user.phone = this.userDto.telephone;
+          this.user.email = this.userDto.email;
+          this.user.city = this.userDto.cityName;
+          console.log(this.user.name);
+          }, (error) => {
 
+          })
+
+          client({
+              method:'GET',
+              url:'countries/getAll'
+          }).then( (response) => {
+              this.countriesFromServer = response.data;
+              this.countries = this.countriesFromServer;
+          }, (error) => {
+
+          })
         })
     },
 
