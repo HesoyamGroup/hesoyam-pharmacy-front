@@ -3,7 +3,7 @@
     <v-container fluid fill-height class="spacing-playground pa-6">
                 <v-row>
                     <v-col cols="4" class="d-flex">
-                        <v-card v-if="infoOverlay" class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
+                        <v-card class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
                             <v-toolbar dark color = 'primary'>
                                 <v-toolbar-title>Profile Information</v-toolbar-title>
                             </v-toolbar>
@@ -80,58 +80,6 @@
                                     </div>
                             </v-card-text>
                         </v-card>
-                        <v-card v-if="!infoOverlay" class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
-                            <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Edit Information</v-toolbar-title>
-                            </v-toolbar>
-                            <v-card-text>
-                                <v-form v-model='form.isInfoFormValid'>
-                                    <v-text-field
-                                        label='First Name:'
-                                        outlined
-                                        :rules="rules.firstNameRules"
-                                        v-model = form.userEdit.firstName>
-                                    </v-text-field>
-                                    <v-text-field
-                                        label="Last Name:"
-                                        outlined
-                                        :rules="rules.lastNameRules"
-                                        v-model = form.userEdit.lastName>
-                                    </v-text-field>
-                                    <v-select
-                                        v-model="form.userEdit.gender"
-                                        :items="genders"
-                                        label="Gender:"
-                                        outlined
-                                        return-object>
-                                    </v-select>
-                                    <v-text-field
-                                        label="Phone Number:"
-                                        outlined
-                                        :rules="rules.phoneNumberRules"
-                                        v-model = form.userEdit.telephone>
-                                    </v-text-field>
-                                    <div class="text-center">
-                                        <v-btn 
-                                        v-if='form.isInfoFormValid' 
-                                        rounded 
-                                        color="success" 
-                                        dark 
-                                        @click="saveUser"
-                                        class='mr-6'>
-                                            Save
-                                        </v-btn>
-                                        <v-btn 
-                                        rounded 
-                                        color="error" 
-                                        dark 
-                                        @click="infoOverlay = !infoOverlay">
-                                            Cancel
-                                        </v-btn>
-                                    </div>
-                                </v-form>
-                            </v-card-text>
-                        </v-card>
                     </v-col>
                     
                     
@@ -182,7 +130,6 @@
                                 <v-toolbar-title>Reserved Medicine</v-toolbar-title>
                             </v-toolbar>
                             <v-card-title>
-                                    <v-spacer></v-spacer>
                                     <v-text-field
                                         v-model="searchMedicine"
                                         append-icon="mdi-magnify"
@@ -191,6 +138,7 @@
                                         hide-details
                                         outlined
                                     ></v-text-field>
+                                    <v-spacer></v-spacer>
                                 </v-card-title>
                             <v-card-actions class='justify-center'>
                                 <v-btn
@@ -242,6 +190,62 @@
                     </v-col>
                 </v-row>
 
+                <v-dialog v-model='infoOverlay' max-width="20%">
+                    <v-card class='elevation-12 flex-grow-1' shaped>
+                            <v-toolbar dark color = 'primary'>
+                                <v-toolbar-title>Edit Information</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-form v-model='form.isInfoFormValid'>
+                                    <v-text-field
+                                        class='mt-4'
+                                        label='First Name:'
+                                        outlined
+                                        :rules="rules.firstNameRules"
+                                        v-model = form.userEdit.firstName>
+                                    </v-text-field>
+                                    <v-text-field
+                                        label="Last Name:"
+                                        outlined
+                                        :rules="rules.lastNameRules"
+                                        v-model = form.userEdit.lastName>
+                                    </v-text-field>
+                                    <v-select
+                                        v-model="form.userEdit.gender"
+                                        :items="genders"
+                                        label="Gender:"
+                                        outlined
+                                        return-object>
+                                    </v-select>
+                                    <v-text-field
+                                        label="Phone Number:"
+                                        outlined
+                                        :rules="rules.phoneNumberRules"
+                                        v-model = form.userEdit.telephone>
+                                    </v-text-field>
+                                    <div class="text-center">
+                                        <v-btn 
+                                        v-if='form.isInfoFormValid' 
+                                        rounded 
+                                        color="success" 
+                                        dark 
+                                        @click="saveUser"
+                                        class='mr-6'>
+                                            Save
+                                        </v-btn>
+                                        <v-btn 
+                                        rounded 
+                                        color="error" 
+                                        dark 
+                                        @click="cancelUserEdit">
+                                            Cancel
+                                        </v-btn>
+                                    </div>
+                                </v-form>
+                            </v-card-text>
+                        </v-card>
+                </v-dialog>
+                
                 <v-dialog v-model='showAddressCard' max-width="20%">
                     <v-card shaped>
                             <v-toolbar dark color = 'primary'>
@@ -525,8 +529,8 @@ export default {
                     url: 'profile/user-information'
                 })
                 .then( (response) => {
-                    vm.userDTO = response.data;
-                    vm.form.userEdit = response.data;
+                    vm.userDTO = Object.assign(vm.userDTO,response.data);
+                    vm.form.userEdit = Object.assign(vm.form.userEdit ,response.data);
                     console.log(vm.userDTO.firstName)
                 }, (error) => {
 
@@ -620,11 +624,16 @@ export default {
                 })
                 .then((response)=>{
                     console.log('ok');
-                    this.form.userEdit = this.userDTO;
+                    this.userDTO = Object.assign(this.userDTO, this.form.userEdit);
                     this.infoOverlay = !this.infoOverlay;
                 }, (error)=>{
 
                 })
+            },
+            cancelUserEdit: function()
+            {
+                this.infoOverlay = !this.infoOverlay;
+                this.form.userEdit = Object.assign(this.form.userEdit, this.userDTO);
             },
             //Change password
             changePassword: function()
