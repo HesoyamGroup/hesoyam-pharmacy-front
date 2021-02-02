@@ -5,8 +5,10 @@ import vuetify from './plugins/vuetify';
 import 'vuetify/dist/vuetify.min.css';
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import DatetimePicker from 'vuetify-datetime-picker'
 
 Vue.use(VueAxios, axios)
+Vue.use(DatetimePicker)
 
 Vue.config.productionTip = false
 
