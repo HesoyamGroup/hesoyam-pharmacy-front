@@ -105,7 +105,7 @@ const routes = [
         router.push({path: '/login'});
       }
       else{
-        let user = getLoggedUserData();
+        let user = UserService.getLoggedUserData();
         if(user.userRole == 'PHARMACIST'){
           next();
         }
@@ -120,11 +120,11 @@ const routes = [
     component: DermatologistPage,
     beforeEnter: function(to, from, next){
 
-      if(!isUserLoggedIn()){
+      if(!UserService.isUserLoggedIn()){
         router.push({path: '/login'});
       }
       else{
-        let user = getLoggedUserData();
+        let user = UserService.getLoggedUserData();
         if(user.userRole == 'DERMATOLOGIST'){
           next();
         }
@@ -159,7 +159,7 @@ const routes = [
     name: 'SearchUsers',
     component: SearchUsersPage,
     beforeEnter: function(to, from, next){
-      let user = getLoggedUserData();
+      let user = UserService.getLoggedUserData();
       if(user.userRole == 'PHARMACIST' || user.userRole == 'DERMATOLOGIST'){
         next();
       }
