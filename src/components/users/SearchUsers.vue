@@ -107,7 +107,7 @@ export default {
         },
 
         sortByLastName: function(){
-            if(this.sort_first_name_asc){
+            if(this.sort_last_name_asc){
                 this.patientsFixed.sort(function(a, b) {
                     var nameA = a.lastName.toUpperCase(); // ignore upper and lowercase
                     var nameB = b.lastName.toUpperCase(); // ignore upper and lowercase
@@ -138,7 +138,7 @@ export default {
             }
 
             this.sort_last_name_asc = !this.sort_last_name_asc;
-            alert(this.sort_last_name_asc);
+            
         },
 
         sortByDate: function(){
