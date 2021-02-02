@@ -12,6 +12,7 @@ import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
+import EmployeePage from '../views/EmployeePage.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -95,6 +96,22 @@ const routes = [
       else{
         next();
       }
+    }
+  },
+  {
+    path: '/pharmacist/:id',
+    name: 'Pharmacist',
+    component: EmployeePage,
+    beforeEnter: function(to, from, next){
+      UserService.isUserLoggedIn() ? next() : router.push({path: '/login'});
+    }
+  },
+  {
+    path: '/dermatologist/:id',
+    name: 'Dermatologist',
+    component: EmployeePage,
+    beforeEnter: function(to, from, next){
+      UserService.isUserLoggedIn() ? next() : router.push({path: '/login'});
     }
   },
   {
