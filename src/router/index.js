@@ -15,6 +15,7 @@ import AllPharmaciesPage from '../views/AllPharmaciesPage.vue'
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
+import EmployeePage from '../views/EmployeePage.vue'
 import SearchUsersPage from '../views/SearchUsersPage.vue'
 
 import * as UserService from '../service/UserService.js';
@@ -114,6 +115,22 @@ const routes = [
           router.push({path: '/'});
         }
       }
+    }
+  },
+  {
+    path: '/pharmacist/:id',
+    name: 'Pharmacist',
+    component: EmployeePage,
+    beforeEnter: function(to, from, next){
+      UserService.isUserLoggedIn() ? next() : router.push({path: '/login'});
+    }
+  },
+  {
+    path: '/dermatologist/:id',
+    name: 'Dermatologist',
+    component: EmployeePage,
+    beforeEnter: function(to, from, next){
+      UserService.isUserLoggedIn() ? next() : router.push({path: '/login'});
     }
   },
   {
