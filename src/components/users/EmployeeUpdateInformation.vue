@@ -328,7 +328,7 @@ import {client} from '@/client/axiosClient';
 
       const role = localStorage.getItem('user_role');
       var link = '';
-      if(role.toLowerCase() === "pharmacist"){
+      if(role.toLowerCase() === "role_pharmacist"){
         link = 'profile/user-information';
       } else {
         link = 'dermatologist/dermatologist-information-edit';
