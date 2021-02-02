@@ -32,12 +32,24 @@
             item-key='id'
             show-expand
             class='elevation-12'>
-                <template v-slot:expanded-item="{headers, item}">
+
+            <template v-slot:expanded-item="{headers, item}">
                     <td :colspan="headers.length">
                         <div class="row sp-details">
                             <div class="col-4 text-left ma-6">
                                 <v-row>
                                     <h1>{{item.name}}</h1>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                    color="primary"
+                                    rounded
+                                    @click="goToProfile(item.id)"
+                                    >
+                                        Profile
+                                    </v-btn>
+                                </v-row>
+                                <v-row>
+                                    <div>{{item.cityName}}, {{item.addressLine}}</div>
                                 </v-row>
                                 <v-row>
                                     <h3> Rating: {{item.rating}}/5.00 </h3>
@@ -46,20 +58,32 @@
                                     <v-divider
                                     ></v-divider>
                                 </v-row>
-                                <v-row>
+                                <v-row v-if='item.description'>
                                     <h3>Description:</h3>
                                 </v-row>
-                                <v-row>
+                                <v-row v-if='item.description'>
                                     <v-divider
                                     ></v-divider>
                                 </v-row>
-                                <v-row>
+                                <v-row v-if='item.description'>
                                     <div>{{item.description}}</div>
+                                </v-row>
+                                <v-row>
+                                    
                                 </v-row>
                             </div>
                             <div class="col-7 text-right">
                                 <v-row>
-                                    <leaflet-map mode="display" height="250" :value="{lat: 0.00, lng: 0.00}"></leaflet-map>
+                                    <v-card id="leafletmap" class='justify-right flex-grow-1 ma-4'>
+                                        <leaflet-map 
+                                        id='bilostas' 
+                                        mode="display" 
+                                        height="250"
+                                        width="250"
+                                        v-model='item.pharmacyLocationDTO'
+                                        >
+                                        </leaflet-map>
+                                    </v-card>
                                 </v-row>
                             </div>
                         </div>
@@ -83,14 +107,14 @@ export default {
         return {
             allPharmacies: [],
             searchPharmacy: '',
-            singleExpand: false,
+            singleExpand: true,
+            ratingFilter: '',
             expanded: [],
             pharmacyHeaders:[
                 {text:'Name', value:'name'},
                 {text:'Rating', value:'rating'},
                 {text:'City', value:'cityName'},
             ],
-            latlng: null,
 
         }
     },
@@ -106,8 +130,21 @@ export default {
 
         })
     },
+    computed:{
+        pharmacyHeaders(){
+            return[
+                {text:'Name', value:'name'},
+                {text:'Rating', value:'rating'},
+                {text:'City', value:'cityName'},
+            ]
+        }
+    },
     methods:{
-
+        goToProfile(id)
+        {
+            var url = '../pharmacy/'+id;
+            window.location.href = url;
+        },
     },
 }
 </script>
