@@ -7,6 +7,34 @@
                             <v-toolbar dark color = 'primary'>
                                 <v-toolbar-title>Profile Information</v-toolbar-title>
                             </v-toolbar>
+                            <div class="text-center">
+                                <v-btn 
+                                class='ma-2'
+                                rounded 
+                                color="primary" 
+                                dark 
+                                @click="infoOverlay = !infoOverlay">
+                                    Edit Info
+                                </v-btn>
+                                    
+                                <v-btn
+                                class='ma-2'
+                                rounded
+                                color='primary'
+                                dark
+                                @click="showPasswordCard = !showPasswordCard">
+                                    Change Password
+                                </v-btn>
+
+                                <v-btn
+                                class='ma-2'
+                                rounded
+                                color='primary'
+                                dark
+                                @click="showAddressCard = !showAddressCard">
+                                    Change Address
+                                </v-btn>
+                            </div>
                             <v-card-text>
                                     <v-text-field
                                         label='First Name:'
@@ -50,32 +78,15 @@
                                         v-model = address.addressLine
                                         readonly>
                                     </v-text-field>
+                                    
                                     <div class="text-center">
-                                        <v-btn 
-                                        class='ma-2'
-                                        rounded 
-                                        color="primary" 
-                                        dark 
-                                        @click="infoOverlay = !infoOverlay">
-                                            Edit Info
-                                        </v-btn>
-                                        
                                         <v-btn
                                         class='ma-2'
                                         rounded
                                         color='primary'
                                         dark
-                                        @click="showPasswordCard = !showPasswordCard">
-                                            Change Password
-                                        </v-btn>
-
-                                        <v-btn
-                                        class='ma-2'
-                                        rounded
-                                        color='primary'
-                                        dark
-                                        @click="showAddressCard = !showAddressCard">
-                                            Change Address
+                                        @click='allergiesDialog = !allergiesDialog'>
+                                            My Allergies
                                         </v-btn>
                                     </div>
                             </v-card-text>
@@ -109,19 +120,6 @@
                                         </v-col>
                                     </v-row>
                                 </v-container>
-                        </v-card>
-                    </v-col>
-                    <v-col v-if='false' cols="4" class="d-flex">
-                        <v-card class="elevation-12 ma-4 mb-1 flex-grow-1" shaped>
-                            <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Allergies</v-toolbar-title>
-                            </v-toolbar>
-                        
-                            <v-data-table
-                            :headers="headers"
-                            :items="desserts"
-                            :items-per-page="5"
-                            ></v-data-table>
                         </v-card>
                     </v-col>
                     <v-col cols='4'>
@@ -190,6 +188,7 @@
                     </v-col>
                 </v-row>
 
+                <!-- edit information dialog -->
                 <v-dialog v-model='infoOverlay' max-width="20%">
                     <v-card class='elevation-12 flex-grow-1' shaped>
                             <v-toolbar dark color = 'primary'>
@@ -246,6 +245,7 @@
                         </v-card>
                 </v-dialog>
                 
+                <!-- change address dialog -->
                 <v-dialog v-model='showAddressCard' max-width="20%">
                     <v-card shaped>
                             <v-toolbar dark color = 'primary'>
@@ -300,6 +300,8 @@
                             </v-card-text>
                         </v-card>
                 </v-dialog>
+
+                <!-- change password dialog -->
                 <v-dialog v-model='showPasswordCard' max-width="20%">
                     <v-form v-model='isFormValid'>
                         <v-card shaped>
@@ -354,6 +356,8 @@
                         </v-card>
                     </v-form>
                 </v-dialog>
+
+                <!-- medicine reservation dialog -->
                 <v-dialog v-model="showCancelDialog" max-width="33%">
                     <v-card shaped>
                             <v-toolbar dark color='primary'>
@@ -390,6 +394,38 @@
                                 </v-btn>
                             </v-card-actions>
                         </v-card>
+                </v-dialog>
+
+                <!-- allergies dialog -->
+                <v-dialog v-model='allergiesDialog' max-width="20%">
+                    <v-card shaped>
+                        <v-toolbar dark color = 'primary'>
+                            <v-toolbar-title>Allergies</v-toolbar-title>
+                        </v-toolbar>
+                        <v-card-actions class='justify-center'>
+                            <v-btn
+                            color='success'>
+                                Add Allergy
+                            </v-btn>
+                            <v-btn
+                            color='error'>
+                                Delete Allergy
+                            </v-btn>
+                        </v-card-actions>
+                        <v-data-table
+                        :headers="headersAllergies"
+                        :items="allergies"
+                        :items-per-page="5"
+                        no-data-text="Luckily, You have no Allergies!">
+                        </v-data-table>
+                        <v-card-actions class='justify-center'>
+                            <v-btn
+                            color="error"
+                            @click='allergiesDialog = !allergiesDialog'>
+                                Close
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
                 </v-dialog>
     </v-container>
     
@@ -434,7 +470,7 @@ export default {
                     },
                     isInfoFormValid: false,
                 },
-                infoOverlay: true,
+                infoOverlay: false,
                 genders: ['MALE', 'FEMALE', 'OTHER', 'DONT_SAY'],
                 //Password changing
                 newPassword: '',
@@ -443,21 +479,11 @@ export default {
                 showPasswordCard: false,
                 isFormValid: false,
                 //Allergies
-                headers: [
-                {
-                    text: 'Dessert (100g serving)',
-                    align: 'start',
-                    sortable: false,
-                    value: 'name',
-                },
-                { text: 'Calories', value: 'calories' },
-                { text: 'Fat (g)', value: 'fat' },
-                { text: 'Carbs (g)', value: 'carbs' },
-                { text: 'Protein (g)', value: 'protein' },
-                { text: 'Iron (%)', value: 'iron' },
+                allergiesDialog: false,
+                headersAllergies: [
+                    {text: 'Medicine Name:', value: 'medicineName'}
                 ],
-                desserts: [
-                ],
+                allergies: [],
                 //Reserved medicine
                 medicineHeaders:[
                 { text: 'Medicine:', value:'iteratorMedicineReservationItem[0].medicine.name'},
