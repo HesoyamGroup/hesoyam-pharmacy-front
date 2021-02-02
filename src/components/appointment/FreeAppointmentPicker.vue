@@ -27,7 +27,7 @@ export default {
     name: 'FreeAppointmentPicker',
     data: function(){
         return {
-            newFrom: '',
+            newFrom: null,
             newDuration: null,
             newPrice: null
 
@@ -35,12 +35,17 @@ export default {
     },
     methods:{
         addFreeAppointment(){
-            let from = new Date(this.newFrom);
+            let offset = new Date(this.newFrom).getTimezoneOffset();
+            let from = new Date(this.newFrom.getTime() - offset*60000);
             let to = new Date(from.getTime() + this.newDuration*60000);
+
+            let fromStr = from.toISOString();
+            let toStr = to.toISOString();
             let employeeId = this.$route.params.id;
+            //alert(fromStr.substr(0, fromStr.length-1) + ' >>>> ' + toStr.substr(0, toStr.length-1));
             client({
                 method: 'POST',
-                url: '/checkup/free/employee/' + employeeId,
+                url: '/checkup/free/dermatologist/' + employeeId,
                 data:{
                     range:{
                         from: from.toISOString(),
@@ -51,7 +56,6 @@ export default {
             }).then((response) => {
                 alert('Free appointment added!');
                 this.$emit('free-appointment-added', response.data);
-                this.newFrom = '';
                 this.newDuration = null;
                 this.newPrice = null;
             }, (error) => {

@@ -39,6 +39,7 @@
 
 <script>
 import * as UserService from '@/service/UserService'
+import * as DateFormatter from '@/utils/DateFormatter'
 import {client} from '@/client/axiosClient'
 import FreeAppointmentPicker from '../components/appointment/FreeAppointmentPicker.vue'
 
@@ -60,7 +61,7 @@ export default {
         this.employeeId = this.$route.params.id;
         this.userRole = UserService._getUserRole();
         this.fetchEmployee();
-        this.$on('free-appointment-added', freeAppointment => this.addAppointment)
+        this.$on('free-appointment-added', (freeAppointment) => this.addAppointment(freeAppointment))
     },
     mounted(){
     },
@@ -73,6 +74,16 @@ export default {
                 this.employee = response.data;
             }, (error) => {
                 alert('Employee not found');
+            });
+            client({
+                method: 'GET',
+                url: '/checkup/free/dermatologist/' + this.employeeId
+            }).then((response) => {
+                this.freeAppointments = response.data;
+                for(let appointment of this.freeAppointments){
+                    appointment.range.from = DateFormatter.toJavascriptDateTime(appointment.range.from);
+                    appointment.range.to = DateFormatter.toJavascriptDateTime(appointment.range.to);
+                }
             })
         },
         addAppointment(appointment){
