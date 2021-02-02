@@ -101,17 +101,10 @@
               :color="selectedEvent.color"
               dark
             >
-              <v-btn icon>
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
+
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-btn icon>
-                <v-icon>mdi-heart</v-icon>
-              </v-btn>
-              <v-btn icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
+
             </v-toolbar>
             <v-card-text>
               <span v-html="selectedEvent.details"></span>
@@ -152,6 +145,7 @@ import {client} from '@/client/axiosClient';
       events: [],
       colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+      role: null,
     }),
     mounted () {
       this.$refs.calendar.checkChange()
@@ -206,29 +200,45 @@ import {client} from '@/client/axiosClient';
         //   const first = new Date(firstTimestamp - (firstTimestamp % 900000))
         //   const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
         //   const second = new Date(first.getTime() + secondTimestamp)
-
         client({
           method: 'GET',
-          url: 'appointment/appointments-for-pharmacist/' + min + "!" + max,
+          url: 'profile/check-role'
         })
         .then((response) => {
-          fromServer = response.data;
-          console.log(response.data)
-          for(var event of response.data){
-            events.push({
-              name: event.patientFirstName + ' ' + event.patientLastName,
-              start: this.convertToDate(event.from),
-              end: this.convertToDate(event.to),
-              color: 'indigo',
-              timed: null,
-            })
-          }
-          this.events = events;
-          console.log(this.events)
-        })
+          this.role = response.data.toLowerCase();
+        
+        var link = '';
 
-          
-        },
+        if(this.role === 'pharmacist'){
+          link = 'appointment/appointments-for-pharmacist/' + min + "!" + max; 
+        } else {
+          link = 'appointment/appointments-for-dermatologist/' + min + "!" + max;
+        }
+
+          client({
+            method: 'GET',
+            url: link,
+          })
+          .then((response) => {
+            fromServer = response.data;
+            // console.log(response.data)
+            for(var event of response.data){
+              events.push({
+                name: event.patientFirstName + ' ' + event.patientLastName,
+                start: this.convertToDate(event.from),
+                end: this.convertToDate(event.to),
+                color: 'indigo',
+                timed: null,
+                details: event.pharmacyName
+              })
+            }
+            this.events = events;
+            // console.log(this.events)
+          })
+        })
+      
+
+    },
 
         // this.events = events
       rnd (a, b) {

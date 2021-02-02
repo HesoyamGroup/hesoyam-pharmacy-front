@@ -325,9 +325,17 @@ import {client} from '@/client/axiosClient';
     }),
 
     mounted() {
+
+      const role = localStorage.getItem('user_role');
+      var link = '';
+      if(role.toLowerCase() === "pharmacist"){
+        link = 'profile/user-information';
+      } else {
+        link = 'dermatologist/dermatologist-information-edit';
+      }      
       client({
         method: 'GET',
-        url: 'profile/user-information'
+        url: link
         })
       .then( (response) => {
         this.userDto = response.data;

@@ -6,15 +6,20 @@ import ProfilePage from '../views/ProfilePage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import MedicineSearchPage from '../views/MedicineSearchPage.vue'
 import PharmacistPage from '../views/PharmacistPage.vue'
-import DermatologistPage from '../views/Dermatologist1Page.vue'
+import DermatologistPage from '../views/DermatologistPage.vue'
 import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
+import SupplierPage from '../views/SupplierPage.vue'
+import BrowseMedicinePage from '../views/BrowseMedicinePage.vue'
+import AllPharmaciesPage from '../views/AllPharmaciesPage.vue'
 
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
 import EmployeePage from '../views/EmployeePage.vue'
+import SearchUsersPage from '../views/SearchUsersPage.vue'
 
 import * as UserService from '../service/UserService.js';
+
 
 import {client} from '@/client/axiosClient'
 
@@ -74,6 +79,14 @@ const routes = [
     }
   },
   {
+    path:'/supplier-profile',
+    component: SupplierPage
+  },
+  {
+    path:'/browse-medicine',
+    component: BrowseMedicinePage
+  },
+  {
     path: '/medicine-search',
     component: MedicineSearchPage,
   },
@@ -94,7 +107,13 @@ const routes = [
         router.push({path: '/login'});
       }
       else{
-        next();
+        let user = UserService.getLoggedUserData();
+        if(user.userRole == 'PHARMACIST'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
       }
     }
   },
@@ -115,8 +134,28 @@ const routes = [
     }
   },
   {
+    path: '/pharmacy/all',
+    name: 'AllPharmacies',
+    component: AllPharmaciesPage
+  },
+  {
     path: '/dermatologist',
-    component: DermatologistPage
+    component: DermatologistPage,
+    beforeEnter: function(to, from, next){
+
+      if(!UserService.isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        let user = UserService.getLoggedUserData();
+        if(user.userRole == 'DERMATOLOGIST'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+      }
+    }
   },
   {
     path: '/pharmacy/:id',
@@ -137,6 +176,22 @@ const routes = [
         }
     }
   },
+
+  {
+    path: '/searchusers',
+    name: 'SearchUsers',
+    component: SearchUsersPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST' || user.userRole == 'DERMATOLOGIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+
   {
     path: '/dermatologists',
     name: 'Dermatologists',

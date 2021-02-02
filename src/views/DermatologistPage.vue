@@ -1,5 +1,4 @@
 <template>
-
     <div id="pharmacist-page-main-container">
         <v-card color="basil">
     <v-card-title class="text-center justify-center py-6">
@@ -8,11 +7,6 @@
       </h1>
 
     </v-card-title>
-    <v-row justify="center">
-      <h2 class="display-1 basil2--text" id="pharmacy-text">
-        {{userDTO.pharmacyName}}
-      </h2>
-    </v-row>
     <v-btn plain @click="logout()">Logout</v-btn>
     <v-tabs
       v-model="tab"
@@ -70,7 +64,6 @@
                 userDTO:{
                     firstName: '',
                     lastName: '',
-                    pharmacyName: ''
                 },
                 mode: 'calendar',
                 tab: 0,
@@ -84,9 +77,10 @@
         mounted(){
           client({
             method: 'GET',
-            url: 'pharmacist/pharmacist-information'
+            url: 'dermatologist/dermatologist-information'
           }).then((response) => {
-            this.userDTO = response.data;
+                console.log(response.data);
+                this.userDTO = response.data;
           })
         },
         methods:{
