@@ -421,6 +421,9 @@
                             </v-btn>
                         </v-card-actions>
                         <v-data-table
+                        show-select
+                        v-model='selectedAllergy'
+                        :single-select="singleSelectAllergy"
                         :headers="headersAllergies"
                         :items="allergies"
                         :items-per-page="5"
@@ -429,7 +432,8 @@
                         <v-card-actions class='justify-center'>
                             <v-btn
                             class='ma-4'
-                            color='error'>
+                            color='error'
+                            @click='deleteAllergy'>
                                 Delete Allergy
                             </v-btn>
                             <v-btn
@@ -501,6 +505,8 @@ export default {
                 allergies: [],
                 notAllergicTo: [],
                 selectedAllergyMedicine: {},
+                singleSelectAllergy: true,
+                selectedAllergy: [],
                 //Reserved medicine
                 medicineHeaders:[
                 { text: 'Medicine:', value:'iteratorMedicineReservationItem[0].medicine.name'},
@@ -798,6 +804,31 @@ export default {
 
                 })
                 
+            },
+            deleteAllergy: function()
+            {
+                console.log(this.selectedAllergy[0].id);
+                const vm = this;
+                client({
+                    method: 'POST',
+                    url: 'patient/delete-allergy',
+                    data:{
+                        id: vm.selectedAllergy[0].id
+                    }
+                })
+                .then((response) => {
+                    vm.allergies = response.data;
+                    vm.allergiesDialog = false;
+                    vm.selectedAllergy = [];
+                    client({
+                        method: 'GET',
+                        url: 'patient/not-allergic-to',
+                        
+                    })
+                    .then((response) => {
+                        vm.notAllergicTo = response.data;
+                    })
+                })
             }
         }
         
