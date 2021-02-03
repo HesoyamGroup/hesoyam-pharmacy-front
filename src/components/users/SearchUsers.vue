@@ -9,18 +9,28 @@
     <!-- <v-row > -->
         <v-text-field
         v-model="query"
-                outlined
                 clearable
                 label="Search"
                 type="text"
+                outlined
+                
         ></v-text-field>
+        <v-row justify="center">
+        <v-btn @click="searchQuery()" class="btn"><v-icon color="indigo lighten-1">mdi-account-search</v-icon></v-btn>
+        <v-btn @click="resetList()" class="btn"><v-icon color = "indigo lighten-1">mdi-refresh</v-icon></v-btn>
+        <br>
+        <br>
+        </v-row>
         <!-- <v-btn icon='mdi-search'></v-btn> -->
     <!-- </v-row> -->
+    <v-row justify="center">
     <span>Sort by:</span>
-    <br>
-    <v-btn @click="sortByFirstName()">Name</v-btn>
-    <v-btn @click="sortByLastName()">Surname</v-btn>
-    <v-btn @click="sortByDate()">Date</v-btn>
+    </v-row>
+    <v-row justify="center">
+    <v-btn @click="sortByFirstName()" plain color="indigo lighten-1">Name</v-btn>
+    <v-btn @click="sortByLastName()" plain color="indigo lighten-1">Surname</v-btn>
+    <v-btn @click="sortByDate()" plain color="indigo lighten-1">Date</v-btn>
+    </v-row>
     <div v-for="patient in this.patientsFixed" :key="patient.firstName">
     <v-list-item two-line>
         <v-list-item-content>
@@ -30,6 +40,26 @@
         </v-list-item>  
         </div>
     </v-card>
+
+    <v-snackbar
+      v-model="snackbar"
+      :vertical="vertical"
+      light
+      timeout="2000"
+    >
+      {{snackbarText}}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="indigo"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     </div>
 </template>
 
@@ -46,25 +76,14 @@ export default {
                 sort_first_name_asc: true,
                 sort_last_name_asc: true,
                 sort_date_asc: true,
+                snackbarText: '',
+                snackbar: false,
+                vertical: false,
             }
         },
         
-    mounted(){
-        client({
-            method: 'GET',
-            url: 'dermatologist/patients-for-dermatologist'
-        })
-        .then((response) => {
-            this.patients = response.data;
-            
-            for(let patient of response.data){
-                patient.lastCheckupDate = this.toDate(patient.dateOfAppointment);
-                this.patientsFixed.push(patient);
-            }
-        })
-        
-        
-
+    mounted(){      
+        this.getAllPatients();
     },
 
     methods:{
@@ -174,6 +193,63 @@ export default {
 
             this.sort_date_asc = !this.sort_date_asc;
         },
+
+        searchQuery: function(){
+            var link = 'appointment/search-for-user/' + this.query;
+            client({
+                method: 'GET',
+                url: link
+            })
+            .then((response) => {
+                this.patientsFixed = [];
+                if(response.data.length === 0){
+                    this.snackbar = true;
+                    this.snackbarText = "No patients found!";
+                }
+                this.patients = this.sortByGrade(response.data);
+                for(var patient of response.data){
+                    patient.lastCheckupDate = this.toDate(patient.dateOfAppointment);
+                    this.patientsFixed.push(patient);
+                }
+            })
+        },
+        sortByGrade: function(data){
+            data.sort(function(a, b) {
+                    var gradeA = a.grade;
+                    var gradeB = b.grade;
+                    if (gradeA < gradeB) {
+                        return -1;
+                    }
+                    if (gradeA > gradeB) {
+                        return 1;
+                    }
+
+                    // names must be equal
+                    return 0;
+                    });
+        },
+        resetList: function(){
+            this.patientsFixed = [];
+            this.getAllPatients();
+        },
+        getAllPatients: function(){
+            var link = '';
+        if(localStorage.getItem('user_role').toLowerCase() === 'role_pharmacist')
+            link = 'pharmacist/patients-for-pharmacist';
+        else
+            link = 'dermatologist/patients-for-dermatologist';
+
+        client({
+            method: 'GET',
+            url: link 
+        })
+        .then((response) => {
+            for(var patient of response.data){
+                patient.lastCheckupDate = this.toDate(patient.dateOfAppointment);
+                this.patientsFixed.push(patient);
+            }
+        })
+        },
     },
 }
 </script>
@@ -182,4 +258,11 @@ export default {
     .main-container{
         margin-top: 5%,
     }
+    span{
+        color: grey;
+    }
+    .btn{
+        margin-left: 2%;
+    }
+
 </style>
