@@ -3,14 +3,7 @@
         <template v-if="employees.length > 0">
             <v-list-item v-for="employee in employees" :key="employee.id">
                 <v-list-item-content>
-                    <v-row>
-                        <v-col>
-                            <v-list-item-title>{{employee.firstName}} {{employee.lastName}}</v-list-item-title>
-                        </v-col>
-                        <v-col>
-                            <v-btn :to="'/' + type + '/' + employee.id"><v-icon>mdi-account</v-icon></v-btn>
-                        </v-col>
-                    </v-row>
+                    <pharmacy-employee-list-item :employee="employee" :type="type"></pharmacy-employee-list-item> 
                 </v-list-item-content>
             </v-list-item>
         </template>
@@ -23,12 +16,16 @@
 </template>
 
 <script>
+import PharmacyEmployeeListItem from './PharmacyEmployeeListItem.vue'
 export default {
     name: 'PharmacyEmployeeList',
     props: ['type', 'employees'],
+    components: { 
+        PharmacyEmployeeListItem
+    },
     data: function(){
         return{
-
+            dialog: false
         }
     }
 }
