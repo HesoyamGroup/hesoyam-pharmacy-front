@@ -12,7 +12,7 @@
 
         <v-row>
             <v-col>
-                <free-appointment-picker v-if="isDermatologist"></free-appointment-picker>
+                <free-appointment-input v-if="isDermatologist"></free-appointment-input>
             </v-col>
             <v-col>
                 <v-card class="ma-3">
@@ -41,12 +41,12 @@
 import * as UserService from '@/service/UserService'
 import * as DateFormatter from '@/utils/DateFormatter'
 import {client} from '@/client/axiosClient'
-import FreeAppointmentPicker from '../components/appointment/FreeAppointmentPicker.vue'
+import FreeAppointmentInput from '../components/appointment/FreeAppointmentInput.vue'
 
 export default {
     name: 'EmployeePage',
     components:{
-        FreeAppointmentPicker
+        FreeAppointmentInput
     },
     data: function(){
         return {
@@ -61,7 +61,6 @@ export default {
         this.employeeId = this.$route.params.id;
         this.userRole = UserService._getUserRole();
         this.fetchEmployee();
-        this.$on('free-appointment-added', (freeAppointment) => this.addAppointment(freeAppointment))
     },
     mounted(){
     },

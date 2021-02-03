@@ -1,75 +1,77 @@
 <template>
-<div>
-    <v-card class="ma-3">
-        <v-card-title>Add free appointment</v-card-title>
-        <v-card-text>
-            <v-form>
-                <v-datetime-picker v-model="newFrom" label="From">
-                    <template v-slot:dateIcon><v-icon>mdi-calendar</v-icon></template>
-                    <template v-slot:timeIcon><v-icon>mdi-clock-outline</v-icon></template>
-                </v-datetime-picker>
-                <v-text-field label="Duration (min)" v-model="newDuration" required></v-text-field>
-                <v-text-field label="Price" v-model="newPrice" required></v-text-field>
-                <v-btn @click="addFreeAppointment()" class="ml-auto" :disabled="!formValid">Add</v-btn>
-            </v-form>
-        </v-card-text>
-        <v-card-actions>
-        </v-card-actions>
-    </v-card>
-</div>
-    
+    <div>
+        <v-card class="ma-3">
+            <v-card-title>Free appointments</v-card-title>
+            <v-data-table
+            :headers="headers"
+            :items="appointments"
+            class="elevation-1"
+            >
+                <template v-slot:item.reserve="{ item }">
+                <v-btn @click="reserveAppointment(item)">Reserve</v-btn>
+                </template>
+
+                <template v-slot:item.pharmacy="{ item }">
+                    <v-btn :to="'/pharmacy/' + item.pharmacy.id">{{item.pharmacy.name}}</v-btn>
+                </template>
+            </v-data-table>
+        </v-card>
+    </div>
 </template>
 
 <script>
-import {client} from '@/client/axiosClient'
+//Props:
+//      appointments: List<FreeCheckUpDTO>
+//      employee-id: Long
+import * as UserService from '@/service/UserService'
 
 export default {
     name: 'FreeAppointmentPicker',
+    props: ['appointments', 'employee-id'],
     data: function(){
-        return {
-            newFrom: null,
-            newDuration: null,
-            newPrice: null
-
+        return{
+            userRole: '',
+            //employee: {}
         }
+    },
+    created(){
+        this.userRole = UserService.getLoggedUserData().userRole;
+    },
+    mounted(){
+
     },
     methods:{
-        addFreeAppointment(){
-            let offset = new Date(this.newFrom).getTimezoneOffset();
-            let from = new Date(this.newFrom.getTime() - offset*60000);
-            let to = new Date(from.getTime() + this.newDuration*60000);
 
-            let fromStr = from.toISOString();
-            let toStr = to.toISOString();
-            let employeeId = this.$route.params.id;
-            //alert(fromStr.substr(0, fromStr.length-1) + ' >>>> ' + toStr.substr(0, toStr.length-1));
-            client({
-                method: 'POST',
-                url: '/checkup/free/dermatologist/' + employeeId,
-                data:{
-                    range:{
-                        from: from.toISOString(),
-                        to: to.toISOString()
-                    },
-                    price: this.newPrice
-                }
-            }).then((response) => {
-                alert('Free appointment added!');
-                this.$emit('free-appointment-added', response.data);
-                this.newDuration = null;
-                this.newPrice = null;
-            }, (error) => {
-                alert(error.response.data);
-            })
-        },
-        reserveAppointment(appointment){
-            //TODO 3.13
-        }
     },
+
+
     computed:{
-        formValid(){
-            return this.newFrom != '' && this.newDuration > 0 && this.newPrice > 0;
-        }
+        isPatient(){
+            return this.userRole == 'PATIENT';
+        },
+        isAdministrator(){
+            return this.userRole == 'ADMINISTRATOR';
+        },
+        headers(){
+            if(this.isPatient){
+                return [
+                        { text: 'Pharmacy', value: 'pharmacy' },
+                        { text: 'From', value: 'range.from' },
+                        { text: 'To', value: 'range.to' },
+                        { text: 'Price', value: 'price' },
+                        { text: '', value: 'reserve', sortable: false}
+                ]
+            }
+            else if(this.isAdministrator){
+                return [
+                        { text: 'Pharmacy', value: 'pharmacy' },
+                        { text: 'From', value: 'range.from' },
+                        { text: 'To', value: 'range.to' },
+                        { text: 'Price', value: 'price' }
+                ]
+            }
+        } 
     }
+
 }
 </script>
