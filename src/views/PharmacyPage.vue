@@ -8,7 +8,6 @@
             </v-col>
             <v-col>
                 <pharmacy-inventory v-if="isAdministrator" v-model="pharmacy"></pharmacy-inventory>
-                <pharmacy-medicine-list v-model="pharmacy"/>
             </v-col>
         </v-row>
     </div>
@@ -18,7 +17,6 @@
 <script>
 import {client} from '@/client/axiosClient';
 import PharmacyInfo from '@/components/pharmacy/PharmacyInfo.vue';
-import PharmacyMedicineList from '@/components/pharmacy/PharmacyMedicineList.vue';
 import PharmacyEmployeeTabs from '../components/pharmacy/PharmacyEmployeeTabs.vue';
 import PharmacyInventory from '../components/pharmacy/PharmacyInventory.vue';
 
@@ -29,7 +27,6 @@ export default {
     name: 'PharmacyPage',
     components: {
         PharmacyInfo,
-        PharmacyMedicineList,
         PharmacyEmployeeTabs,
         PharmacyInventory,
     },

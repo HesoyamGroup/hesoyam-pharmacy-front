@@ -7,8 +7,8 @@
             :items="appointments"
             class="elevation-1"
             >
-                <template v-slot:item.reserve="{ item }">
-                <v-btn @click="reserveAppointment(item)">Reserve</v-btn>
+                <template v-slot:item.actions="{ item }">
+                    <v-btn @click="reserveAppointment(item)">Reserve</v-btn>
                 </template>
 
                 <template v-slot:item.pharmacy="{ item }">
@@ -22,29 +22,29 @@
 <script>
 //Props:
 //      appointments: List<FreeCheckUpDTO>
-//      employee-id: Long
 import * as UserService from '@/service/UserService'
 
 export default {
     name: 'FreeAppointmentPicker',
-    props: ['appointments', 'employee-id'],
+    props: ['appointments'],
     data: function(){
         return{
-            userRole: '',
-            //employee: {}
+            userRole: ''
         }
     },
     created(){
         this.userRole = UserService.getLoggedUserData().userRole;
     },
     mounted(){
-
     },
     methods:{
-
+        //Param:
+        //      appointment - FreeCheckUpDTO
+        reserveAppointment(appointment){
+            //TODO: 3.13
+            alert('Appointment ' + appointment.id + ' is being reserved');
+        }
     },
-
-
     computed:{
         isPatient(){
             return this.userRole == 'PATIENT';
@@ -59,7 +59,7 @@ export default {
                         { text: 'From', value: 'range.from' },
                         { text: 'To', value: 'range.to' },
                         { text: 'Price', value: 'price' },
-                        { text: '', value: 'reserve', sortable: false}
+                        { text: '', value: 'actions', sortable: false}
                 ]
             }
             else if(this.isAdministrator){
@@ -70,7 +70,7 @@ export default {
                         { text: 'Price', value: 'price' }
                 ]
             }
-        } 
+        }
     }
 
 }
