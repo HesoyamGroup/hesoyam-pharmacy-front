@@ -775,15 +775,25 @@ export default {
             //Allergies 
             addAllergy: function()
             {
+                const vm = this;
                 client({
                     method: 'POST',
                     url: 'patient/add-allergy',
                     data:{
-                        id: this.selectedAllergyMedicine.id
+                        id: vm.selectedAllergyMedicine.id
                     }
                 })
                 .then((response) => {
-
+                    vm.allergies = response.data;
+                    vm.allergiesDialog = false;
+                    client({
+                        method: 'GET',
+                        url: 'patient/not-allergic-to',
+                        
+                    })
+                    .then((response) => {
+                        vm.notAllergicTo = response.data;
+                    })
                 },(error) => {
 
                 })
