@@ -25,6 +25,10 @@
                 </v-card>
             </v-flex>
         </v-layout>
+
+        <v-dialog v-model="showChangePass" persistent  max-width="500px">
+            <ChangePass @updatePass="sendUpdatedLoginRequest" :email="form.email" :currentPassword="form.password" @closeChangePass="showChangePass = false"/>
+        </v-dialog>
     </v-container>
 </div>
 </template>
@@ -33,12 +37,18 @@
 <script>
 
 import {client} from '@/client/axiosClient';
+import ChangePass from './ChangePass.vue';
 
 export default {
     name: 'Login',
+     components: {
+            ChangePass
+     },
     data: function(){
         return {
+            showChangePass: false,
             form: {
+                
                 email: '',
                 password: '',
                 isFormValid: false,
@@ -60,6 +70,11 @@ export default {
         }
     },
     methods: {
+        sendUpdatedLoginRequest(newPassword){
+            console.log(newPassword);
+            this.form.password = newPassword;
+            this.sendLoginRequest();
+        },
         sendLoginRequest: function(){
             this.resetLoginStatus();
             client({
@@ -74,7 +89,12 @@ export default {
                 this.form.login.successful = true;
                 setTimeout(() => { this.$router.push({path: '/'})}, 2000);
             }, (error) => {
-                this.form.login.unsuccessful = true;
+                if(error.response.status == '428'){
+                    this.showChangePass = true;
+                }else{
+                    this.form.login.unsuccessful = true;
+                }
+                
             })
         },
         saveTokenDataToLocalStorage: function(response){
