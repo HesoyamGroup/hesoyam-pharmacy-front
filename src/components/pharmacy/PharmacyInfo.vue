@@ -59,25 +59,39 @@ export default {
             //client(...)
 
             let pharmacyId = this.$route.params.id;
+            // client({
+            //     method: 'GET',
+            //     url: 'patient/' + this.userId + '/subscribed/pharmacy/' + pharmacyId
+            // }).then((response) => {
+            //     this.subscribed = response.data;
+            //     console.log("Patient is subscribed: " + response.data);
+            // }, (error) => {});
             client({
                 method: 'GET',
-                url: 'patient/' + this.userId + '/subscribed/pharmacy/' + pharmacyId
+                url: `/subscribe/is-subbed/${pharmacyId}`
             }).then((response) => {
                 this.subscribed = response.data;
-                console.log("Patient is subscribed: " + response.data);
             }, (error) => {});
         }
     },
     methods:{
         subscribe: function(){
-            //TODO: 3.23 Subscribe
-            //client(...)
-            this.subscribed = true;
+            client({
+                method: 'PUT',
+                url: `/subscribe/sub/${this.$route.params.id}`
+            }).then( (response) => {
+                this.subscribed = true;
+            }, (error) => {});
+            
         },
         unsubscribe: function(){
-            //TODO: 3.23 Unsubscribe
-            //client(...)
-            this.subscribed = false;
+            client({
+                method: 'PUT',
+                url: `/subscribe/unsub/${this.$route.params.id}`
+            }).then((response) => {
+                this.subscribed = false;
+            }, (error) => {});
+            
 
         },
         getColor(rating){
