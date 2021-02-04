@@ -22,7 +22,6 @@
 <script>
 //Props:
 //      appointments: List<FreeCheckUpDTO>
-import * as DateFormatter from '@/utils/DateFormatter'
 import * as UserService from '@/service/UserService'
 import {client} from '@/client/axiosClient'
 
@@ -45,9 +44,6 @@ export default {
         reserveAppointment(appointment){
             //TODO: 3.13
             alert('Appointment ' + appointment.id + ' is being reserved');
-            appointment.range.from = appointment.range.from + ':00';
-            appointment.range.to = appointment.range.to + ':00';
-            console.log(appointment.range);
             client({
                 method: 'POST',
                 url: '/checkup/reserve',
@@ -61,6 +57,13 @@ export default {
             })
             .then((response) => {
                 console.log('ok');
+                for( var i = 0; i < this.appointments.length; i++){ 
+                    if ( this.appointments[i].id === response.data.id) 
+                    { 
+                        this.appointments.splice(i, 1);
+                        break;
+                    }
+                }
             }, (error) => {
 
             })
