@@ -7,7 +7,7 @@
                         <v-toolbar dark color="primary" >
                             <v-toolbar-title>My storage</v-toolbar-title>
                             <v-spacer></v-spacer>
-                            <v-btn icon color="green accent-3" large>
+                            <v-btn icon color="green accent-3" large @click="addMedicineDialog()">
                                 <v-icon>mdi-hospital</v-icon>
                             </v-btn>
                         </v-toolbar>
@@ -75,7 +75,7 @@
 
                                         <td>
                                             <v-layout justify-center>
-                                                <v-btn :disabled="row.item.reserved > 0" color="primary">
+                                                <v-btn :disabled="row.item.reserved > 0" color="primary" @click="deleteInventoryItem(row.item)">
                                                     Delete
                                                 </v-btn>
                                             </v-layout>
@@ -129,6 +129,60 @@
             </v-form>
         </v-dialog>
 
+        <v-dialog v-model="addItem" max-width="500px" max-height="700px">
+            <v-card>
+                <v-toolbar>
+                    <v-toolbar-title>
+                        Add new medicines to inventory
+                    </v-toolbar-title>
+                </v-toolbar>
+                <v-card-text>
+                    <v-data-table :items="medicinesToAdd" hide-default-footer disable-pagination>
+                        <template v-slot:header="header">
+                            <th>
+                                Medicine name
+                            </th>
+
+                            <th>
+                                Add
+                            </th>
+                        </template>
+
+                        <template v-slot:item="row">
+                            <tr>
+                                <td>
+                                    <v-layout justify-center>
+                                        {{row.item.name}}
+                                    </v-layout>
+                                </td>
+
+
+                                <td>
+                                    <v-layout justify-center>
+                                        <v-btn icon color="green accent-3" @click="addMedicine(row.item)">
+                                            <v-icon>mdi-plus-circle</v-icon>
+                                        </v-btn>
+                                    </v-layout>
+                                </td>
+                            </tr>
+                        </template>
+
+
+                        <template v-slot:footer="footer">
+                            <v-container class="footer" >
+                                <v-row justify="center">
+                                    <v-btn :disabled="!canGoBackMedicinePagination" @click="decMedicinePage()">Prev</v-btn>
+                                    <v-btn :disabled="!hasMoreMedicinePagination" @click="incMedicinePage()">Next</v-btn>
+                                </v-row>
+                            </v-container>
+                        </template>
+                    </v-data-table>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
+
+        <v-snackbar v-model="addMedicineError">An error occured while trying to add medicine. </v-snackbar>
+
 
     </div>
 
@@ -140,15 +194,9 @@
     export default{
         name: 'storage-view',
         mounted(){
-            client({
-                method: 'GET',
-                url: '/storage/my'
-            }).then( (response) => {
-                this.items = response.data;
-            }, (error) => {
-                console.log('An error occured during retrieving of your storage');
-            });
+            this.refreshMyInventoryItems();
         },
+        props: ['update'],
         data(){
             return {
                 items: [],
@@ -157,6 +205,7 @@
                 editedMedicine: null,
                 backupedMedicine: {},
                 editStock: false,
+                addItem: false,
                 disableUserInteraction: false,
                 rules: {
                     minStock: [
@@ -164,10 +213,57 @@
                         minStock => ( (this.editedMedicine == null || this.editedMedicine == {}) || minStock >= this.editedMedicine.reserved) || 'Min stock cannot go below reserved value',
                     ]
                 },
-                isFormValid: true
+                isFormValid: true,
+                medicinesToAdd: [],
+                medicinePage: 1,
+                maxPerMedicinePage: 8,
+                addMedicineError: false
             }
         },
         methods: {
+            addMedicine(med){
+                this.addMedicineError = false;
+                client({
+                    method: 'POST',
+                    url: 'storage/my/add',
+                    data: {
+                        medicine: {
+                            id: med.id
+                        }
+                    }
+                }).then((response) => {
+                    this.addItem = false;
+                    this.refreshUnadded();
+                    this.refreshMyInventoryItems();
+                }, (error) => {
+                    this.addMedicineError = true;
+                    setTimeout(() => this.addMedicineError = false, 3000);
+                });
+            },
+            refreshUnadded(){
+                client({
+                    method: 'GET',
+                    url: `storage/my/unadded?page=${this.medicinePage}`
+                }).then ((response) => {
+                    this.medicinesToAdd = response.data;
+                }, (error) => {
+                    console.log('An error occured during retrieving unadded medicine.');
+                })
+            },
+            refreshMyInventoryItems(){
+                client({
+                    method: 'GET',
+                    url: `/storage/my?page=${this.page}`
+                }).then( (response) => {
+                    this.items = response.data;
+                }, (error) => {
+                    console.log('An error occured during retrieving of your storage');
+                });
+            },
+            addMedicineDialog(){
+                this.addItem = true;
+                this.refreshUnadded();
+            },
             editMedicineStock(medicine){
                 this.editStock = true;
                 Object.assign(this.backupedMedicine, medicine);
@@ -176,6 +272,16 @@
             cancelEdit(){
                 this.editStock = false;
                 Object.assign(this.editedMedicine, this.backupedMedicine);
+            },
+            deleteInventoryItem(item){
+                client({
+                    method: 'DELETE',
+                    url: `/storage/my/delete/${item.id}`
+                }).then( (response) => {
+                    this.items = this.items.filter((it) => it.id != item.id);
+                }, (error) => {
+                    console.log('An error occured while trying to delete an item.');
+                });
             },
             submitChanges(){
                 this.disableUserInteraction = true;
@@ -193,19 +299,40 @@
 
                 });
             },
+            incMedicinePage(){
+                this.medicinePage += 1;
+                this.refreshUnadded();
+            },
+            decMedicinePage(){
+                this.medicinePage -= 1;
+                this.refreshUnadded();
+            },  
             incPage(){
                 this.page += 1;
+                this.refreshMyInventoryItems();
             },
             decPage(){
                 this.page -= 1;
+                this.refreshMyInventoryItems();
             }
         },
         computed:{
+            hasMoreMedicinePagination(){
+                return this.medicinesToAdd.length >= this.maxPerMedicinePage;
+            },
+            canGoBackMedicinePagination(){
+                return this.medicinePage > 1;
+            },
             hasMorePagination(){
                 return this.items.length >= this.maxPerPage;
             },
             canGoBackPagination(){
                 return this.page > 1;
+            }
+        },
+        watch: {
+            'update': function(){
+                this.refreshMyInventoryItems();
             }
         }
     }

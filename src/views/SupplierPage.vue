@@ -5,19 +5,18 @@
             <v-row rows="6" class="row-1">
                 <v-col>
                     <!--Edit user info-->
-                    Edit user info
+                    <SupplierChangeBasicInfo />
                 </v-col>
 
 
                 <v-col>
-                    <StorageView />
+                    <StorageView :update="update"/>
                 </v-col>
             </v-row>
 
 
             <v-row rows="6" class="row-2">
-                <!--Offers-->
-                Offers
+                <OfferManagement @myEvent="updateUpdate()"/>
             </v-row>
         </v-container>
 
@@ -27,10 +26,24 @@
 
 <script>
     import StorageView from '@/components/storage/StorageView.vue';
+    import OfferManagement from '@/components/pharmacy/offers/OfferManagement.vue';
+    import SupplierChangeBasicInfo from '@/components/users/SupplierChangeBasicInfo.vue';
     export default {
         name: 'supplier-page',
         components: {
-            StorageView
+            StorageView,
+            OfferManagement,
+            SupplierChangeBasicInfo
+        },
+        data(){
+            return {
+                update: false
+            }
+        },
+        methods: {
+            updateUpdate(){
+                this.update = !this.update;
+            }
         }
     }
 </script>
