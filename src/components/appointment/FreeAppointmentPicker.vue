@@ -22,7 +22,9 @@
 <script>
 //Props:
 //      appointments: List<FreeCheckUpDTO>
+import * as DateFormatter from '@/utils/DateFormatter'
 import * as UserService from '@/service/UserService'
+import {client} from '@/client/axiosClient'
 
 export default {
     name: 'FreeAppointmentPicker',
@@ -43,6 +45,25 @@ export default {
         reserveAppointment(appointment){
             //TODO: 3.13
             alert('Appointment ' + appointment.id + ' is being reserved');
+            appointment.range.from = appointment.range.from + ':00';
+            appointment.range.to = appointment.range.to + ':00';
+            console.log(appointment.range);
+            client({
+                method: 'POST',
+                url: '/checkup/reserve',
+                data:{
+                    id: appointment.id,
+                    range: null,
+                    pharmacy: appointment.pharmacy,
+                    price: appointment.price,
+                    dermatologist: appointment.dermatologist
+                }
+            })
+            .then((response) => {
+                console.log('ok');
+            }, (error) => {
+
+            })
         }
     },
     computed:{
