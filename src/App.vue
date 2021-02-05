@@ -26,6 +26,7 @@
       </div>
 
       <v-spacer></v-spacer>
+      <v-btn @click="logout()" to="/login">Logout</v-btn>
 
       <v-btn
         href="https://github.com/vuetifyjs/vuetify/releases/latest"
@@ -46,6 +47,7 @@
 
 <script>
 import HelloWorld from './components/HelloWorld';
+import * as UserService from './service/UserService';
 
 export default {
   name: 'App',
@@ -57,5 +59,10 @@ export default {
   data: () => ({
     //
   }),
+  methods:{
+    logout(){
+      UserService.clearUserData();
+    }
+  }
 };
 </script>

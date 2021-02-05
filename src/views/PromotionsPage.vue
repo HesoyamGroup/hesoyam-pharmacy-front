@@ -31,7 +31,8 @@
                 </v-menu>
             </v-card-text>
             <v-card-actions>
-                <v-btn @click="addPromotion()" :disabled="!newPromotionValid" color="primary">Add</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn @click="addPromotion()" :disabled="!newPromotionValid" color="green" :dark="newPromotionValid">Add</v-btn>
             </v-card-actions>
         </v-card>
 
