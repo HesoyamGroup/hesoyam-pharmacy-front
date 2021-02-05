@@ -17,6 +17,7 @@ import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
 import EmployeePage from '../views/EmployeePage.vue'
 import SearchUsersPage from '../views/SearchUsersPage.vue'
+import EPrescriptionPage from '../views/EPrescriptionPage.vue';
 
 import * as UserService from '../service/UserService.js';
 
@@ -225,6 +226,12 @@ const routes = [
         router.push({path: '/'});
       }
     }
+  },
+
+  {
+    path: '/eprescription',
+    name: 'eprescription',
+    component: EPrescriptionPage
   }
 ]
 
