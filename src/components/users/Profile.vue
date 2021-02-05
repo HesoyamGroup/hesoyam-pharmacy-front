@@ -559,7 +559,7 @@ export default {
                 selectedAllergy: [],
                 //Reserved medicine
                 medicineHeaders:[
-                { text: 'Medicine:', value:'iteratorMedicineReservationItem[0].medicine.name'},
+                { text: 'Medicine:', value:'medicineReservationItemList[0].medicine.name'},
                 { text: 'Status:', value:'medicineReservationStatus'},
                 { text: 'Pick Up Date:', value:'pickUpDate'},                
                 ],
