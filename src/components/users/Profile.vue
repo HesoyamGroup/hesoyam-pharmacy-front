@@ -402,17 +402,28 @@
                         <v-toolbar dark color = 'primary'>
                             <v-toolbar-title>Allergies</v-toolbar-title>
                         </v-toolbar>
-                        <v-card-actions class='justify-center'>
+                        <v-card-actions>
+                            <v-select
+                            class='mt-4'
+                            :items="notAllergicTo"
+                            label="New Allergy"
+                            outlined
+                            item-text="medicineName"
+                            item-value="id"
+                            return-object
+                            v-model='selectedAllergyMedicine'>
+                            </v-select>
                             <v-btn
-                            color='success'>
+                            class='ml-4'
+                            color='success'
+                            @click='addAllergy'>
                                 Add Allergy
-                            </v-btn>
-                            <v-btn
-                            color='error'>
-                                Delete Allergy
                             </v-btn>
                         </v-card-actions>
                         <v-data-table
+                        show-select
+                        v-model='selectedAllergy'
+                        :single-select="singleSelectAllergy"
                         :headers="headersAllergies"
                         :items="allergies"
                         :items-per-page="5"
@@ -420,6 +431,13 @@
                         </v-data-table>
                         <v-card-actions class='justify-center'>
                             <v-btn
+                            class='ma-4'
+                            color='error'
+                            @click='deleteAllergy'>
+                                Delete Allergy
+                            </v-btn>
+                            <v-btn
+                            class='ma-4'
                             color="error"
                             @click='allergiesDialog = !allergiesDialog'>
                                 Close
@@ -481,9 +499,14 @@ export default {
                 //Allergies
                 allergiesDialog: false,
                 headersAllergies: [
-                    {text: 'Medicine Name:', value: 'medicineName'}
+                    {text: 'Medicine Name:', value: 'medicineName'},
+                    {text: 'Manufacturer:', value: 'manufacturerName'}
                 ],
                 allergies: [],
+                notAllergicTo: [],
+                selectedAllergyMedicine: {},
+                singleSelectAllergy: true,
+                selectedAllergy: [],
                 //Reserved medicine
                 medicineHeaders:[
                 { text: 'Medicine:', value:'iteratorMedicineReservationItem[0].medicine.name'},
@@ -551,16 +574,16 @@ export default {
         mounted(){
             const vm = this;
             client({
-                    method: 'GET',
-                    url: 'profile/user-information'
-                })
-                .then( (response) => {
-                    vm.userDTO = Object.assign(vm.userDTO,response.data);
-                    vm.form.userEdit = Object.assign(vm.form.userEdit ,response.data);
-                    console.log(vm.userDTO.firstName)
-                }, (error) => {
+                method: 'GET',
+                url: 'profile/user-information'
+            })
+            .then( (response) => {
+                vm.userDTO = Object.assign(vm.userDTO,response.data);
+                vm.form.userEdit = Object.assign(vm.form.userEdit ,response.data);
+                console.log(vm.userDTO.firstName)
+            }, (error) => {
 
-                })
+           })
             
             client({
                 method:'GET',
@@ -594,6 +617,22 @@ export default {
 
             })
 
+            client({
+                method: 'GET',
+                url: 'patient/all-allergies'
+            })
+            .then((response) => {
+                vm.allergies = response.data;
+            })
+
+            client({
+                method: 'GET',
+                url: 'patient/not-allergic-to',
+                
+            })
+            .then((response) => {
+                vm.notAllergicTo = response.data;
+            })
         },
         methods:{
             //Get all cities in selected country
@@ -737,6 +776,58 @@ export default {
                     this.showCancelDialog = false;                 
                 },(error)=>{
 
+                })
+            },
+            //Allergies 
+            addAllergy: function()
+            {
+                const vm = this;
+                client({
+                    method: 'POST',
+                    url: 'patient/add-allergy',
+                    data:{
+                        id: vm.selectedAllergyMedicine.id
+                    }
+                })
+                .then((response) => {
+                    vm.allergies = response.data;
+                    vm.allergiesDialog = false;
+                    client({
+                        method: 'GET',
+                        url: 'patient/not-allergic-to',
+                        
+                    })
+                    .then((response) => {
+                        vm.notAllergicTo = response.data;
+                    })
+                },(error) => {
+
+                })
+                
+            },
+            deleteAllergy: function()
+            {
+                console.log(this.selectedAllergy[0].id);
+                const vm = this;
+                client({
+                    method: 'POST',
+                    url: 'patient/delete-allergy',
+                    data:{
+                        id: vm.selectedAllergy[0].id
+                    }
+                })
+                .then((response) => {
+                    vm.allergies = response.data;
+                    vm.allergiesDialog = false;
+                    vm.selectedAllergy = [];
+                    client({
+                        method: 'GET',
+                        url: 'patient/not-allergic-to',
+                        
+                    })
+                    .then((response) => {
+                        vm.notAllergicTo = response.data;
+                    })
                 })
             }
         }

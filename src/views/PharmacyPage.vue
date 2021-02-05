@@ -4,11 +4,11 @@
         <v-row>
             <v-col>
                 <pharmacy-info v-model="pharmacy" />
+                <pharmacy-appointments :pharmacyId="pharmacy.id"></pharmacy-appointments>
                 <pharmacy-employee-tabs></pharmacy-employee-tabs>
             </v-col>
             <v-col>
                 <pharmacy-inventory v-if="isAdministrator" v-model="pharmacy"></pharmacy-inventory>
-                <pharmacy-medicine-list v-model="pharmacy"/>
             </v-col>
         </v-row>
     </div>
@@ -18,9 +18,9 @@
 <script>
 import {client} from '@/client/axiosClient';
 import PharmacyInfo from '@/components/pharmacy/PharmacyInfo.vue';
-import PharmacyMedicineList from '@/components/pharmacy/PharmacyMedicineList.vue';
 import PharmacyEmployeeTabs from '../components/pharmacy/PharmacyEmployeeTabs.vue';
 import PharmacyInventory from '../components/pharmacy/PharmacyInventory.vue';
+import PharmacyAppointments from '../components/pharmacy/PharmacyAppointments.vue';
 
 import * as UserService from '@/service/UserService';
 
@@ -29,9 +29,9 @@ export default {
     name: 'PharmacyPage',
     components: {
         PharmacyInfo,
-        PharmacyMedicineList,
         PharmacyEmployeeTabs,
         PharmacyInventory,
+        PharmacyAppointments
     },
     data: function(){
         return {

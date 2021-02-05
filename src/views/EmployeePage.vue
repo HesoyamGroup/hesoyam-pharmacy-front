@@ -10,30 +10,14 @@
             <v-card-subtitle>{{employee.role}}</v-card-subtitle>
         </v-card-title>
 
-        <v-row>
-            <v-col>
-                <free-appointment-picker v-if="isDermatologist"></free-appointment-picker>
+        <v-row v-if="employeeIsDermatologist">
+            <v-col v-if="isAdministrator">
+                <free-appointment-input></free-appointment-input>
             </v-col>
             <v-col>
-                <v-card class="ma-3">
-                    <v-card-title>Free appointments</v-card-title>
-                    <v-data-table
-                    :headers="headers"
-                    :items="freeAppointments"
-                    class="elevation-1"
-                    >
-                        <template v-slot:item.reserve="{ item }">
-                        <v-btn @click="reserveAppointment(item)">Reserve</v-btn>
-                        </template>
-
-                        <template v-slot:item.pharmacy="{ item }">
-                            <v-btn :to="'/pharmacy/' + item.pharmacy.id">{{item.pharmacy.name}}</v-btn>
-                        </template>
-                    </v-data-table>
-                </v-card>
+                <free-appointment-picker :appointments="freeAppointments"></free-appointment-picker>
             </v-col>
         </v-row>
-
     </v-card>
 </template>
 
@@ -41,11 +25,13 @@
 import * as UserService from '@/service/UserService'
 import * as DateFormatter from '@/utils/DateFormatter'
 import {client} from '@/client/axiosClient'
+import FreeAppointmentInput from '../components/appointment/FreeAppointmentInput.vue'
 import FreeAppointmentPicker from '../components/appointment/FreeAppointmentPicker.vue'
 
 export default {
     name: 'EmployeePage',
     components:{
+        FreeAppointmentInput,
         FreeAppointmentPicker
     },
     data: function(){
@@ -53,17 +39,13 @@ export default {
             employeeId: 0,
             userRole: '',
             employee: {},
-            freeAppointments: [],
-            
+            freeAppointments: []
         }
     },
     created(){
         this.employeeId = this.$route.params.id;
         this.userRole = UserService._getUserRole();
         this.fetchEmployee();
-        this.$on('free-appointment-added', (freeAppointment) => this.addAppointment(freeAppointment))
-    },
-    mounted(){
     },
     methods:{
         fetchEmployee(){
@@ -77,7 +59,10 @@ export default {
             });
             client({
                 method: 'GET',
-                url: '/checkup/free/dermatologist/' + this.employeeId
+                url: '/checkup/free/dermatologist/' + this.employeeId,
+                params:{
+                    pharmacy: ''
+                }
             }).then((response) => {
                 this.freeAppointments = response.data;
                 for(let appointment of this.freeAppointments){
@@ -86,9 +71,6 @@ export default {
                 }
             })
         },
-        addAppointment(appointment){
-            this.freeAppointments.push(appointment);
-        },
         getColor(rating){
             if(rating >= 4) return 'green';
             else if(rating >= 2) return 'orange';
@@ -96,34 +78,12 @@ export default {
         }
     },
     computed:{
-        isDermatologist(){
+        employeeIsDermatologist(){
             return (this.employee ? this.employee.role : '') == 'DERMATOLOGIST';
-        },
-        isPatient(){
-            return this.userRole == 'PATIENT';
         },
         isAdministrator(){
             return this.userRole == 'ADMINISTRATOR';
-        },
-        headers(){
-            if(this.isPatient){
-                return [
-                        { text: 'Pharmacy', value: 'pharmacy' },
-                        { text: 'From', value: 'range.from' },
-                        { text: 'To', value: 'range.to' },
-                        { text: 'Price', value: 'price' },
-                        { text: '', value: 'reserve', sortable: false}
-                ]
-            }
-            else if(this.isAdministrator){
-                return [
-                        { text: 'Pharmacy', value: 'pharmacy' },
-                        { text: 'From', value: 'range.from' },
-                        { text: 'To', value: 'range.to' },
-                        { text: 'Price', value: 'price' }
-                ]
-            }
-        } 
+        }
     }
 }
 </script>
