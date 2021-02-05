@@ -17,6 +17,8 @@ import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
 import EmployeePage from '../views/EmployeePage.vue'
 import SearchUsersPage from '../views/SearchUsersPage.vue'
+import PromotionsPage from '../views/PromotionsPage.vue'
+import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -207,6 +209,20 @@ const routes = [
     }
   },
   {
+    path: '/hand-out-medicine',
+    name: 'HandOutMedicine',
+    component: HandOutMedicinePage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
     path: '/my-pharmacy',
     name: 'MyPharmacy',
     component: PharmacyPage,
@@ -220,6 +236,20 @@ const routes = [
           let pharmacyId = response.data;
           router.push({path: '/pharmacy/' + pharmacyId});
         }, (error) => {});
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/promotions',
+    name: 'Promotions',
+    component: PromotionsPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        next();
       }
       else{
         router.push({path: '/'});
