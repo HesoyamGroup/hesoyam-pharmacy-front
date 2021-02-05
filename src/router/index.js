@@ -18,6 +18,7 @@ import DermatologistsPage from '../views/DermatologistsPage.vue'
 import EmployeePage from '../views/EmployeePage.vue'
 import SearchUsersPage from '../views/SearchUsersPage.vue'
 import PromotionsPage from '../views/PromotionsPage.vue'
+import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -200,6 +201,20 @@ const routes = [
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/hand-out-medicine',
+    name: 'HandOutMedicine',
+    component: HandOutMedicinePage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST'){
         next();
       }
       else{
