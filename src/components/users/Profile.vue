@@ -242,7 +242,6 @@
                                             v-if='futureCounselingSelected.length>0'
                                             rounded
                                             color='error'
-                                            @click='cancelCounseling'
                                             >
                                                 Cancel Counseling
                                             </v-btn>
