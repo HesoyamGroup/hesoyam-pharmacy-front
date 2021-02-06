@@ -242,6 +242,7 @@
                                             v-if='futureCounselingSelected.length>0'
                                             rounded
                                             color='error'
+                                            @click='cancelCouseling'
                                             >
                                                 Cancel Counseling
                                             </v-btn>
@@ -946,7 +947,25 @@ export default {
                     } 
                 })
             },
-
+            cancelCouseling: function()
+            {
+                console.log(this.futureCounselingSelected[0])
+                client({
+                    method:'POST',
+                    url:'counseling/cancel/patient',
+                    data:{
+                        id: this.futureCounselingSelected[0].id,
+                        pharmacyName: '',
+                        pharmacistFullName: '',
+                        range: null, 
+                        price: 0
+                    }
+                })
+                .then((response) => {
+                    this.futureCounselingSelected = [];
+                    this.getFutureCounselings();
+                })
+            },
             //Checkups
             getFutureCheckups: function()
             {
