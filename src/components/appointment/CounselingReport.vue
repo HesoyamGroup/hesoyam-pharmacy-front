@@ -158,6 +158,13 @@
                   :min="1"
                   v-model="quantityInput"
                 ></v-text-field>
+                <v-text-field
+                  label="Therapy duration (days)"
+                  hint="7"
+                  type="number"
+                  :min="1"
+                  v-model="therapyDurationInput"
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -165,17 +172,25 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
+            color="indigo lighten-1"
             plain
-            @click="dialog = false"
+            @click="testAvailability()"
           >
-            Close
+            Test availability
           </v-btn>
           <v-btn
             color="indigo lighten-1"
             plain
             @click="addPrescriptionItem()"
+            v-if="itemAvailable"
           >
             Save
+          </v-btn>
+          <v-btn
+            plain
+            @click="dialog = false"
+          >
+            Close
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -224,6 +239,9 @@ import {client} from '@/client/axiosClient';
         snackbar: false,
         snackbarText: null,
         vertical: false,
+        therapyDurationInput: 0,
+        itemAvailable: false,
+        pharmacyId: null,
       }
       
     },
@@ -231,7 +249,8 @@ import {client} from '@/client/axiosClient';
         this.patientEmail = this.$route.query.patientEmail;
         this.patientEmail = this.patientEmail.replace(/\s/g, '+');
         this.from = this.$route.query.from;
-        console.log(this.patientEmail);
+        this.pharmacyId = this.$route.query.pharmacy;
+        console.log(this.$route.query.pharmacy);
         console.log(this.from);
         client({
             method: 'GET',
@@ -267,6 +286,17 @@ import {client} from '@/client/axiosClient';
             
             
         },
+
+        testAvailability: function(){
+          client({
+            url: 'medicine/check-availability/' + this.medicineInput + '&&' + this.quantityInput + '&&' + this.pharmacyId,
+            method: 'GET'
+          })
+          .then((response) => {
+            this.itemAvailable = response.data;
+          })
+        },
+
         submit: function(){
             this.e6 = 3;
             var x = (new Date()).getTimezoneOffset() * 60000; 

@@ -1,4 +1,5 @@
 <template>
+<div>
   <v-row class="fill-height">
     <v-col>
       <v-sheet height="64">
@@ -113,8 +114,13 @@
             <v-card-actions>
               <v-btn plain color="indigo lighten-1"
               @click="openAppointment(selectedEvent)"
-              v-if="new Date(selectedEvent.start) >= new Date()">
+              v-if="available(selectedEvent) && !selectedEvent.disabled">
                 Start
+              </v-btn>
+              <v-btn plain color="error"
+              @click="didntShowUp(selectedEvent)"
+              v-if="available(selectedEvent) && !selectedEvent.disabled">
+                Didn't show up
               </v-btn>
               <v-btn
                 text
@@ -129,6 +135,27 @@
       </v-sheet>
     </v-col>
   </v-row>
+
+  <v-snackbar
+      v-model="snackbar"
+      :vertical="vertical"
+      light
+      timeout="2000"
+    >
+      {{snackbarText}}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="indigo"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+  </div>
 </template>
 
 <script>
@@ -146,6 +173,9 @@ import {client} from '@/client/axiosClient';
         '4day': '4 Days',
       },
       selectedEvent: {},
+      snackbar: null,
+      vertical: false,
+      snackbarText: null,
       selectedElement: null,
       selectedOpen: false,
       events: [],
@@ -197,8 +227,34 @@ import {client} from '@/client/axiosClient';
         if(localStorage.getItem('user_role') === 'ROLE_PHARMACIST')
           link = '/counseling-report'
         
-        const encoded = encodeURI(link + '?patientEmail=' + selectedEvent.patientEmail + '&from=' + selectedEvent.start)
+        const encoded = encodeURI(link + '?patientEmail=' + selectedEvent.patientEmail + '&from=' + selectedEvent.start + '&pharmacy=' + 
+        selectedEvent.pharmacy);
         this.$router.push(encoded);
+      },
+      
+      didntShowUp: function(selectedEvent){
+        var x = (new Date()).getTimezoneOffset() * 60000; 
+        client({
+          method: 'POST',
+          url: 'appointment/patient-didnt-show',
+          data:{
+            patientEmail: selectedEvent.patientEmail,
+            from: (new Date(new Date(selectedEvent.start) - x)).toISOString().slice(0,-1)
+          }
+        })
+        .then((response) => {
+          this.snackbar = true;
+          this.snackbarText = response.data;
+          this.selectedOpen = false;
+        })
+        selectedEvent.disabled = true;
+      },
+
+      available: function(selectedEvent){
+        if(new Date(selectedEvent.start) >= new Date() && selectedEvent.status === 'TAKEN')
+          return true;
+        else
+          return false;
       },
 
       updateRange ({ start, end }) {
@@ -240,7 +296,10 @@ import {client} from '@/client/axiosClient';
                 end: this.convertToDate(event.to),
                 color: 'indigo',
                 timed: null,
-                details: event.pharmacyName
+                details: event.pharmacyName,
+                status: event.appointmentStatus,
+                disabled: false,
+                pharmacy: event.pharmacyId,
               })
             }
             this.events = events;
