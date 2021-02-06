@@ -27,7 +27,7 @@
         </v-layout>
 
         <v-dialog v-model="showChangePass" persistent  max-width="500px">
-            <ChangePass @updatePass="sendUpdatedLoginRequest" :email="form.email" :currentPassword="form.password" @closeChangePass="showChangePass = false"/>
+            <ChangePass :email="form.email" :currentPassword="form.password"/>
         </v-dialog>
     </v-container>
 </div>
