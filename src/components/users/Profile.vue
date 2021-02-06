@@ -186,6 +186,54 @@
                             </v-card-actions>
                         </v-card>
                     </v-col>
+                    <v-col>
+                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
+                            <v-toolbar 
+                            flat
+                            color='primary'
+                            dark>
+                                <v-toolbar-title>Appointments</v-toolbar-title>
+                            </v-toolbar>
+                            <v-tabs>
+                                <v-tab>
+                                    Checkups
+                                </v-tab>
+                                <v-tab>
+                                    Counselings
+                                </v-tab>
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <v-data-table
+                                        v-model='futureCheckupSelected'
+                                        :items='futureCheckups'
+                                        :headers='checkupsHeaders'
+                                        no-data-text="You have no upcoming checkups"
+                                        :single-select="singleSelectCheckups"
+                                        show-select
+                                        return-object
+                                        >
+                                        </v-data-table>
+                                    </v-card>
+                                    <v-card-actions class='justify-center'>
+                                        <v-btn
+                                        v-if='futureCheckupSelected.length>0'
+                                        rounded
+                                        color='error'
+                                        @click='cancelCheckup'
+                                        >
+                                            Cancel Checkup
+                                        </v-btn>
+                                    </v-card-actions>
+                                </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat>
+                                    
+                                    </v-card>
+                                </v-tab-item>
+
+                            </v-tabs>
+                        </v-card>
+                    </v-col>
                 </v-row>
 
                 <!-- edit information dialog -->
@@ -454,6 +502,8 @@
 <script>
 
 import {client} from '@/client/axiosClient';
+import * as DateFormatter from '@/utils/DateFormatter'
+
 
 export default {
         name: 'Profile',
@@ -509,7 +559,7 @@ export default {
                 selectedAllergy: [],
                 //Reserved medicine
                 medicineHeaders:[
-                { text: 'Medicine:', value:'iteratorMedicineReservationItem[0].medicine.name'},
+                { text: 'Medicine:', value:'medicineReservationItemList[0].medicine.name'},
                 { text: 'Status:', value:'medicineReservationStatus'},
                 { text: 'Pick Up Date:', value:'pickUpDate'},                
                 ],
@@ -519,12 +569,23 @@ export default {
                 cancelledMedicine: [],
                 completedMedicine: [], 
                 searchMedicine: '',
-                //Cancellation dialog
+                //Medicine cancellation dialog
                 showCancelDialog: false,
                 searchMedicineCancelDialog: '',
                 cancelableMedicine: [],
                 selectedCancelReservationList:[],
                 singleSelectCancellation: true,
+                //Checkup view and cancellation
+                futureCheckups: [],
+                checkupsHeaders: [
+                    {text:'Pharmacy', value:'pharmacyName'},
+                    {text:'Dermatologist', value:'dermatologistFullName'},
+                    {text:'Price', value:'price'},
+                    {text:'Date', value:'range.from'},
+                    {text:'Time', value:'range.to'}
+                ],
+                singleSelectCheckups: true,
+                futureCheckupSelected: [],
                 //Loyalty Program
                 value:69,
                 
@@ -573,6 +634,7 @@ export default {
         },
         mounted(){
             const vm = this;
+            //User information
             client({
                 method: 'GET',
                 url: 'profile/user-information'
@@ -585,6 +647,7 @@ export default {
 
            })
             
+            //user address
             client({
                 method:'GET',
                 url: 'profile/user-address'
@@ -595,6 +658,7 @@ export default {
 
             })
 
+            //country change
             client({
                 method:'GET',
                 url: 'countries/getAll'
@@ -605,6 +669,7 @@ export default {
 
             })
 
+            //reserved medicine
             client({
                 method: 'GET',
                 url: 'medicine-reservation/get-reservations'
@@ -617,6 +682,7 @@ export default {
 
             })
 
+            // patient allergies
             client({
                 method: 'GET',
                 url: 'patient/all-allergies'
@@ -625,6 +691,7 @@ export default {
                 vm.allergies = response.data;
             })
 
+            // medicine patient is not allergic to
             client({
                 method: 'GET',
                 url: 'patient/not-allergic-to',
@@ -633,6 +700,9 @@ export default {
             .then((response) => {
                 vm.notAllergicTo = response.data;
             })
+
+            // patient's future checkups
+            this.getFutureCheckups()
         },
         methods:{
             //Get all cities in selected country
@@ -662,7 +732,6 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log('ok');
                     this.address.city = this.selectedCity;
                     this.address.addressLine = this.addressLine;
                     this.overlay = !this.overlay;
@@ -688,7 +757,6 @@ export default {
                     }
                 })
                 .then((response)=>{
-                    console.log('ok');
                     this.userDTO = Object.assign(this.userDTO, this.form.userEdit);
                     this.infoOverlay = !this.infoOverlay;
                 }, (error)=>{
@@ -713,7 +781,6 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log('password changed');
                     
                 },(error)=>{
 
@@ -807,7 +874,6 @@ export default {
             },
             deleteAllergy: function()
             {
-                console.log(this.selectedAllergy[0].id);
                 const vm = this;
                 client({
                     method: 'POST',
@@ -828,6 +894,50 @@ export default {
                     .then((response) => {
                         vm.notAllergicTo = response.data;
                     })
+                })
+            },
+            //Checkups
+            getFutureCheckups: function()
+            {
+                const vm = this;
+                client({
+                method: 'GET',
+                url: 'checkup/future/patient'
+                })
+                .then((response) => {
+                    vm.futureCheckups = response.data;
+                    
+                    if(vm.futureCheckups.length > 0)
+                    {
+                        for(let appointment of vm.futureCheckups)
+                        {
+                            appointment.range.to = DateFormatter.toAppointmentDateTime(appointment.range.from, appointment.range.to);
+                            appointment.range.from = DateFormatter.toAppointmentDate(appointment.range.from);
+                        }
+                    } 
+
+                }, (error) => {
+
+                })
+            },
+
+            cancelCheckup: function()
+            {
+                console.log(this.futureCheckupSelected[0])
+                client({
+                    method:'POST',
+                    url:'checkup/cancel/patient',
+                    data:{
+                        id: this.futureCheckupSelected[0].id,
+                        pharmacyName: '',
+                        dermatologistFullName: '',
+                        range: null, 
+                        price: 0
+                    }
+                })
+                .then((response) => {
+                    this.futureCheckupSelected = [];
+                    this.getFutureCheckups();
                 })
             }
         }
