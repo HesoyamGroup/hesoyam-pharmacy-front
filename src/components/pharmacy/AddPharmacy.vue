@@ -87,6 +87,7 @@
                                                 </v-row>
 
                                                 <v-row justify='end'>
+                                                    <v-subheader v-if="!admin_form.formErrorOccured">Initial password will be 00000000</v-subheader>
                                                     <v-subheader v-if="admin_form.formErrorOccured" class="red--text">Administrator emails must be unique.</v-subheader>
                                                     <v-btn :disabled="!admin_form.isFormValid" @click="addAdministrator()" color="primary">Add administrator</v-btn>
                                                 </v-row>
@@ -231,6 +232,7 @@
                     telephone: this.admin_form.phoneNumber,
                     email: this.admin_form.email,
                     gender: this.admin_form.gender,
+                    password: '00000000',
                     address: this.getAddress()
                 });
 
