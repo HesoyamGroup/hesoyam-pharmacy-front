@@ -17,8 +17,10 @@ import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
 import EmployeePage from '../views/EmployeePage.vue'
 import SearchUsersPage from '../views/SearchUsersPage.vue'
+import EPrescriptionPage from '../views/EPrescriptionPage.vue';
 import PromotionsPage from '../views/PromotionsPage.vue'
 import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
+import VacationRequestsPage from '../views/VacationRequestsPage.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -245,6 +247,26 @@ const routes = [
       }
     }
   },
+
+  {
+    path: '/eprescription',
+    name: 'eprescription',
+    component: EPrescriptionPage,
+    beforeEnter: function(to, from, next){
+      if(!UserService.isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        let user = UserService.getLoggedUserData();
+        if(user.userRole == 'PATIENT'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+      }
+    }
+  },
   {
     path: '/promotions',
     name: 'Promotions',
@@ -252,6 +274,20 @@ const routes = [
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/vacation-requests',
+    name: 'Vacation Requests',
+    component: VacationRequestsPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR' || user.userRole == 'SYS_ADMIN'){
         next();
       }
       else{
