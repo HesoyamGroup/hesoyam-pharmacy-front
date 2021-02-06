@@ -36,7 +36,9 @@
                                                 </td>
                                                 <td>
                                                     <v-layout>
-                                                        {{row.item.price}}
+                                                        <div v-if="row.item.price != row.item.discountedPrice" class="text-decoration-line-through red--text mr-1">{{row.item.price}}</div>
+                                                        <div v-if="row.item.price == row.item.discountedPrice">{{row.item.price}}</div>
+                                                        <div v-if="row.item.price != row.item.discountedPrice" class="green--text">  {{row.item.discountedPrice}}</div>
                                                     </v-layout>
                                                 </td>
 
@@ -49,7 +51,7 @@
                                                 </td>
                                                 <td>
                                                     <v-layout>
-                                                        <v-btn icon color="primary">
+                                                        <v-btn icon color="primary" @click="completeEPrescription(row.item)">
                                                             <v-icon>mdi-cash-100</v-icon>
                                                         </v-btn>
                                                     </v-layout>
@@ -70,6 +72,7 @@
         </v-container>
 
         <v-snackbar v-model="showError" :timeout="3000" color="red">{{error}}</v-snackbar>
+        <v-snackbar v-model="showSuccess" :timeout="3000" color="green">Successfully completed. Check your email.</v-snackbar>
     </div>
 </template>
 
@@ -107,10 +110,33 @@
                 ],
                 pharmacies: [],
                 error: '',
-                showError: false
+                showError: false,
+                showSuccess: false
             }
         },
         methods:{
+            completeEPrescription(eprescription){
+                client({
+                    method: 'post',
+                    url: 'eprescription/complete',
+                    data: {
+                        pharmacyId: eprescription.id,
+                        prescriptionId: eprescription.eprescriptionId
+                    }
+                }).then( (response) => {
+                    this.pharmacies = [];
+                    this.qrCode = null;
+                    this.showSuccess = true;
+                }, (error) => {
+                    if(error.response.status == 400) this.error="It seems like pharmacy no longer can provide this medicine for you.";
+                    else if(error.response.status == 404) this.error="It seems your prescription is already completed.";
+                    else this.error="Hmm, unknown error. Try again..";
+                    this.showError=true;
+                    setTimeout( () =>{
+                        this.showError = false;
+                    }, 2500);
+                })
+            },
             uploadImage(){
                 const formData = new FormData();
                 formData.append('file',this.qrCode);
@@ -124,8 +150,11 @@
                 }, (error) => {
                     if(error.response.status == 400) this.error='We couldn\'t read your QR code, try again.';
                     else if(error.response.status == 404) this.error='Prescription is already completed or you uploaded wrong QR code';
-                    else this.error="Hmm, unknown error.";
+                    else this.error="Hmm, unknown error. Try again..";
                     this.showError = true;
+                    setTimeout( () => {
+                        this.showError = false;
+                    }, 2500)
                 });
             },
             getColor(rating){

@@ -231,7 +231,21 @@ const routes = [
   {
     path: '/eprescription',
     name: 'eprescription',
-    component: EPrescriptionPage
+    component: EPrescriptionPage,
+    beforeEnter: function(to, from, next){
+      if(!UserService.isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        let user = UserService.getLoggedUserData();
+        if(user.userRole == 'PATIENT'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+      }
+    }
   }
 ]
 
