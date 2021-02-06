@@ -40,7 +40,7 @@
                                         </v-col>
 
                                         <v-col>
-                                            <v-text-field v-model="form.confirmPassword" :rules="form.rules.confirmPasswordRules" label="Password" type="password" prepend-icon="mdi-lock"> </v-text-field>
+                                            <v-text-field v-model="form.confirmPassword" :rules="form.rules.confirmPasswordRules" label="Confirm password" type="password" prepend-icon="mdi-lock"> </v-text-field>
                                         </v-col>
 
                                         <v-col>
