@@ -11,7 +11,7 @@ import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 import SupplierPage from '../views/SupplierPage.vue'
 import BrowseMedicinePage from '../views/BrowseMedicinePage.vue'
 import AllPharmaciesPage from '../views/AllPharmaciesPage.vue'
-
+import CounselingReservationPage from '../views/CounselingReservationPage.vue'
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
@@ -95,7 +95,10 @@ const routes = [
     path: '/medicine-search',
     component: MedicineSearchPage,
   },
-
+  {
+    path: '/counseling-reservation',
+    component: CounselingReservationPage
+  },
   {
     path: '/about',
     name: 'About',

@@ -227,10 +227,28 @@
                                 </v-tab-item>
                                 <v-tab-item>
                                     <v-card flat>
-                                    
+                                        <v-data-table
+                                            v-model='futureCounselingSelected'
+                                            :items='futureCounselings'
+                                            :headers='counselingHeaders'
+                                            no-data-text="You have no upcoming checkups"
+                                            :single-select="singleSelectCounseling"
+                                            show-select
+                                            return-object
+                                            >
+                                        </v-data-table>
+                                        <v-card-actions class='justify-center'>
+                                            <v-btn
+                                            v-if='futureCounselingSelected.length>0'
+                                            rounded
+                                            color='error'
+                                            @click='cancelCouseling'
+                                            >
+                                                Cancel Counseling
+                                            </v-btn>
+                                        </v-card-actions>
                                     </v-card>
                                 </v-tab-item>
-
                             </v-tabs>
                         </v-card>
                     </v-col>
@@ -586,6 +604,17 @@ export default {
                 ],
                 singleSelectCheckups: true,
                 futureCheckupSelected: [],
+                //Counseling view and cancellation
+                futureCounselings: [],
+                counselingHeaders: [
+                    {text:'Pharmacy', value:'pharmacyName'},
+                    {text:'Pharmacist', value:'pharmacistFullName'},
+                    {text:'Price', value:'price'},
+                    {text:'Date', value:'range.from'},
+                    {text:'Time', value:'range.to'}
+                ],
+                singleSelectCounseling: true,
+                futureCounselingSelected: [],
                 //Loyalty Program
                 value:69,
                 
@@ -702,7 +731,8 @@ export default {
             })
 
             // patient's future checkups
-            this.getFutureCheckups()
+            this.getFutureCheckups();
+            this.getFutureCounselings();
         },
         methods:{
             //Get all cities in selected country
@@ -894,6 +924,46 @@ export default {
                     .then((response) => {
                         vm.notAllergicTo = response.data;
                     })
+                })
+            },
+            //Counselings
+            getFutureCounselings: function()
+            {
+                const vm=this;
+                client({
+                    method: 'GET',
+                    url:'counseling/future/patient'
+                })
+                .then((response) => {
+                    vm.futureCounselings = response.data;
+
+                    if(vm.futureCounselings.length > 0)
+                    {
+                        for(let appointment of vm.futureCounselings)
+                        {
+                            appointment.range.to = DateFormatter.toAppointmentDateTime(appointment.range.from, appointment.range.to);
+                            appointment.range.from = DateFormatter.toAppointmentDate(appointment.range.from);
+                        }
+                    } 
+                })
+            },
+            cancelCouseling: function()
+            {
+                console.log(this.futureCounselingSelected[0])
+                client({
+                    method:'POST',
+                    url:'counseling/cancel/patient',
+                    data:{
+                        id: this.futureCounselingSelected[0].id,
+                        pharmacyName: '',
+                        pharmacistFullName: '',
+                        range: null, 
+                        price: 0
+                    }
+                })
+                .then((response) => {
+                    this.futureCounselingSelected = [];
+                    this.getFutureCounselings();
                 })
             },
             //Checkups
