@@ -108,8 +108,14 @@
             </v-toolbar>
             <v-card-text>
               <span v-html="selectedEvent.details"></span>
+
             </v-card-text>
             <v-card-actions>
+              <v-btn plain color="indigo lighten-1"
+              @click="openAppointment(selectedEvent)"
+              v-if="new Date(selectedEvent.start) >= new Date()">
+                Start
+              </v-btn>
               <v-btn
                 text
                 color="secondary"
@@ -185,6 +191,16 @@ import {client} from '@/client/axiosClient';
 
         nativeEvent.stopPropagation()
       },
+
+      openAppointment: function(selectedEvent){
+        var link = '';
+        if(localStorage.getItem('user_role') === 'ROLE_PHARMACIST')
+          link = '/counseling-report'
+        
+        const encoded = encodeURI(link + '?patientEmail=' + selectedEvent.patientEmail + '&from=' + selectedEvent.start)
+        this.$router.push(encoded);
+      },
+
       updateRange ({ start, end }) {
         const events = []
         var fromServer = []
@@ -200,16 +216,11 @@ import {client} from '@/client/axiosClient';
         //   const first = new Date(firstTimestamp - (firstTimestamp % 900000))
         //   const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
         //   const second = new Date(first.getTime() + secondTimestamp)
-        client({
-          method: 'GET',
-          url: 'profile/check-role'
-        })
-        .then((response) => {
-          this.role = response.data.toLowerCase();
+        this.role = localStorage.getItem('user_role');
         
         var link = '';
 
-        if(this.role === 'pharmacist'){
+        if(this.role === 'ROLE_PHARMACIST'){
           link = 'appointment/appointments-for-pharmacist/' + min + "!" + max; 
         } else {
           link = 'appointment/appointments-for-dermatologist/' + min + "!" + max;
@@ -221,9 +232,9 @@ import {client} from '@/client/axiosClient';
           })
           .then((response) => {
             fromServer = response.data;
-            // console.log(response.data)
             for(var event of response.data){
               events.push({
+                patientEmail: event.patientEmail,
                 name: event.patientFirstName + ' ' + event.patientLastName,
                 start: this.convertToDate(event.from),
                 end: this.convertToDate(event.to),
@@ -233,9 +244,7 @@ import {client} from '@/client/axiosClient';
               })
             }
             this.events = events;
-            // console.log(this.events)
           })
-        })
       
 
     },
