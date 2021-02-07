@@ -197,32 +197,33 @@
                                 <v-divider inset vertical></v-divider>
 
                                 <v-col>
-                                    <v-row rows="1">
-                                        <v-subheader class="font-weight-black" justify="center">
-                                            <span>
-                                                Reply 
-                                                <span v-if="complaints.selected">  
-                                                    {{complaints.selected.patientFirstName}} {{complaints.selected.patientLastName}}
+                                    <v-form v-model="complaints.replyFormValid">
+                                        <v-row rows="1">
+                                            <v-subheader class="font-weight-black" justify="center">
+                                                <span>
+                                                    Reply 
+                                                    <span v-if="complaints.selected">  
+                                                        {{complaints.selected.patientFirstName}} {{complaints.selected.patientLastName}}
+                                                    </span>
                                                 </span>
-                                            </span>
-                                        </v-subheader>
-                                    </v-row>
+                                            </v-subheader>
+                                        </v-row>
 
-                                    <v-row>
-                                        <v-textarea :disabled="complaints.inProgress" v-model="complaints.text" no-resize :rules="complaints.rules.replyRules">
+                                        <v-row>
+                                            <v-textarea :disabled="complaints.inProgress" v-model="complaints.text" no-resize :rules="complaints.rules.replyRules">
 
-                                        </v-textarea>
-                                    </v-row>
+                                            </v-textarea>
+                                        </v-row>
 
-                                    <v-row rows="2" justify="end">
-                                        <v-subheader v-if="complaints.inProgress">
-                                            Replying...
-                                        </v-subheader>
-                                        <v-btn @click="reply()" :disabled="!complaints.selected || complaints.inProgress" color="primary"> 
-                                            Send reply.
-                                        </v-btn>
-                                    </v-row>
-
+                                        <v-row rows="2" justify="end">
+                                            <v-subheader v-if="complaints.inProgress">
+                                                Replying...
+                                            </v-subheader>
+                                            <v-btn @click="reply()" :disabled="!complaints.replyFormValid || !complaints.selected || complaints.inProgress" color="primary"> 
+                                                Send reply.
+                                            </v-btn>
+                                        </v-row>
+                                    </v-form>
 
                                 </v-col>
                             </v-row>
@@ -256,6 +257,7 @@
         data(){
             return {
                 complaints: {
+                    replyFormValid: false,
                     inProgress: false,
                     showDialog: false,
                     selected: null,
