@@ -13,6 +13,7 @@
                             <v-col>
                                 <v-card >
                                     <v-card-text class="p-6">
+                                    <v-form v-model="changeUserInfoFormValid">
                                         <v-row>
                                             <v-col>
                                                 <v-text-field v-model="firstName" label="First name" :rules="rules.firstNameRules"> </v-text-field>
@@ -33,7 +34,7 @@
 
                                         <v-row>
                                             <v-col>
-                                                <v-select v-model="selectedCountry" item-text="countryName" item-value="id" :items="countries" label="Country" :rules="rules.countryRules"> </v-select>
+                                                <v-select v-model="selectedCountry" item-text="countryName" item-value="id" @change="onCountryChanged()" :items="countries" label="Country" :rules="rules.countryRules"> </v-select>
                                             </v-col>
 
                                             <v-col>
@@ -41,13 +42,13 @@
                                             </v-col>
                                         </v-row>
                                          <v-text-field v-model="addressLine" label="Address line" :rules="rules.addressLineRules"> </v-text-field>
+                                    </v-form>
                                     </v-card-text>
 
                                     <v-card-actions>
                                         <v-spacer> </v-spacer>
-
-                                        <v-btn color="gray">Reset</v-btn>
-                                        <v-btn color="primary">Update</v-btn>
+                                        <v-subheader class="green--text"> {{updateUserInfoMessage}} </v-subheader>
+                                        <v-btn :disabled="!changeUserInfoFormValid" color="primary" @click="updateInfo()">Update</v-btn>
                                     </v-card-actions>
                                 </v-card>
                             </v-col>
@@ -92,6 +93,8 @@
         },
         data(){
             return {
+                updateUserInfoMessage: '',
+                changeUserInfoFormValid: true,
                 passChangeSuccessMessage: '',
                 passChangeErrorMessage: '',
                 isChangePassFormValid : false,
@@ -156,6 +159,20 @@
             }
         },
         methods: {
+            onCountryChanged: function(){
+            this.selectedCity = null;
+            this.refreshCities();
+            
+            },
+            refreshCities: function(){
+                //Retrieve cities
+                client({
+                    method: 'GET',
+                    url: `cities/within-country/${this.selectedCountry}`
+                }).then( (response) => {
+                    this.cities = response.data;
+                })
+            },
             changePass(){
                 client({
                     method: 'POST',
@@ -191,6 +208,7 @@
                 });
             },
             fetchUserLocationInfo(){
+
                 client({
                     method: 'GET',
                     url: 'profile/user-address'
@@ -199,7 +217,52 @@
                     this.addressLine = data.addressLine;
                     this.selectedCountry = data.city.country.id;
                     this.selectedCity = data.city.id;
+                    client({
+                        method: 'GET',
+                        url: 'countries/getAll'
+                    }).then((response) => {
+                        this.countries = response.data;
+                        client({
+                            method: 'GET',
+                            url: `cities/within-country/${this.selectedCountry}`
+                        }).then((response) => {
+                            this.cities = response.data;
+                        })
+                    });
                 });
+            },
+            updateInfo(){
+                this.updateBasicInfo();
+                this.updateLocationInfo();
+                this.updateUserInfoMessage = 'Successfully changed.';
+                setTimeout(() => {
+                    this.updateUserInfoMessage = '';
+                }, 2500)
+            },
+            updateLocationInfo(){
+               client({
+                    method: 'POST',
+                    url: 'profile/change-address',
+                    data: {
+                        addressLine: this.addressLine,
+                        city: {
+                            id: this.selectedCity
+                        }
+                    }
+                });
+            },
+            updateBasicInfo(){
+                 client({
+                    method: 'POST',
+                    url: 'profile/change-user-basic-info',
+                    data: {
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        gender: this.gender,
+                        telephone: this.phoneNumber
+                    }
+                });
+                
             }
         }
     }
