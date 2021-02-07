@@ -22,6 +22,7 @@ import PromotionsPage from '../views/PromotionsPage.vue'
 import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 import VacationRequestsPage from '../views/VacationRequestsPage.vue'
 import NewOrderPage from '../views/NewOrderPage.vue'
+import PatientFeedbackPage from '../views/PatientFeedbackPage.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -58,6 +59,12 @@ const routes = [
         next();
       }
     }
+  },
+
+  {
+    path: '/feedback',
+    component: PatientFeedbackPage,
+    //TODO: dodati ko moze da vidi
   },
 
   {
