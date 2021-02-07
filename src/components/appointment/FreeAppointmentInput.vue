@@ -42,7 +42,7 @@ export default {
             let fromStr = from.toISOString();
             let toStr = to.toISOString();
             let employeeId = this.$route.params.id;
-            //alert(fromStr.substr(0, fromStr.length-1) + ' >>>> ' + toStr.substr(0, toStr.length-1));
+
             client({
                 method: 'POST',
                 url: '/checkup/free/dermatologist/' + employeeId,

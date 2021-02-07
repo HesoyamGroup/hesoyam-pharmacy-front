@@ -11,7 +11,7 @@ import SysAdminProfilePage from '../views/SysAdminProfilePage.vue'
 import SupplierPage from '../views/SupplierPage.vue'
 import BrowseMedicinePage from '../views/BrowseMedicinePage.vue'
 import AllPharmaciesPage from '../views/AllPharmaciesPage.vue'
-
+import CounselingReservationPage from '../views/CounselingReservationPage.vue'
 import PharmacyPage from '../views/PharmacyPage.vue'
 import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
@@ -24,6 +24,7 @@ import EPrescriptionPage from '../views/EPrescriptionPage.vue';
 import PromotionsPage from '../views/PromotionsPage.vue'
 import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 import VacationRequestsPage from '../views/VacationRequestsPage.vue'
+import NewOrderPage from '../views/NewOrderPage.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -97,7 +98,10 @@ const routes = [
     path: '/medicine-search',
     component: MedicineSearchPage,
   },
-
+  {
+    path: '/counseling-reservation',
+    component: CounselingReservationPage
+  },
   {
     path: '/about',
     name: 'About',
@@ -304,6 +308,20 @@ const routes = [
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'ADMINISTRATOR' || user.userRole == 'SYS_ADMIN'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/order/new',
+    name: 'NewOrderPage',
+    component: NewOrderPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
         next();
       }
       else{
