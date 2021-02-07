@@ -18,7 +18,7 @@
 
                     <v-card-actions>
                         <v-spacer> </v-spacer>
-                        <v-subheader v-if="form.login.unsuccessful" class="red--text">Invalid username/password</v-subheader>
+                        <v-subheader v-if="form.login.unsuccessful" class="red--text">{{loginError}}</v-subheader>
                         <v-subheader v-if="form.login.successful" class="green--text">Login successful. You will be redirected in a second.</v-subheader>
                         <v-btn :disabled="!form.isFormValid" @click="sendLoginRequest" color="primary">Login</v-btn>
                     </v-card-actions>
@@ -27,7 +27,7 @@
         </v-layout>
 
         <v-dialog v-model="showChangePass" persistent  max-width="500px">
-            <ChangePass @updatePass="sendUpdatedLoginRequest" :email="form.email" :currentPassword="form.password" @closeChangePass="showChangePass = false"/>
+            <ChangePass :email="form.email" :currentPassword="form.password"/>
         </v-dialog>
     </v-container>
 </div>
@@ -47,6 +47,7 @@ export default {
     data: function(){
         return {
             showChangePass: false,
+            loginError: '',
             form: {
                 
                 email: '',
@@ -71,7 +72,6 @@ export default {
     },
     methods: {
         sendUpdatedLoginRequest(newPassword){
-            console.log(newPassword);
             this.form.password = newPassword;
             this.sendLoginRequest();
         },
@@ -91,8 +91,12 @@ export default {
             }, (error) => {
                 if(error.response.status == '428'){
                     this.showChangePass = true;
+                }else if(error.response.status=='401'){
+                    this.form.login.unsuccessful = true;
+                    this.loginError = 'Check your email for activation link';
                 }else{
                     this.form.login.unsuccessful = true;
+                    this.loginError = 'Wrong username/password';
                 }
                 
             })
