@@ -232,12 +232,26 @@
                 });
             },
             updateInfo(){
-                this.updateBasicInfo();
-                this.updateLocationInfo();
-                this.updateUserInfoMessage = 'Successfully changed.';
-                setTimeout(() => {
-                    this.updateUserInfoMessage = '';
-                }, 2500)
+                client({
+                    method:'POST',
+                    url:'profile/change-info',
+                    data: {
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        gender: this.gender,
+                        telephone: this.phoneNumber,
+                        addressLine: this.addressLine,
+                        city: {
+                            id: this.selectedCity
+                        }
+                    }
+                }).then((response) => {
+                    this.updateUserInfoMessage = 'Successfully changed.';
+                    setTimeout(() => {
+                        this.updateUserInfoMessage = '';
+                    }, 2500)
+                });
+                
             },
             updateLocationInfo(){
                client({
