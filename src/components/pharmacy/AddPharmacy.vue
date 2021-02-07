@@ -25,18 +25,48 @@
 
                                             <v-row>
                                                 <v-subheader v-if="pharmacy_form.formErrorOccured" class="red--text">{{this.pharmacy_form.errorMessage}}</v-subheader>
-                                                <v-subheader v-if="pharmacy_form.requestSuccessful" class="green-text">Successfully created pharmacy. </v-subheader>
+                                                <v-subheader v-if="pharmacy_form.requestSuccessful" class="green--text">Successfully created pharmacy. </v-subheader>
                                             </v-row>
 
                                             <v-row>
-                                                <v-btn @click="addPharmacy()" :disabled="!pharmacy_form.isFormValid" style="width:100%" fluid color="success">Create pharmacy</v-btn>
+                                                <v-btn @click="addPharmacy()" :disabled="!pharmacy_form.isFormValid  || !locationFormValid" style="width:100%" fluid color="success">Create pharmacy</v-btn>
                                             </v-row>
 
                                         </v-form>
                                     </v-col>
 
                                     <v-col cols="3">
-                                            
+                                        <v-form v-model="locationFormValid">
+                                            <v-row>
+                                                <v-col>
+
+                                                        <v-select  item-text="countryName" item-value="id" @change="onCountryChanged()" v-model="pharmacy_form.selectedCountry" :items="countries" label="Country" prepend-icon="mdi-map-marker"></v-select>
+
+                                                </v-col>
+
+                                                <v-col>
+                                                    <v-select v-model="pharmacy_form.selectedCity" item-text="cityName" item-value="id" :rules="pharmacy_form.rules.cityRules" :disabled="pharmacy_form.forbidCitySelection"  :items="cities"  label="City" prepend-icon="mdi-city"> </v-select>
+                                                </v-col>
+                                            </v-row>
+
+                                            <v-row>
+                                                <v-col>
+                                                    <v-text-field  v-model="pharmacy_form.addressLine" :rules="pharmacy_form.rules.addressLineRules" name="address" label="Address line" type="text" prepend-icon="mdi-home-city"> </v-text-field>
+                                                </v-col>
+
+                                                <v-col>
+                                                        <v-row>
+                                                            <v-col>
+                                                                <v-text-field  v-model="pharmacy_form.latitude" :rules="pharmacy_form.rules.latitudeRule" name="latitude" label="Latitude" prepend-icon="mdi-crosshairs-gps" type="number" min="-90" max="90"> </v-text-field>
+                                                            </v-col>
+
+                                                            <v-col>
+                                                                <v-text-field  v-model="pharmacy_form.longitude" :rules="pharmacy_form.rules.longitudeRule" name="longitude" label="Longitude" prepend-icon="mdi-crosshairs-gps" type="number" min="-180" max="180"> </v-text-field>
+                                                            </v-col>
+                                                        </v-row>
+                                                </v-col>
+                                            </v-row>
+                                        </v-form>
                                     </v-col>
 
                                     <v-col cols="6">
@@ -110,8 +140,21 @@
     import {client} from '@/client/axiosClient';
     export default{
         name: 'add-pharmacy',
+        mounted(){
+            client({
+                method:'GET',
+                url:'countries/getAll'
+            }).then( (response) => {
+                this.countries = response.data;
+            }, (error) => {
+
+            });
+        },
         data(){
             return {
+                locationFormValid: false,
+                countries: [],
+                cities: [],
                 pharmacy_form: {
                     isFormValid: false,
                     formErrorOccured: false,
@@ -119,7 +162,6 @@
                     errorMessage: '',
                     name: '',
                     description: '',
-                    address: this.getAddress(), //todo: change with real data(location comp)
                     rules: {
                         nameRules: [
                             name => !!name || 'Pharmacy name is required.',
@@ -127,8 +169,30 @@
                         ],
                         descriptionRules: [
                             desc => /^.{0,300}$/.test(desc) || 'Pharmacy description should not exceed 300 characters.'
+                        ],
+                        addressLineRules: [
+                        add => !!add || 'Address line is mandatory',
+                        add => /^.{3,150}$/.test(add) || 'Address line should have between 3 and 150 characters'
+                        ],
+                        latitudeRule: [
+                            v => (!isNaN(parseFloat(v)) && v >= -90 && v <= 90) || 'Latitude has to be between -90 and 90'
+                        ],
+                        longitudeRule: [
+                            v => (!isNaN(parseFloat(v)) && v >= -180 && v <= 180) || 'Longitude has to be between -180 and 180'
+                        ],
+                        countryRules:[
+                            country => !!country || "You must select a country."
+                        ],
+                        cityRules: [
+                            city => !!city || "You must select a city."
                         ]
-                    }
+                    },
+                    selectedCountry: null,
+                    selectedCity: null,
+                    forbidCitySelection: true,
+                    addressLine: '',
+                    latitude: 0,
+                    longitude: 0
                 },
                 admin_form: {
                     isFormValid: false,
@@ -172,51 +236,60 @@
                     ],
                     admins: [],
                     rules: {
-                    emailRules: [
-                        em => !!em || 'E-mail is required.',
-                        em => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(em) || 'E-mail must be valid',
-                    ],
-                    passwordRules: [
-                        pw => !!pw || 'Password is required.',
-                        pw => /^.{8,64}$/.test(pw) || 'Password should have between 8 and 64 characters.',
-                    ],
-                    confirmPasswordRules: [
-                        pw => this.form.password === pw || "Passwords must match",
-                    ],
-                    firstNameRules: [
-                        fn => !!fn || 'First name is required.',
-                        fn => /^[a-z A-Z\.-]{3,75}$/.test(fn) || "First name should have between 2 and 75 characters."
-                    ],
-                    lastNameRules: [
-                        fn => !!fn || 'Last name is required.',
-                        fn => /^[a-z A-Z\.-]{3,100}$/.test(fn) || "Last name should have between 3 and 100 characters."
-                    ],
-                    phoneNumberRules: [
-                        num => !!num || 'Phone number is mandatory.',
-                        value => (/^\d{10}$/.test(value) || /^(\d{3}[- .]?){2}\d{4}$/.test(value) 
-                        || /^((\(\d{3}\))|\d{3})[- .]?\d{3}[- .]?\d{4}$/.test(value)
-                        || /^(\+\d{1,3}( )?)?((\(\d{3}\))|\d{3})[- .]?\d{3}[- .]?\d{4}$/.test(value)) || 'Phone number format is not valid.'
-                    ],
-                    addressLineRules: [
-                        add => !!add || 'Address line is mandatory',
-                        add => /^.{3,150}$/.test(add) || 'Address line should have between 3 and 15 characters'
-                    ],
-                    latitudeRule: [
-                        v => (!isNaN(parseFloat(v)) && v >= -90 && v <= 90) || 'Latitude has to be between -90 and 90'
-                    ],
-                    longitudeRule: [
-                        v => (!isNaN(parseFloat(v)) && v >= -180 && v <= 180) || 'Longitude has to be between -180 and 180'
-                    ],
-                    genderRules: [
-                        gender => this.admin_form.genders.includes(gender) || 'You must choose a gender'
-                    ]
-                },
+                        emailRules: [
+                            em => !!em || 'E-mail is required.',
+                            em => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(em) || 'E-mail must be valid',
+                        ],
+                        firstNameRules: [
+                            fn => !!fn || 'First name is required.',
+                            fn => /^[a-z A-Z\.-]{3,75}$/.test(fn) || "First name should have between 2 and 75 characters."
+                        ],
+                        lastNameRules: [
+                            fn => !!fn || 'Last name is required.',
+                            fn => /^[a-z A-Z\.-]{3,100}$/.test(fn) || "Last name should have between 3 and 100 characters."
+                        ],
+                        phoneNumberRules: [
+                            num => !!num || 'Phone number is mandatory.',
+                            value => (/^\d{10}$/.test(value) || /^(\d{3}[- .]?){2}\d{4}$/.test(value) 
+                            || /^((\(\d{3}\))|\d{3})[- .]?\d{3}[- .]?\d{4}$/.test(value)
+                            || /^(\+\d{1,3}( )?)?((\(\d{3}\))|\d{3})[- .]?\d{3}[- .]?\d{4}$/.test(value)) || 'Phone number format is not valid.'
+                        ],
+                        addressLineRules: [
+                            add => !!add || 'Address line is mandatory',
+                            add => /^.{3,150}$/.test(add) || 'Address line should have between 3 and 15 characters'
+                        ],
+                        latitudeRule: [
+                            v => (!isNaN(parseFloat(v)) && v >= -90 && v <= 90) || 'Latitude has to be between -90 and 90'
+                        ],
+                        longitudeRule: [
+                            v => (!isNaN(parseFloat(v)) && v >= -180 && v <= 180) || 'Longitude has to be between -180 and 180'
+                        ],
+                        genderRules: [
+                            gender => this.admin_form.genders.includes(gender) || 'You must choose a gender'
+                        ]
+                    },
                 },
                 
             }
         },
         // firstName, lastName, telephone, email, gender, address,
         methods: {
+            onCountryChanged: function(){
+                if(this.pharmacy_form.selectedCountry != null){
+                    this.pharmacy_form.forbidCitySelection = false;
+                }
+                this.pharmacy_form.selectedCity = null;
+                this.refreshCities();
+                
+            },
+            refreshCities: function(){
+                client({
+                    method: 'GET',
+                    url: `cities/within-country/${this.pharmacy_form.selectedCountry}`
+                }).then( (response) => {
+                    this.cities = response.data;
+                });
+            },
             addAdministrator: function(){
                 this.admin_form.formErrorOccured = false; //reset.
 
@@ -255,13 +328,13 @@
                 this.admin_form.phoneNumber= '';
                 this.admin_form.gender= null;
             },
-            getAddress: function(){
+            getAddress(){
                 return {
-                    addressLine: "Koste Sokice 3",
-                    latitude: "66",
-                    longitude: "67",
+                    addressLine: this.pharmacy_form.addressLine,
+                    latitude: this.pharmacy_form.latitude,
+                    longitude: this.pharmacy_form.longitude,
                     city: {
-                        id: "1"
+                        id: this.pharmacy_form.selectedCity
                     }
                 }
             },
@@ -304,6 +377,15 @@
             resetWholeForm: function(){
                 this.resetAdminForm();
                 this.resetPharmacyForm();
+                this.resetLocationForm();
+            },
+            resetLocationForm(){
+                this.pharmacy_form.selectedCountry = null;
+                this.pharmacy_form.selectedCity = null;
+                this.pharmacy_form.forbidCitySelection = true;
+                this.pharmacy_form.addressLine='';
+                this.pharmacy_form.latitude = 0;
+                this.pharmacy_form.longitude = 0;
             },
             resetPharmacyForm: function(){
                 this.pharmacy_form.isFormValid= false;

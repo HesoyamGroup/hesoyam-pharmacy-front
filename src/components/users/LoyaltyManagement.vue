@@ -30,9 +30,7 @@
                                         </th>
 
                                         <th>
-                                            <v-btn icon :disabled="config.edit">
-                                                <v-icon color="green" large>mdi-plus-box-outline</v-icon>
-                                            </v-btn>
+                                            Delete
                                         </th>
                                     </template>
                                     
@@ -48,9 +46,16 @@
                                                      <v-icon>mdi-wrench</v-icon>
                                                  </v-btn>
                                             </td>
+
+                                            <td>
+                                                <v-btn color="red" icon :disabled="config.edit" @click="deleteMembership(row.item)">
+                                                    <v-icon>mdi-delete-alert</v-icon>
+                                                </v-btn>
+                                            </td>
                                         </tr>
                                     </template>
                                 </v-data-table>
+
                             </v-col>
 
                             <v-divider class="divider" inset vertical></v-divider>
@@ -235,14 +240,7 @@
     export default{
         name: 'loyalty-management',
         mounted(){
-            client({
-                method:'GET',
-                url: '/loyalty/membership/all'
-            }).then((response) => {
-                this.memberships = response.data;
-            }, (error) => {
-                console.log('Error occured during memberships retrieval.');
-            });
+            this.refreshMemberships();
 
             client({
                 method: 'GET',
@@ -311,6 +309,33 @@
             }
         },
         methods: {
+            refreshMemberships(){
+                client({
+                method:'GET',
+                url: '/loyalty/membership/all'
+                }).then((response) => {
+                    this.memberships = response.data;
+                }, (error) => {
+                    console.log('Error occured during memberships retrieval.');
+                });
+            },
+            deleteMembership(membership){
+                client({
+                    method: 'DELETE',
+                    url: `loyalty/membership/delete/${membership.id}`
+                }).then( (response) => {
+                    this.refreshMemberships();
+                }, (error) => {
+                    let status = error.response.status;
+                    if(status == '404'){
+                        console.log('Not found');
+                    }else if(status == '400'){
+                        console.log('There are people in that group! Migrate them first.');
+                    }else{
+                        console.log('Try again!');
+                    }
+                });
+            },
             createMembership: function(){
                 this.membership.error = false;
                 client({

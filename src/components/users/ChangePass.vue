@@ -40,6 +40,7 @@
 
                             <v-card-actions>
                                 <v-spacer> </v-spacer>
+                                <v-subheader class="orange--text">After password change, you will need to login with new password.</v-subheader>
                                 <v-btn color="gray" @click="closeDialog()"> Cancel </v-btn>
                                 <v-btn color="primary" :disabled="!formValid" @click="submitDialog()">Save</v-btn>
                             </v-card-actions>
@@ -84,8 +85,9 @@
                         confirmNewPassword: this.confirmNewPassword
                     }
                 }).then((response) => {
-                    this.$emit('updatePass', this.newPassword);
                     this.closeDialog();
+                    this.$router.go();
+
                 });
                 
                 
