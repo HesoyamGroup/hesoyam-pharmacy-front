@@ -313,9 +313,18 @@ const routes = [
     }
   },
   {
-    path: '/graphs',
-    name: 'Graphs',
-    component: GraphicalReports
+    path: '/report',
+    name: 'Report',
+    component: GraphicalReports,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
   }
 ]
 

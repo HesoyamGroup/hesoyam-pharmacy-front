@@ -34,12 +34,13 @@
 
 <script>
 import LineChart from './LineChart.vue'
+import {client} from '@/client/axiosClient'
 export default {
   components: { LineChart },
     name: 'RevenueChart',
     data: function(){
         return{
-            label: 'Profit',
+            label: 'Revenue',
             labels: [],
             data: [],
             dates: [],
@@ -48,9 +49,21 @@ export default {
     },
     methods:{
         search(){
-            //TODO:
-            this.labels = ['24. Dec. 2020', '25. Dec. 2020.', '26. Dec. 2020.'];
-            this.data = [47, 27, 34];
+            let from = new Date(this.dates[0]).toISOString();
+            let to = new Date(this.dates[1]).toISOString();
+            client({
+                method: 'POST',
+                url: '/sales/revenue',
+                data: {
+                    from: from,
+                    to: to
+                }
+            }).then((response) => {
+                this.labels = response.data.labels;
+                this.data = response.data.results;
+            }, (error) => {
+
+            });
         },
         pastDates(value){
             let now = new Date(Date.now());

@@ -4,8 +4,7 @@
         <v-card-subtitle>{{subtitle}}</v-card-subtitle>
         <v-card-text>
             <v-tabs
-            center-active
-            >
+            center-active>
                 <v-tab>Monthly</v-tab>
                 <v-tab-item class="mt-5">
                     <line-chart :chartData="chartDataMonth"></line-chart>
@@ -37,24 +36,48 @@ export default {
     name: 'SalesChart',
     data: function(){
         return {
-            quarterData: [455, 128, 378, 489],
-            labelsQuarter: ['Q1', 'Q2', 'Q3', 'Q4'],
-            monthData: [455, 128, 378, 489, 354, 127, 471, 231, 258, 476, 947, 643],
-            labelsMonth: ['Jan 2020', 'Feb 2020', 'Mar 2020', 'Apr 2020', 'May 2020', 'Jun 2020', 'Jul 2020', 'Aug 2020', 'Sep 2020', 'Oct 2020', 'Nov 2020', 'Dec 2020'],
-            yearData: [4578, 1274],
-            labelsYear: ['2020', '2021']
+            quarterData: [],
+            labelsQuarter: [],
+            monthData: [],
+            labelsMonth: [],
+            yearData: [],
+            labelsYear: []
         }
     },
     mounted(){
-        //fetchSalesData();
+        this.fetchSalesData();
     },
     methods:{
         fetchSalesData(){
             client({
                 method: 'GET',
-                url: '/sales/' + this.type + '/month'
+                url: '/sales/' + this.type,
+                params:{
+                    type: 'MONTHLY'
+                }
             }).then((response) => {
-                //TODO:
+                this.monthData = response.data.results;
+                this.labelsMonth = response.data.labels;
+            });
+            client({
+                method: 'GET',
+                url: '/sales/' + this.type,
+                params:{
+                    type: 'QUARTERLY'
+                }
+            }).then((response) => {
+                this.quarterData = response.data.results;
+                this.labelsQuarter = response.data.labels;
+            });
+            client({
+                method: 'GET',
+                url: '/sales/' + this.type,
+                params:{
+                    type: 'YEARLY'
+                }
+            }).then((response) => {
+                this.yearData = response.data.results;
+                this.labelsYear = response.data.labels;
             });
         }
     },
