@@ -23,6 +23,8 @@ import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 import VacationRequestsPage from '../views/VacationRequestsPage.vue'
 import NewOrderPage from '../views/NewOrderPage.vue'
 
+import GraphicalReports from '../components/report/GraphicalReports.vue'
+
 import * as UserService from '../service/UserService.js';
 
 
@@ -309,6 +311,11 @@ const routes = [
         router.push({path: '/'});
       }
     }
+  },
+  {
+    path: '/graphs',
+    name: 'Graphs',
+    component: GraphicalReports
   }
 ]
 
