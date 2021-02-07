@@ -226,6 +226,8 @@ import {client} from '@/client/axiosClient';
         var link = '';
         if(localStorage.getItem('user_role') === 'ROLE_PHARMACIST')
           link = '/counseling-report'
+        else
+          link = '/checkup-report'
         
         const encoded = encodeURI(link + '?patientEmail=' + selectedEvent.patientEmail + '&from=' + selectedEvent.start + '&pharmacy=' + 
         selectedEvent.pharmacy);

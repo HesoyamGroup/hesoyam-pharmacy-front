@@ -9,7 +9,7 @@
       step="1"
       color="indigo lighten-2"
     >
-      Counseling report
+      Checkup report
     </v-stepper-step>
 
     <v-stepper-content step="1">
@@ -29,7 +29,7 @@
         Continue
       </v-btn>
       <v-btn plain>
-        <router-link to="/pharmacist" class="cancel-btn" color="indigo lighten-2">
+        <router-link to="/dermatologist" class="cancel-btn" color="indigo lighten-2">
         Cancel
         </router-link>
       </v-btn>
@@ -109,7 +109,7 @@
         Submit
       </v-btn>
       <v-btn color="indigo lighten-2" plain>
-        <router-link to="/pharmacist" class="cancel-btn" color="indigo lighten-2">
+        <router-link to="/dermatologist" class="cancel-btn" color="indigo lighten-2">
         Cancel
         </router-link>
       </v-btn>
@@ -305,7 +305,7 @@ import {client} from '@/client/axiosClient';
             this.from = (new Date(new Date(this.from) - x)).toISOString().slice(0,-1);
             client({
                 method: 'POST',
-                url: 'counseling/finish-counseling',
+                url: 'checkup/finish-checkup',
                 data: {
                     prescriptionItems: this.items,
                     report: this.report,
@@ -314,8 +314,8 @@ import {client} from '@/client/axiosClient';
                 }
             })
             .then((response) => {
-                if(response.data === 'Successfully finished counseling!'){
-                    setTimeout(() => { this.$router.push({path: '/pharmacist'})}, 2000);
+                if(response.data === 'Successfully finished checkup!'){
+                    setTimeout(() => { this.$router.push({path: '/dermatologist'})}, 2000);
                 }
                 this.snackbar = true;
                 this.snackbarText = response.data;
