@@ -13,8 +13,20 @@
                                 <v-file-input v-model="qrCode"  accept="image/*" label="QR code upload" prepend-icon="mdi-camera"></v-file-input>
                                 <v-btn @click="uploadImage()">Submit</v-btn>
                             </v-row>
-                                <v-divider> </v-divider>
-                            <v-row rows="8" justify="center">
+                            <v-row rows="2">
+                                <v-list>
+                                    <v-list-item v-for="item in medicineInfo" :key="item.name">
+                                        <v-list-item-icon>
+                                            <v-icon color="yellow"> mdi-star</v-icon>
+                                        </v-list-item-icon>
+
+                                        <v-list-item-content>
+                                            <v-list-item-title>{{item.name}}  --- Quantity: {{item.quantity}}</v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-row>
+                            <v-row rows="6" justify="center">
                                 <v-layout child-flex>
                                     <v-data-table :headers="headers" :items="filteredPharmacies"  class="mt-6">
                                         <template v-slot:item="row">
@@ -109,6 +121,7 @@
                     }
                 ],
                 pharmacies: [],
+                medicineInfo: null,
                 error: '',
                 showError: false,
                 showSuccess: false
@@ -125,6 +138,7 @@
                     }
                 }).then( (response) => {
                     this.pharmacies = [];
+                    this.medicineInfo = [];
                     this.qrCode = null;
                     this.showSuccess = true;
                 }, (error) => {
@@ -141,12 +155,21 @@
                 const formData = new FormData();
                 formData.append('file',this.qrCode);
                 this.pharmacies = [];
+                this.medicineInfo = [];
                 client({
                     method: 'POST',
                     url: '/eprescription/upload',
                     data: formData
                 }).then((response) => {
-                    this.pharmacies = response.data;
+                    this.pharmacies = response.data.pharmacies;
+                    let result = [];
+                    for(let key in response.data.requestedMedicine){
+                        result.push({
+                            name: key,
+                            quantity: response.data.requestedMedicine[key]
+                        });
+                    }
+                    this.medicineInfo = result;
                 }, (error) => {
                     if(error.response.status == 400) this.error='We couldn\'t read your QR code, try again.';
                     else if(error.response.status == 404) this.error='Prescription is already completed or you uploaded wrong QR code';
