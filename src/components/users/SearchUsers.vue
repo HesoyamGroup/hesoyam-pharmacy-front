@@ -91,6 +91,86 @@ export default {
             return array[0] + "-" +array[1] + "-" + array[2];
         },
 
+
+        toDateTime: function(array){
+            return array[0] + "-" +array[1] + "-" + array[2] + " " + array[3] + ":" + array[4];
+        },
+        
+        closeDialog: function(){
+            this.dialog = false;
+            this.allAppointments = [];
+        },
+
+        openAppointment: function(item){
+            console.log(item);
+            var encodedURI = '';
+            if(this.userRole === "ROLE_PHARMACIST")
+                encodedURI = encodeURI('/counseling-report' + '?patientEmail=' + item.patientEmail + '&from=' + item.fixedDate
+                    + '&pharmacy=' + item.pharmacyId);
+            else {
+                
+                encodedURI = encodeURI('/checkup-report' + '?patientEmail=' + item.patientEmail + '&from=' + item.fixedDate
+                    + '&pharmacy=' + item.pharmacyId);
+            }
+            
+            this.$router.push({path: encodedURI});
+        },
+
+        loadAllAppointments: function(patient){
+            var link = "";
+            if(localStorage.getItem("user_role") === "ROLE_PHARMACIST")
+                link = "counseling/get-all-counselings-for-patient"
+            else
+                link = "checkup/get-all-checkups-for-patient"
+
+            link += "/"+patient.email;
+
+            client({
+                url: link,
+                method: 'GET',
+            })
+            .then((response) => {
+                // this.allAppointments = response.data;
+
+                for(var appointment of response.data){
+                    appointment.fixedDate = this.toDateTime(appointment.from);
+                    if(appointment.appointmentStatus === 'TAKEN')
+                        appointment.disabled = false;
+                    else
+                        appointment.disabled = true;
+                    this.allAppointments.push(appointment);
+                }
+
+                this.dialog = true;
+                if(localStorage.getItem("role") === "ROLE_PHARMACIST"){
+                    this.dialogHeadlineText = "Select a counseling!";
+                } else {
+                    this.dialogHeadlineText = "Select a checkup!";
+                }
+                console.log(this.allAppointments);
+            })
+        },
+
+        didntShowUp: function(item){
+            var x = (new Date()).getTimezoneOffset() * 60000; 
+            console.log(item)
+            client({
+            method: 'POST',
+            url: 'appointment/patient-didnt-show',
+            data:{
+                patientEmail: item.patientEmail,
+                from: (new Date(new Date(item.fixedDate) - x)).toISOString().slice(0,-1)
+            }
+            })
+            .then((response) => {
+            this.snackbar = true;
+            this.snackbarText = response.data;
+            this.dialog = false;
+            item.disabled = true;
+            })
+            
+      },
+
         sortByFirstName: function(){
             if(this.sort_first_name_asc){
                 this.patientsFixed.sort(function(a, b) {
