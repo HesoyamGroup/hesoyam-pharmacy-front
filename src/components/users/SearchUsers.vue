@@ -35,7 +35,24 @@
     <v-list-item two-line>
         <v-list-item-content>
             <v-list-item-title>{{patient.firstName}} {{patient.lastName}}</v-list-item-title>
-            <v-list-item-subtitle>{{patient.lastCheckupDate}}</v-list-item-subtitle>
+            <v-list-item-subtitle>
+                <v-col
+                cols="12"
+                sm="6"
+                md="3"
+                > 
+                    {{patient.lastCheckupDate}}
+                </v-col>
+                <v-col
+                cols="12"
+                sm="6"
+                md="3"
+                >
+                    <v-btn plain color = "indigo lighten-2" @click="loadAllAppointments(patient)">
+                        Appointments
+                    </v-btn>
+                </v-col>
+                </v-list-item-subtitle>
         </v-list-item-content>
         </v-list-item>  
         </div>
@@ -60,17 +77,93 @@
         </v-btn>
       </template>
     </v-snackbar>
+
+
+      <v-row justify="center">
+    <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="600px"
+    >
+      
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{dialogHeadlineText}}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+        <v-list>
+        <v-list-item-group
+            v-model="selectedItem"
+            color="primary"
+        >
+            <v-list-item
+            v-for="item of allAppointments"
+            :key="item.fixedDate"
+            >
+            <v-list-item-content v-if="!item.disabled">
+                <v-col
+                cols="12"
+                sm="6"
+                md="3"
+                >
+                <v-list-item-title v-text="item.fixedDate"></v-list-item-title>
+                </v-col>
+                <v-col
+                cols="12"
+                sm="6"
+                md="3"
+                >
+                <v-btn
+                v-if="userRole === 'ROLE_PHARMACIST'"
+                plain 
+                @click="openAppointment(item)"
+                color="indigo lighten-2">
+                Start Appointment
+                </v-btn>
+
+                <v-btn plain
+                color="error"
+                @click="didntShowUp(item)">
+                Didnt show
+                </v-btn>
+                </v-col>
+
+            </v-list-item-content>
+            </v-list-item>
+        </v-list-item-group>
+        </v-list>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            plain
+            @click="closeDialog()"
+          >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-row>
     </div>
 </template>
 
 <script>
 import {client} from '@/client/axiosClient';
 
+
 export default {
     name: 'SearchUsers',
     data(){
             return {
                 patients: [],
+                userRole: null,
+                selectedItem: null,
+                dialogHeadlineText: null,
+                dialog: false,
+                allAppointments: [],
                 patientsFixed: [],
                 query: '',
                 sort_first_name_asc: true,
@@ -84,6 +177,7 @@ export default {
         
     mounted(){      
         this.getAllPatients();
+        this.userRole = localStorage.getItem('user_role');
     },
 
     methods:{
@@ -331,6 +425,7 @@ export default {
         })
         },
     },
+    
 }
 </script>
 
