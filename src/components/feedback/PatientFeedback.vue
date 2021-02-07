@@ -24,16 +24,54 @@
                 </v-tab>
                 <!-- Dermatologists -->
                 <v-tab-item>
-                    Fuck you1
+                    <v-card>
+                        <v-card-title>
+                            <v-text-field
+                                v-model="searchDermatologists"
+                                append-icon="mdi-magnify"
+                                label="Search"
+                                single-line
+                                hide-details
+                            ></v-text-field>
+                            <v-spacer></v-spacer>
+                            <v-spacer></v-spacer>
+                        </v-card-title>
+                        <v-data-table
+                        v-model='selectedDermatologist'
+                        :items='dermatologistsList'
+                        :headers='dermatologistsHeaders'
+                        :search="searchDermatologists"
+                        :single-select='singleSelect'
+                        show-select
+                        return-object
+                        item-key="dermatologistId">
+                        </v-data-table>
+                        <v-card-actions class="justify-center"
+                        v-if='selectedDermatologist.length > 0'>
+                            <v-btn
+                            color="primary"
+                            v-if='selectedDermatologist[0].yourRating == 0.0'>
+                            Add Feedback
+                            </v-btn>
+                            <v-btn
+                            color='primary'
+                            v-if='selectedDermatologist[0].yourRating > 0.0'>
+                            Edit Feedback
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
                 </v-tab-item>
+                <!-- Pharmacists -->
                 <v-tab-item>
-                    Fuck you2
+                    
                 </v-tab-item>
+                <!-- Medicine -->
                 <v-tab-item>
-                    Fuck you3
+                    
                 </v-tab-item>
+                <!-- Pharmacies -->
                 <v-tab-item>
-                    Fuck you4
+                    
                 </v-tab-item>
             </v-tabs>
         </v-card>
@@ -43,11 +81,39 @@
 
 <script>
 
+    import {client} from '@/client/axiosClient';
+
     export default {
         name:'PatientFeedback',
         data(){
             return{
+                //Single select is for all data tables
+                singleSelect: true,
+                //Dermatologists
+                dermatologistsList: [],
+                selectedDermatologist: [],
+                dermatologistsHeaders: [
+                    {text:'Dermatologist', value:'dermatologistFullName'},
+                    {text:'Average Rating', value:'averageRating'},
+                    {text:'Your Rating', value:'yourRating'}
+                ],
+                searchDermatologists: '',
+            }
+        },
+        mounted(){
+            this.getCheckups()
+        },
+        methods:{
+            getCheckups: function(){
+                client({
+                    method: 'GET',
+                    url: 'feedback/checkups'
+                })
+                .then((response) => {
+                    this.dermatologistsList = response.data
+                }, (error) => {
 
+                })
             }
         }
     }
