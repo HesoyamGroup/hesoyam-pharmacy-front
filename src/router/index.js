@@ -27,6 +27,8 @@ import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 import VacationRequestsPage from '../views/VacationRequestsPage.vue'
 import NewOrderPage from '../views/NewOrderPage.vue'
 
+import GraphicalReports from '../components/report/GraphicalReports.vue'
+
 import * as UserService from '../service/UserService.js';
 
 
@@ -335,6 +337,20 @@ const routes = [
     path: '/order/new',
     name: 'NewOrderPage',
     component: NewOrderPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/report',
+    name: 'Report',
+    component: GraphicalReports,
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'ADMINISTRATOR'){

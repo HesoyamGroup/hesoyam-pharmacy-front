@@ -185,6 +185,7 @@ export default {
             return array[0] + "-" +array[1] + "-" + array[2];
         },
 
+
         toDateTime: function(array){
             return array[0] + "-" +array[1] + "-" + array[2] + " " + array[3] + ":" + array[4];
         },
@@ -196,8 +197,16 @@ export default {
 
         openAppointment: function(item){
             console.log(item);
-            const encodedURI = encodeURI('/counseling-report' + '?patientEmail=' + item.patientEmail + '&from=' + item.fixedDate
-            + '&pharmacy=' + item.pharmacyId);
+            var encodedURI = '';
+            if(this.userRole === "ROLE_PHARMACIST")
+                encodedURI = encodeURI('/counseling-report' + '?patientEmail=' + item.patientEmail + '&from=' + item.fixedDate
+                    + '&pharmacy=' + item.pharmacyId);
+            else {
+                
+                encodedURI = encodeURI('/checkup-report' + '?patientEmail=' + item.patientEmail + '&from=' + item.fixedDate
+                    + '&pharmacy=' + item.pharmacyId);
+            }
+            
             this.$router.push({path: encodedURI});
         },
 
