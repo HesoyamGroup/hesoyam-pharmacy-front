@@ -104,6 +104,13 @@
       <v-btn
         plain
         color="indigo lighten-1"
+        @click="newAppointmentDialog = true"
+      >
+        Book another checkup
+      </v-btn>
+      <v-btn
+        plain
+        color="indigo lighten-1"
         @click="submit()"
       >
         Submit
@@ -121,50 +128,62 @@
 
   <v-row justify="center">
     <v-dialog
-      v-model="dialog"
+      v-model="newAppointmentDialog"
       persistent
-      max-width="600px"
+      max-width="1000px"
     >
       
       <v-card>
         <v-card-title>
-          <span class="headline">New item</span>
+          <span class="headline">Book another counseling!</span>
         </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
               <v-col
-                cols="12"
+                cols="2"
                 sm="6"
                 md="4"
               >
-                <v-autocomplete
-                  label="Medicine*"
-                  required
-                  v-model="medicineInput"
-                  :items="medicineItems"
-                  item-text="name"
-                ></v-autocomplete>
+
+                <v-date-picker v-model="datePicker" :disabledDates="disabledDates"
+                color="indigo lighten-2"
+                no-title></v-date-picker>
+
               </v-col>
+            
               <v-col
-                cols="12"
+                cols="2"
                 sm="6"
                 md="4"
               >
-                <v-text-field
-                  label="Quantity"
-                  hint="1"
-                  type="number"
-                  :min="1"
-                  v-model="quantityInput"
-                ></v-text-field>
-                <v-text-field
-                  label="Therapy duration (days)"
-                  hint="7"
-                  type="number"
-                  :min="1"
-                  v-model="therapyDurationInput"
-                ></v-text-field>
+              <v-col style="width: 350px; flex: 0 1 auto;">
+                <h2>Start:</h2>
+                <v-time-picker
+                  v-model="e7"
+                ></v-time-picker>
+              </v-col>
+              <v-col style="width: 350px; flex: 0 1 auto;">
+              <h2>End:</h2>
+              <v-time-picker
+                v-model="e8"
+              ></v-time-picker>
+              </v-col>
+
+              </v-col>
+
+              <v-col
+                cols="2"
+                sm="6"
+                md="4"
+              >
+              <v-text-field 
+              type="number" 
+              :min="0"
+              label="Price"
+              v-model="priceInput"
+              >
+              </v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -174,21 +193,21 @@
           <v-btn
             color="indigo lighten-1"
             plain
-            @click="testAvailability()"
+            @click="checkNewAppointmentDate()"
           >
-            Test availability
+            Check
           </v-btn>
           <v-btn
             color="indigo lighten-1"
             plain
-            @click="addPrescriptionItem()"
-            v-if="itemAvailable"
+            @click="bookAppointment()"
+            v-if="dateAvailable"
           >
-            Save
+            Book
           </v-btn>
           <v-btn
             plain
-            @click="dialog = false"
+            @click="newAppointmentDialog = false"
           >
             Close
           </v-btn>
@@ -227,6 +246,8 @@ import {client} from '@/client/axiosClient';
     data () {
       return {
         e6: 1,
+        e7: null,
+        e8: null,
         patientEmail: null,
         from: null,
         report: null,
@@ -242,6 +263,13 @@ import {client} from '@/client/axiosClient';
         therapyDurationInput: 0,
         itemAvailable: false,
         pharmacyId: null,
+        newAppointmentDialog: false,
+        dateAvailable: false,
+        priceInput: null,
+        datePicker: null,
+        disabledDates: {
+          to: new Date(Date.now() - 8640000)
+        },
       }
       
     },
@@ -296,6 +324,50 @@ import {client} from '@/client/axiosClient';
           })
           .then((response) => {
             this.itemAvailable = response.data;
+          })
+        },
+
+        checkNewAppointmentDate: function(){
+          var x = (new Date()).getTimezoneOffset() * 60000; 
+
+          var dateTime = this.datePicker + " " + this.e7;
+          dateTime = new Date(dateTime).toISOString().substring(0, 16);
+          
+          var to = this.datePicker + " " + this.e8;
+          to = new Date(to).toISOString().substring(0, 16);
+
+          
+
+          var link = 'appointment/check-new-appointment/'+this.patientEmail+'&&'+dateTime+'&&'+to;
+
+          client({
+            url: link,
+            method: 'GET'
+          })
+          .then((response) => {
+            this.dateAvailable = response.data;
+          })
+        },
+
+        bookAppointment: function(){
+          var x = (new Date()).getTimezoneOffset() * 60000; 
+          client({
+            url: 'appointment/book-new-appointment',
+            method: 'POST',
+            data: {
+              patientEmail: this.patientEmail,
+              from: (new Date(new Date(this.datePicker + ' ' + this.e7) - x)).toISOString().slice(0,-1),
+              to: (new Date(new Date(this.datePicker + ' ' + this.e8) - x)).toISOString().slice(0,-1),
+              pharmacyId: this.pharmacyId,
+              price: this.priceInput
+            },
+          })
+          .then((response) => {
+            if(response.data){
+              this.snackbar = true;
+              this.snackbarText = response.data;
+              this.newAppointmentDialog = false;
+            }
           })
         },
 
