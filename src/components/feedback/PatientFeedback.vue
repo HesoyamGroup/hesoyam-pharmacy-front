@@ -50,15 +50,12 @@
                         v-if='selectedDermatologist.length > 0'>
                             <v-btn
                             color="primary"
-                            v-if='selectedDermatologist[0].yourRating == 0.0'>
+                            v-if='selectedDermatologist[0].yourRating == 0.0'
+                            @click='addFeedbackDermatologistDialog'>
                             Add Feedback
                             </v-btn>
-                            <v-btn
-                            color='primary'
-                            v-if='selectedDermatologist[0].yourRating > 0.0'>
-                            Edit Feedback
-                            </v-btn>
                         </v-card-actions>
+                        
                     </v-card>
                 </v-tab-item>
                 <!-- Pharmacists -->
@@ -75,6 +72,40 @@
                 </v-tab-item>
             </v-tabs>
         </v-card>
+        <v-dialog v-model='dermatologistFeedbackDialog' max-width="50%">
+            <v-card shaped>
+                <v-toolbar dark color='primary'>
+                    <v-toolbar-title>Feedback</v-toolbar-title>
+                </v-toolbar>
+                <v-row class="justify-center">
+                    <v-rating
+                    class='ma-4'
+                    length="5"
+                    size="58"
+                    value="1"
+                    v-model='ratingDermatologist'
+                    ></v-rating>
+                </v-row>
+                <v-row class="justify-center">
+                    <v-textarea
+                    class='ma-4'
+                    outlined
+                    rows="5"
+                    row-height="15"
+                    no-resize
+                    label="Your Comment"
+                    v-model='commentDermatologist'
+                    ></v-textarea>
+                </v-row>
+                <v-card-actions class='justify-center'>
+                    <v-btn
+                    color="primary"
+                    @click='addFeedbackDermatologist'>
+                    Confirm
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </div>
 </template>
@@ -95,9 +126,11 @@
                 dermatologistsHeaders: [
                     {text:'Dermatologist', value:'dermatologistFullName'},
                     {text:'Average Rating', value:'averageRating'},
-                    {text:'Your Rating', value:'yourRating'}
                 ],
                 searchDermatologists: '',
+                dermatologistFeedbackDialog: false,
+                ratingDermatologist: 1,
+                commentDermatologist: '',
             }
         },
         mounted(){
@@ -113,6 +146,31 @@
                     this.dermatologistsList = response.data
                 }, (error) => {
 
+                })
+            },
+            addFeedbackDermatologistDialog: function()
+            {
+                this.dermatologistFeedbackDialog = true;
+                this.ratingDermatologist = 1;
+                this.commentDermatologist = '';
+            },
+            addFeedbackDermatologist: function()
+            {
+                console.log(this.ratingDermatologist);
+                console.log(this.commentDermatologist);
+                client({
+                    method:'POST',
+                    url: 'feedback/dermatologist',
+                    data:{
+                        "dermatologistId": this.selectedDermatologist[0].dermatologistId,
+                        "dermatologistFullName": "",
+                        "averageRating": 0,
+                        "yourRating": this.ratingDermatologist,
+                        "yourComment": this.commentDermatologist
+                    }
+                })
+                .then((response) => {
+                    this.selectedDermatologist[0].averageRating = response.data;
                 })
             }
         }
