@@ -39,8 +39,6 @@ export default {
             let from = new Date(this.newFrom.getTime() - offset*60000);
             let to = new Date(from.getTime() + this.newDuration*60000);
 
-            let fromStr = from.toISOString();
-            let toStr = to.toISOString();
             let employeeId = this.$route.params.id;
 
             client({
