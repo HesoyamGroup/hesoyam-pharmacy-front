@@ -7,7 +7,7 @@
       </h1>
 
     </v-card-title>
-    <v-btn plain @click="logout()">Logout</v-btn>
+    <!-- <v-btn plain @click="logout()">Logout</v-btn> -->
     <v-tabs
       v-model="tab"
       background-color="transparent"
