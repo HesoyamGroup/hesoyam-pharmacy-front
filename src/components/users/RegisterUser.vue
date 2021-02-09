@@ -128,13 +128,13 @@
                         'SYS_ADMIN',
                         'SUPPLIER'
                     ],
-                    selectedAccountType: null,
                     genders: [
                             'MALE',
                             'FEMALE',
                             'OTHER',
                             'DONT_SAY'
                     ],
+                    selectedAccountType: null,
                     gender: null,
                     password: '',
                     confirmPassword: '',
@@ -225,6 +225,7 @@
                 }).then( (response) => {
                         this.form.status.registrationInProgress = false;
                         this.form.status.registrationSuccessful = true;
+                        this.resetForm();
                 }, (error) => {
                         this.form.status.registrationInProgress = false;
                         this.form.status.registrationErrorOccured = true;
@@ -267,6 +268,19 @@
                 }).then( (response) => {
                     this.form.cities = response.data;
                 });
+            },
+            resetForm(){
+                this.form.selectedAccountType = null;
+                this.form.gender = null;
+                this.form.password = '';
+                this.form.confirmPassword = '';
+                this.form.firstName = '';
+                this.form.lastName = '';
+                this.form.email = '';
+                this.form.phone = '';
+                this.form.selectedCountry = null;
+                this.form.selectedCity = null;
+                this.form.addressLine = '';
             },
             resetFormStatus: function(){
                 this.form.status = {

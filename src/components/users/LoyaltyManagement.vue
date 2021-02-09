@@ -110,7 +110,11 @@
 
                             </v-col cols="3">
                                 <v-row>
+                                    <v-form v-model="loyaltyProgramConfigFormValid">
                                     <v-container>
+                                        <v-subheader class="font-weight-black">
+                                            Loyalty program config
+                                        </v-subheader>
                                         <v-row>
                                             <v-select v-model="config.selected" :items="config.configs" label="Possible configs" outlined>
                                                 <template slot="selection" slot-scope="data">
@@ -123,15 +127,15 @@
                                             </v-select>
                                         </v-row>
                                         <v-row>
-                                            <v-text-field v-if="config.selected" v-model="config.selected.checkUpPoints" :disabled="!config.edit" label="Checkup points" prepend-icon="plus-circle-multiple-outline" type="number" min="0" :rules="config.rules.pointRules">
+                                            <v-text-field v-if="config.selected" v-model="config.selected.checkUpPoints" :disabled="!config.edit" label="Enter points received per checkup" prepend-icon="plus-circle-multiple-outline" type="number" min="0" :rules="config.rules.pointRules">
                                             </v-text-field>
-                                            <v-subheader v-else>
-                                                Select a loyalty program config to see data.
+                                            <v-subheader v-else class="orange--text">
+                                                Select a loyalty program config to see data. ^
                                             </v-subheader>
                                         </v-row>
 
                                         <v-row>
-                                            <v-text-field v-if="config.selected" v-model="config.selected.counselingPoints" :disabled="!config.edit" label="Counseling points" prepend-icon="plus-circle-multiple-outline" type="number" min="0" :rules="config.rules.pointRules"></v-text-field>
+                                            <v-text-field v-if="config.selected" v-model="config.selected.counselingPoints" :disabled="!config.edit" label="Enter points received per counseling" prepend-icon="plus-circle-multiple-outline" type="number" min="0" :rules="config.rules.pointRules"></v-text-field>
                                         </v-row>
 
                                         <v-row>
@@ -156,12 +160,13 @@
                                             <v-btn  v-if="!config.edit" :disabled="!config.selected" color="primary" @click="startEdit()">
                                                 Edit
                                             </v-btn>
-                                            <v-btn  v-if="config.edit" :disabled="config.disableInteraction" color="primary" @click="updateConfig()">
+                                            <v-btn  v-if="config.edit" :disabled="config.disableInteraction || !loyaltyProgramConfigFormValid" color="primary" @click="updateConfig()">
                                                 Save
                                             </v-btn>
                                         </v-row>
 
                                     </v-container>
+                                </v-form>
                                 </v-row>
                             </v-col>
 
@@ -253,6 +258,7 @@
         },
         data(){
             return {
+                loyaltyProgramConfigFormValid: false,
                 memberships: [],
                 membership:{
                     form: {
