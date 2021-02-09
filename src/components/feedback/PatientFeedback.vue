@@ -130,7 +130,38 @@
                 </v-tab-item>
                 <!-- Pharmacies -->
                 <v-tab-item>
-                    
+                    <v-card>
+                        <v-card-title>
+                            <v-text-field
+                                v-model="searchPharmacy"
+                                append-icon="mdi-magnify"
+                                label="Search"
+                                single-line
+                                hide-details
+                            ></v-text-field>
+                            <v-spacer></v-spacer>
+                            <v-spacer></v-spacer>
+                        </v-card-title>
+                        <v-data-table
+                        v-model='selectedPharmacy'
+                        :items='pharmacyList'
+                        :headers='pharmacyHeaders'
+                        :search="searchPharmacy"
+                        :single-select='singleSelect'
+                        show-select
+                        return-object
+                        item-key="pharmacyId">
+                        </v-data-table>
+                        <v-card-actions class="justify-center"
+                        v-if='selectedPharmacy.length > 0'>
+                            <v-btn
+                            color="primary"
+                            @click='addFeedbackPharmacyDialog'>
+                            Add Feedback
+                            </v-btn>
+                        </v-card-actions>
+                        
+                    </v-card>   
                 </v-tab-item>
             </v-tabs>
         </v-card>.
@@ -242,6 +273,42 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <!-- Pharmacy dialog -->
+        <v-dialog v-model='pharmacyFeedbackDialog' max-width="50%">
+            <v-card shaped>
+                <v-toolbar dark color='primary'>
+                    <v-toolbar-title>Pharmacy Feedback</v-toolbar-title>
+                </v-toolbar>
+                <v-row class="justify-center">
+                    <v-rating
+                    class='ma-4'
+                    length="5"
+                    size="58"
+                    value="1"
+                    v-model='ratingPharmacy'
+                    ></v-rating>
+                </v-row>
+                <v-row class="justify-center">
+                    <v-textarea
+                    class='ma-4'
+                    outlined
+                    rows="5"
+                    row-height="15"
+                    no-resize
+                    label="Your Comment"
+                    v-model='commentPharmacy'
+                    ></v-textarea>
+                </v-row>
+                <v-card-actions class='justify-center'>
+                    <v-btn
+                    color="primary"
+                    @click='addFeedbackPharmacy'>
+                    Confirm
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </div>
 </template>
@@ -289,13 +356,24 @@
                 medicineFeedbackDialog: false,
                 ratingMedicine: 1,
                 commentMedicine: '',
-
+                //Pharmacy
+                pharmacyList: [],
+                selectedPharmacy: [],
+                pharmacyHeaders: [
+                    {text:'Pharmacy', value:'pharmacyName'},
+                    {text:'Average Rating', value:'averageRating'},
+                ],
+                searchPharmacy: '',
+                pharmacyFeedbackDialog: false,
+                ratingPharmacy: 1,
+                commentPharmacy: '',
             }
         },
         mounted(){
             this.getCheckups()
             this.getCounselings()
             this.getMedicine()
+            this.getPharmacy()
         },
         methods:{
             getCheckups: function(){
@@ -333,6 +411,18 @@
 
                 })
             },
+            getPharmacy: function()
+            {
+                client({
+                    method: 'GET',
+                    url: 'feedback/pharmacies'
+                })
+                .then((response) => {
+                    this.pharmacyList = response.data
+                }, (error) => {
+
+                })
+            },
             addFeedbackDermatologistDialog: function()
             {
                 this.dermatologistFeedbackDialog = true;
@@ -350,6 +440,12 @@
                 this.medicineFeedbackDialog = true;
                 this.ratingMedicine = 1;
                 this.commentMedicine = ''
+            },
+            addFeedbackPharmacyDialog: function()
+            {
+                this.pharmacyFeedbackDialog = true;
+                this.ratingPharmacy = 1;
+                this.commentPharmacy = ''
             },
             addFeedbackDermatologist: function()
             {
@@ -412,6 +508,27 @@
                     this.selectedMedicine[0].averageRating = response.data;
                     this.medicineFeedbackDialog = false;
                     this.selectedMedicine = [];
+                }, (error) =>{
+
+                })
+            },
+            addFeedbackPharmacy: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'feedback/pharmacies',
+                    data:{
+                        'pharmacyId': this.selectedPharmacy[0].pharmacyId,
+                        'pharmacyName': '',
+                        'averageRating': 0,
+                        'yourRating': this.ratingPharmacy,
+                        'comment': this.commentPharmacy
+                    }
+                })
+                .then((response) => {
+                    this.selectedPharmacy[0].averageRating = response.data;
+                    this.pharmacyFeedbackDialog = false;
+                    this.selectedPharmacy = [];
                 }, (error) =>{
                     
                 })
