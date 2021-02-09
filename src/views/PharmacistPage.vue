@@ -13,7 +13,7 @@
         {{userDTO.pharmacyName}}
       </h2>
     </v-row>
-    <v-btn plain @click="logout()">Logout</v-btn>
+    
     <v-tabs
       v-model="tab"
       background-color="transparent"

@@ -28,6 +28,7 @@ import VacationRequestsPage from '../views/VacationRequestsPage.vue'
 import NewOrderPage from '../views/NewOrderPage.vue'
 import OrdersPage from '../views/OrdersPage.vue'
 import NotFoundPage from '../views/NotFoundPage.vue'
+import EmployeeHomePage from '../views/EmployeeHomePage.vue'
 
 
 import GraphicalReports from '../components/report/GraphicalReports.vue'
@@ -198,6 +199,20 @@ const routes = [
     path: '/searchusers',
     name: 'SearchUsers',
     component: SearchUsersPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST' || user.userRole == 'DERMATOLOGIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/home-employee',
+    name: 'EmployeeHome',
+    component: EmployeeHomePage,
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'PHARMACIST' || user.userRole == 'DERMATOLOGIST'){
