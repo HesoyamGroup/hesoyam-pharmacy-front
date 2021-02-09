@@ -95,7 +95,38 @@
                 </v-tab-item>
                 <!-- Medicine -->
                 <v-tab-item>
-                    
+                    <v-card>
+                        <v-card-title>
+                            <v-text-field
+                                v-model="searchMedicine"
+                                append-icon="mdi-magnify"
+                                label="Search"
+                                single-line
+                                hide-details
+                            ></v-text-field>
+                            <v-spacer></v-spacer>
+                            <v-spacer></v-spacer>
+                        </v-card-title>
+                        <v-data-table
+                        v-model='selectedMedicine'
+                        :items='medicineList'
+                        :headers='medicineHeaders'
+                        :search="searchMedicine"
+                        :single-select='singleSelect'
+                        show-select
+                        return-object
+                        item-key="id">
+                        </v-data-table>
+                        <v-card-actions class="justify-center"
+                        v-if='selectedMedicine.length > 0'>
+                            <v-btn
+                            color="primary"
+                            @click='addFeedbackMedicineDialog'>
+                            Add Feedback
+                            </v-btn>
+                        </v-card-actions>
+                        
+                    </v-card>    
                 </v-tab-item>
                 <!-- Pharmacies -->
                 <v-tab-item>
@@ -108,7 +139,7 @@
         <v-dialog v-model='dermatologistFeedbackDialog' max-width="50%">
             <v-card shaped>
                 <v-toolbar dark color='primary'>
-                    <v-toolbar-title>Feedback</v-toolbar-title>
+                    <v-toolbar-title>Dermatologist Feedback</v-toolbar-title>
                 </v-toolbar>
                 <v-row class="justify-center">
                     <v-rating
@@ -144,7 +175,7 @@
         <v-dialog v-model='pharmacistFeedbackDialog' max-width="50%">
             <v-card shaped>
                 <v-toolbar dark color='primary'>
-                    <v-toolbar-title>Feedback</v-toolbar-title>
+                    <v-toolbar-title>Pharmacist Feedback</v-toolbar-title>
                 </v-toolbar>
                 <v-row class="justify-center">
                     <v-rating
@@ -170,6 +201,42 @@
                     <v-btn
                     color="primary"
                     @click='addFeedbackPharmacist'>
+                    Confirm
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Medicine dialog -->
+        <v-dialog v-model='medicineFeedbackDialog' max-width="50%">
+            <v-card shaped>
+                <v-toolbar dark color='primary'>
+                    <v-toolbar-title>Medicine Feedback</v-toolbar-title>
+                </v-toolbar>
+                <v-row class="justify-center">
+                    <v-rating
+                    class='ma-4'
+                    length="5"
+                    size="58"
+                    value="1"
+                    v-model='ratingMedicine'
+                    ></v-rating>
+                </v-row>
+                <v-row class="justify-center">
+                    <v-textarea
+                    class='ma-4'
+                    outlined
+                    rows="5"
+                    row-height="15"
+                    no-resize
+                    label="Your Comment"
+                    v-model='commentMedicine'
+                    ></v-textarea>
+                </v-row>
+                <v-card-actions class='justify-center'>
+                    <v-btn
+                    color="primary"
+                    @click='addFeedbackMedicine'>
                     Confirm
                     </v-btn>
                 </v-card-actions>
@@ -211,11 +278,24 @@
                 pharmacistFeedbackDialog: false,
                 ratingPharmacist: 1,
                 commentPharmacist: '',
+                //Medicine
+                medicineList: [],
+                selectedMedicine: [],
+                medicineHeaders: [
+                    {text:'Medicine', value:'medicineName'},
+                    {text:'Average Rating', value:'averageRating'},
+                ],
+                searchMedicine: '',
+                medicineFeedbackDialog: false,
+                ratingMedicine: 1,
+                commentMedicine: '',
+
             }
         },
         mounted(){
             this.getCheckups()
             this.getCounselings()
+            this.getMedicine()
         },
         methods:{
             getCheckups: function(){
@@ -241,6 +321,18 @@
 
                 })
             },
+            getMedicine: function()
+            {
+                client({
+                    method: 'GET',
+                    url: 'feedback/medicine'
+                })
+                .then((response) => {
+                    this.medicineList = response.data
+                }, (error) => {
+
+                })
+            },
             addFeedbackDermatologistDialog: function()
             {
                 this.dermatologistFeedbackDialog = true;
@@ -252,6 +344,12 @@
                 this.pharmacistFeedbackDialog = true;
                 this.ratingPharmacist = 1;
                 this.commentPharmacist = '';
+            },
+            addFeedbackMedicineDialog: function()
+            {
+                this.medicineFeedbackDialog = true;
+                this.ratingMedicine = 1;
+                this.commentMedicine = ''
             },
             addFeedbackDermatologist: function()
             {
@@ -271,6 +369,7 @@
                 .then((response) => {
                     this.selectedDermatologist[0].averageRating = response.data;
                     this.dermatologistFeedbackDialog = false;
+                    this.selectedDermatologist = [];
                 })
             },
             addFeedbackPharmacist: function()
@@ -291,6 +390,30 @@
                 .then((response) => {
                     this.selectedPharmacist[0].averageRating = response.data;
                     this.pharmacistFeedbackDialog = false;
+                    this.selectedPharmacist = [];
+                }, (error) =>{
+
+                })
+            },
+            addFeedbackMedicine: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'feedback/medicine',
+                    data:{
+                        "id": this.selectedMedicine[0].id,
+                        "medicineName": '',
+                        "averageRating": 0,
+                        "yourRating": this.ratingMedicine,
+                        "comment": this.commentMedicine
+                    }
+                })
+                .then((response) => {
+                    this.selectedMedicine[0].averageRating = response.data;
+                    this.medicineFeedbackDialog = false;
+                    this.selectedMedicine = [];
+                }, (error) =>{
+                    
                 })
             }
         }
