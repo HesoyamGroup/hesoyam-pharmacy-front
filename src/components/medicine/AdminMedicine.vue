@@ -5,7 +5,13 @@
                 <v-col>
                     <v-card>
                         <v-toolbar dark color="primary">
-                            <v-toolbar-title>Administrate medicine</v-toolbar-title>
+                            <v-toolbar-title>
+                                Administrate medicine
+                            </v-toolbar-title>
+                            <v-spacer> </v-spacer>
+                            <v-layout justify-end>
+                                <v-btn @click="showAllMedicine()">View all</v-btn>
+                            </v-layout>
                         </v-toolbar>
 
                         <v-card-text>
@@ -125,6 +131,11 @@
                 </v-col>
             </v-row>
         </v-container>
+        <v-snackbar v-model="showError" color="red">{{error}}</v-snackbar>
+        <v-snackbar v-model="showSuccess" color="green">{{successMessage}}</v-snackbar>
+        <v-dialog max-width="1600" v-model="adminMedicine">
+            <MedicineAdminControl :refresh="refresh"/>
+        </v-dialog>
     </div>
 
 </template>
@@ -133,14 +144,24 @@
 
 <script>
     import {client} from '@/client/axiosClient';
+    import MedicineAdminControl from './MedicineAdminControl.vue';
 
     export default{
         name: 'admin-medicine',
         mounted(){
             this.loadRequiredData();
         },
+        components: {
+            MedicineAdminControl,
+        },
         data(){
             return {
+                showError: false,
+                showSuccess: false,
+                error: '',
+                successMessage: '',
+                refresh: false,
+                adminMedicine: false,
                 form: {
                     isFormValid: false,
                     medicines: [],
@@ -209,6 +230,9 @@
             }
         },
         methods: {
+            showAllMedicine(){
+                this.adminMedicine = true;
+            },
             sendCreateMedicineRequest: function(){
 
                 client({
@@ -216,12 +240,28 @@
                     url: '/medicine/create',
                     data: this.getMedicineRequestData()
                 }).then( (response) => {
-                    console.log(response.data);
+                    this.refresh = !this.refresh;
+                    this.showSuccess = true;
+                    this.successMessage = 'Successfully created medicine!';
+                    this.loadMedicines();
+                    this.resetForm();
                 }, (error) => {
-                    console.log(error.response.data);
+                    this.showError = false;
+                    this.error = 'Make sure you inputed everything correctly.';
                 });
-
-
+            },
+            resetForm(){
+                    this.form.medicineName = '';
+                    this.form.medicineNotes = '';
+                    this.form.loyaltyPoints = '';
+                    this.form.requiresPrescription = false;
+                    this.form.selectedMedicineType = null;
+                    this.form.medicineSpecification.selectedCompositionType = null;
+                    this.form.medicineSpecification.selectedCompositionItems = [];
+                    this.form.medicineSpecification.selectedMedicineReplacements = [];
+                    this.form.medicineSpecification.quantity = null;
+                    this.form.medicineSpecification.selectedContraindications = [];
+                    this.form.manufacter = null;
             },
             getMedicineRequestData: function(){
                 return {
@@ -283,6 +323,12 @@
                 return items;
             },
             loadRequiredData: function(){
+                this.loadContraindications();
+                this.loadManufacturers();
+                this.loadMedicines();
+                this.loadCompositionItems();
+            },
+            loadContraindications(){
                 client({
                     method: 'GET',
                     url: '/contraindication/all'
@@ -291,7 +337,8 @@
                 }, (error) => {
                     console.log('Error occured during contraindication retrieval.');
                 });
-
+            },
+            loadManufacturers(){
                 client({
                     method: 'GET',
                     url: '/manufacturer/all'
@@ -300,7 +347,8 @@
                 }, (error) => {
                     console.log('Error occured during manufacters retrieval.');
                 });
-
+            },
+            loadMedicines(){
                 client({
                     method: 'GET',
                     url: '/medicine/all'
@@ -309,7 +357,8 @@
                 }, (error) => {
                     console.log('Error occured during medicine retrieval.');
                 });
-
+            },
+            loadCompositionItems(){
                 client({
                     method: 'GET',
                     url: '/composition-item/all'
@@ -317,8 +366,9 @@
                     this.form.medicineSpecification.possibleCompositionItems = response.data;
                 }, (error) => {
                     console.log('Error occured during composition items retrieval.');
-                })
-            },
+                });
+            }
+
         }
     }
 
