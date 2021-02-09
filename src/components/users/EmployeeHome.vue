@@ -73,6 +73,15 @@
             <v-list-item-title>Book a new appointment</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="navigation='vacationRequest'">
+          <v-list-item-icon>
+            <v-icon>mdi-calendar</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>Request a vacation</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -90,6 +99,13 @@
     <BookNewAppointment />
   </div>
 
+  <div v-if="navigation==='vacationRequest'">
+    <v-row justify="center" class="vacation-request">
+    <br>
+    <VacationRequestCreation />
+    </v-row>
+  </div>
+
 
   </div>
 </template>
@@ -97,6 +113,7 @@
 <script>
   import WorkCalendar from '@/components/employee/WorkCalendar.vue';
   import SearchUsers from "@/components/users/SearchUsers.vue";
+  import VacationRequestCreation from "@/components/employee/VacationRequestCreation.vue";
   import BookNewAppointment from "@/components/appointment/BookNewAppointment.vue";
   import {client} from '@/client/axiosClient';
 
@@ -104,7 +121,8 @@
     components: {
       WorkCalendar,
       SearchUsers,
-      BookNewAppointment
+      BookNewAppointment,
+      VacationRequestCreation
     },
     data: function(){
         return {
@@ -153,5 +171,9 @@
     }
     .welcome{
       color: #7986CB;
+    }
+    .vacation-request{
+      margin-bottom: 5%;
+      margin-top: 5%;
     }
 </style>
