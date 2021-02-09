@@ -229,9 +229,19 @@
                             <v-list-item-group color="primary" >
                             <v-list-item  v-for="(item, index) in medicineLocations" v-bind:key="index" @click="visitPharmacy(item)">
                                 <v-list-item-content>
-                                    <v-list-item-title>
-                                    {{item.name}}             Price: 100$
-                                    </v-list-item-title>
+                                        <v-row>
+                                            <v-col>
+                                                {{item.name}}
+                                            </v-col>
+                                            <v-col>
+                                                <div v-if="item.price.hasDiscount" class="text-decoration-line-through red--text mr-1">{{item.price.currentPrice}}</div>
+                                                <div v-if="item.price.hasDiscount" class="green--text" >{{item.price.discountedPrice}}</div>
+                                                <div v-if="!item.price.hasDiscount" >{{item.price.currentPrice}}</div>
+                                            </v-col>
+                                            <v-col>
+                                                <span>{{item.address.addressLine}}</span>, <span>{{item.address.city.cityName}}</span>
+                                            </v-col>
+                                        </v-row>
                                 </v-list-item-content>
                             </v-list-item>
                             </v-list-item-group>
@@ -318,7 +328,25 @@
                     method: 'GET',
                     url: `/pharmacy/medicine-${this.selectedMedicine.id}`
                 }).then( (response) => {
-                    this.medicineLocations = response.data;
+                    let response_data = response.data;
+                    for(let item of response_data){
+                        item.price = {
+                            currentPrice: 0,
+                            discountedPrice: 0,
+                            hasDiscount: false
+                        };
+                    }
+                    this.medicineLocations = response_data;
+                    for(let item of this.medicineLocations){
+                        client({
+                            method: 'GET',
+                            url: `medicine/price/${item.id}/${this.selectedMedicine.id}`
+                        }).then((response) => {
+                            item.price=response.data;
+                        });
+                    }
+                    
+                    
                 }, (error) => {
                     console.log('An error occured during pharmacy retrievals.');
                 })

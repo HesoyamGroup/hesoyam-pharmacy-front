@@ -134,7 +134,7 @@
         <v-snackbar v-model="showError" color="red">{{error}}</v-snackbar>
         <v-snackbar v-model="showSuccess" color="green">{{successMessage}}</v-snackbar>
         <v-dialog max-width="1600" v-model="adminMedicine">
-            <MedicineAdminControl :refresh="refresh"/>
+            <MedicineAdminControl :refresh="refresh" @closeDialogEvent="adminMedicine = false"/>
         </v-dialog>
     </div>
 

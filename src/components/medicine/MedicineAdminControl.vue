@@ -4,6 +4,12 @@
                 <v-card>
                     <v-toolbar dark color="primary">
                         <v-toolbar-title> Medicine search </v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-btn icon large @click="closeEvent()"> 
+                            <v-icon color="red">
+                                mdi-close-box
+                            </v-icon>
+                        </v-btn>
                     </v-toolbar>
 
                     <v-card-text>
@@ -129,6 +135,7 @@
                                             </template>
                                         </v-data-table>
                                 </v-container>
+
                             </v-row>
                         </v-container>     
                     </v-card-text>
@@ -272,6 +279,9 @@
             }
         },
         methods: {
+            closeEvent(){
+                this.$emit('closeDialogEvent');
+            },
             deleteMedicine(medicine){
                 client({
                     method: 'DELETE',
