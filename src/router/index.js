@@ -27,6 +27,8 @@ import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 import VacationRequestsPage from '../views/VacationRequestsPage.vue'
 import NewOrderPage from '../views/NewOrderPage.vue'
 import OrdersPage from '../views/OrdersPage.vue'
+import NotFoundPage from '../views/NotFoundPage.vue'
+
 
 import GraphicalReports from '../components/report/GraphicalReports.vue'
 
@@ -375,6 +377,10 @@ const routes = [
         router.push({path: '/'});
       }
     }
+  },
+  {
+    path: '*',
+    component: NotFoundPage
   }
 ]
 
