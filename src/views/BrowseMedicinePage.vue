@@ -1,5 +1,5 @@
 <template> 
-    <div id="supplier-page">
+    <div id="bro-medicine-page">
         <browse-medicine> </browse-medicine>
         
     </div>
