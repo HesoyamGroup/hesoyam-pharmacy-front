@@ -17,12 +17,21 @@ import PharmacistsPage from '../views/PharmacistsPage.vue'
 import DermatologistsPage from '../views/DermatologistsPage.vue'
 import EmployeePage from '../views/EmployeePage.vue'
 import SearchUsersPage from '../views/SearchUsersPage.vue'
+
+import CounselingReportPage from '../views/CounselingReportPage.vue'
+import CheckUpReportPage from '../views/CheckUpReportPage.vue'
+
 import EPrescriptionPage from '../views/EPrescriptionPage.vue';
 import PromotionsPage from '../views/PromotionsPage.vue'
 import HandOutMedicinePage from '../views/HandOutMedicinePage.vue'
 import VacationRequestsPage from '../views/VacationRequestsPage.vue'
 import NewOrderPage from '../views/NewOrderPage.vue'
 import PatientFeedbackPage from '../views/PatientFeedbackPage.vue'
+import OrdersPage from '../views/OrdersPage.vue'
+import NotFoundPage from '../views/NotFoundPage.vue'
+
+
+import GraphicalReports from '../components/report/GraphicalReports.vue'
 
 import * as UserService from '../service/UserService.js';
 
@@ -222,9 +231,40 @@ const routes = [
     }
   },
   {
+
+    path: '/counseling-report',
+    name: 'CounselingReport',
+    component: CounselingReportPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+
+    path: '/checkup-report',
+    name: 'CheckUpReport',
+    component: CheckUpReportPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'DERMATOLOGIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
     path: '/hand-out-medicine',
     name: 'HandOutMedicine',
     component: HandOutMedicinePage,
+
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'PHARMACIST'){
@@ -316,6 +356,38 @@ const routes = [
         router.push({path: '/'});
       }
     }
+  },
+  {
+    path: '/orders',
+    name: 'OrdersPage',
+    component: OrdersPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/report',
+    name: 'Report',
+    component: GraphicalReports,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '*',
+    component: NotFoundPage
   }
 ]
 

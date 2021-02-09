@@ -1,4 +1,5 @@
 <template>
+<div>
   <v-row class="fill-height">
     <v-col>
       <v-sheet height="64">
@@ -108,8 +109,19 @@
             </v-toolbar>
             <v-card-text>
               <span v-html="selectedEvent.details"></span>
+
             </v-card-text>
             <v-card-actions>
+              <v-btn plain color="indigo lighten-1"
+              @click="openAppointment(selectedEvent)"
+              v-if="available(selectedEvent) && !selectedEvent.disabled">
+                Start
+              </v-btn>
+              <v-btn plain color="error"
+              @click="didntShowUp(selectedEvent)"
+              v-if="available(selectedEvent) && !selectedEvent.disabled">
+                Didn't show up
+              </v-btn>
               <v-btn
                 text
                 color="secondary"
@@ -123,6 +135,27 @@
       </v-sheet>
     </v-col>
   </v-row>
+
+  <v-snackbar
+      v-model="snackbar"
+      :vertical="vertical"
+      light
+      timeout="2000"
+    >
+      {{snackbarText}}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="indigo"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+  </div>
 </template>
 
 <script>
@@ -140,6 +173,9 @@ import {client} from '@/client/axiosClient';
         '4day': '4 Days',
       },
       selectedEvent: {},
+      snackbar: null,
+      vertical: false,
+      snackbarText: null,
       selectedElement: null,
       selectedOpen: false,
       events: [],
@@ -185,6 +221,44 @@ import {client} from '@/client/axiosClient';
 
         nativeEvent.stopPropagation()
       },
+
+      openAppointment: function(selectedEvent){
+        var link = '';
+        if(localStorage.getItem('user_role') === 'ROLE_PHARMACIST')
+          link = '/counseling-report'
+        else
+          link = '/checkup-report'
+        
+        const encoded = encodeURI(link + '?patientEmail=' + selectedEvent.patientEmail + '&from=' + selectedEvent.start + '&pharmacy=' + 
+        selectedEvent.pharmacy);
+        this.$router.push(encoded);
+      },
+      
+      didntShowUp: function(selectedEvent){
+        var x = (new Date()).getTimezoneOffset() * 60000; 
+        client({
+          method: 'POST',
+          url: 'appointment/patient-didnt-show',
+          data:{
+            patientEmail: selectedEvent.patientEmail,
+            from: (new Date(new Date(selectedEvent.start) - x)).toISOString().slice(0,-1)
+          }
+        })
+        .then((response) => {
+          this.snackbar = true;
+          this.snackbarText = response.data;
+          this.selectedOpen = false;
+        })
+        selectedEvent.disabled = true;
+      },
+
+      available: function(selectedEvent){
+        if(new Date(selectedEvent.start) >= new Date() && selectedEvent.status === 'TAKEN')
+          return true;
+        else
+          return false;
+      },
+
       updateRange ({ start, end }) {
         const events = []
         var fromServer = []
@@ -200,16 +274,11 @@ import {client} from '@/client/axiosClient';
         //   const first = new Date(firstTimestamp - (firstTimestamp % 900000))
         //   const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
         //   const second = new Date(first.getTime() + secondTimestamp)
-        client({
-          method: 'GET',
-          url: 'profile/check-role'
-        })
-        .then((response) => {
-          this.role = response.data.toLowerCase();
+        this.role = localStorage.getItem('user_role');
         
         var link = '';
 
-        if(this.role === 'pharmacist'){
+        if(this.role === 'ROLE_PHARMACIST'){
           link = 'appointment/appointments-for-pharmacist/' + min + "!" + max; 
         } else {
           link = 'appointment/appointments-for-dermatologist/' + min + "!" + max;
@@ -221,21 +290,22 @@ import {client} from '@/client/axiosClient';
           })
           .then((response) => {
             fromServer = response.data;
-            // console.log(response.data)
             for(var event of response.data){
               events.push({
+                patientEmail: event.patientEmail,
                 name: event.patientFirstName + ' ' + event.patientLastName,
                 start: this.convertToDate(event.from),
                 end: this.convertToDate(event.to),
                 color: 'indigo',
                 timed: null,
-                details: event.pharmacyName
+                details: event.pharmacyName,
+                status: event.appointmentStatus,
+                disabled: false,
+                pharmacy: event.pharmacyId,
               })
             }
             this.events = events;
-            // console.log(this.events)
           })
-        })
       
 
     },
