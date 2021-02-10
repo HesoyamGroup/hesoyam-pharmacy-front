@@ -186,7 +186,7 @@
                             </v-card-actions>
                         </v-card>
                     </v-col>
-                    <v-col>
+                    <v-col cols="4">
                         <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
                             <v-toolbar 
                             flat
@@ -194,12 +194,19 @@
                             dark>
                                 <v-toolbar-title>Appointments</v-toolbar-title>
                             </v-toolbar>
-                            <v-tabs>
+                            <v-tabs
+                                fixed-tabs>
                                 <v-tab>
                                     Checkups
                                 </v-tab>
                                 <v-tab>
                                     Counselings
+                                </v-tab>
+                                <v-tab>
+                                    Past Checkups
+                                </v-tab>
+                                <v-tab>
+                                    Past Counselings
                                 </v-tab>
                                 <v-tab-item>
                                     <v-card flat>
@@ -231,7 +238,7 @@
                                             v-model='futureCounselingSelected'
                                             :items='futureCounselings'
                                             :headers='counselingHeaders'
-                                            no-data-text="You have no upcoming checkups"
+                                            no-data-text="You have no upcoming counselings"
                                             :single-select="singleSelectCounseling"
                                             show-select
                                             return-object
@@ -249,7 +256,59 @@
                                         </v-card-actions>
                                     </v-card>
                                 </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <v-data-table
+                                        :items='pastCheckups'
+                                        :headers='checkupsHeaders'
+                                        no-data-text="You have no past checkups"
+                                        >
+                                        </v-data-table>
+                                    </v-card>
+                                </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <v-data-table
+                                            :items='pastCounselings'
+                                            :headers='counselingHeaders'
+                                            no-data-text="You have no past counselings"
+                                            >
+                                        </v-data-table>
+                                    </v-card>
+                                </v-tab-item>
                             </v-tabs>
+                        </v-card>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols='4'>
+                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
+                            <v-toolbar dark color="primary">
+                                <v-toolbar-title>Loyalty Program - {{loyaltyProgram.categoryName}}</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text class="ma-5">
+                            <p class="display-1 text--primary">
+                                Collected Points - {{loyaltyProgram.points}}
+                            </p>
+                            <p class="display-1 text--primary">
+                                Discount in this Category - {{loyaltyProgram.discount}}%
+                            </p>
+                            <p class="display-1 text--primary">
+                                Penalty Points - {{loyaltyProgram.penaltyPoints}}/3
+                            </p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+
+                    <v-col cols="4">
+                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
+                            <v-toolbar 
+                            flat
+                            color='primary'
+                            dark>
+                                <v-toolbar-title>Other Options</v-toolbar-title>
+                            </v-toolbar>
+                            
                         </v-card>
                     </v-col>
                 </v-row>
@@ -604,6 +663,7 @@ export default {
                 ],
                 singleSelectCheckups: true,
                 futureCheckupSelected: [],
+                pastCheckups: [],
                 //Counseling view and cancellation
                 futureCounselings: [],
                 counselingHeaders: [
@@ -615,8 +675,9 @@ export default {
                 ],
                 singleSelectCounseling: true,
                 futureCounselingSelected: [],
+                pastCounselings: [],
                 //Loyalty Program
-                value:69,
+                loyaltyProgram:{},
                 
                 //Rules
                 rules: {
@@ -733,8 +794,69 @@ export default {
             // patient's future checkups
             this.getFutureCheckups();
             this.getFutureCounselings();
+            this.getLoyaltyProgram();
+            this.getPastCheckups();
+            this.getPastCounselings();
         },
         methods:{
+            getPastCounselings: function()
+            {
+                const vm = this;
+                client({
+                method: 'GET',
+                url: 'counseling/past/patient'
+                })
+                .then((response) => {
+                    vm.pastCounselings = response.data;
+                    
+                    if(vm.pastCounselings.length > 0)
+                    {
+                        for(let appointment of vm.pastCounselings)
+                        {
+                            appointment.range.to = DateFormatter.toAppointmentDateTime(appointment.range.from, appointment.range.to);
+                            appointment.range.from = DateFormatter.toAppointmentDate(appointment.range.from);
+                        }
+                    } 
+
+                }, (error) => {
+
+                })
+            },
+            getPastCheckups: function()
+            {
+                const vm = this;
+                client({
+                method: 'GET',
+                url: 'checkup/past/patient'
+                })
+                .then((response) => {
+                    vm.pastCheckups = response.data;
+                    
+                    if(vm.pastCheckups.length > 0)
+                    {
+                        for(let appointment of vm.pastCheckups)
+                        {
+                            appointment.range.to = DateFormatter.toAppointmentDateTime(appointment.range.from, appointment.range.to);
+                            appointment.range.from = DateFormatter.toAppointmentDate(appointment.range.from);
+                        }
+                    } 
+
+                }, (error) => {
+
+                })
+            },
+            getLoyaltyProgram: function()
+            {
+                client({
+                    method: 'GET',
+                    url: 'loyalty/patient'
+                })
+                .then((response) => {
+                    this.loyaltyProgram = response.data;
+                }, (error) => {
+
+                })
+            },
             //Get all cities in selected country
             getCities: function(){
                 const vm = this;
@@ -1009,7 +1131,23 @@ export default {
                     this.futureCheckupSelected = [];
                     this.getFutureCheckups();
                 })
+            },
+            toBrowsePharmaciesPage: function()
+            {
+                var url = '../pharmacy/all';
+                window.location.href=url;
+            },
+            toFeedbackPage: function()
+            {
+                var url = '../feedback';
+                window.location.href=url;
+            },
+            toCounselingBrowse: function()
+            {
+                var url = '../counseling-reservation';
+                window.location.href=url;
             }
+
         }
         
 

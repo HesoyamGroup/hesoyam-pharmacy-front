@@ -47,11 +47,18 @@
                         item-key="employeeId">
                         </v-data-table>
                         <v-card-actions class="justify-center"
-                        v-if='selectedDermatologist.length > 0'>
+                        >
                             <v-btn
                             color="primary"
-                            @click='addFeedbackDermatologistDialog'>
+                            @click='addFeedbackDermatologistDialog'
+                            v-if='selectedDermatologist.length > 0' >
                             Add Feedback
+                            </v-btn>
+                            <v-btn
+                            color="primary"
+                            v-if='selectedDermatologist.length > 0'
+                            @click='addComplaintDermatologistDialog'>
+                            Add Complaint
                             </v-btn>
                         </v-card-actions>
                         
@@ -88,6 +95,11 @@
                             color="primary"
                             @click='addFeedbackPharmacistDialog'>
                             Add Feedback
+                            </v-btn>
+                            <v-btn
+                            color="primary"
+                            @click='addComplaintPharmacistDialog'>
+                            Add Complaint
                             </v-btn>
                         </v-card-actions>
                         
@@ -159,6 +171,11 @@
                             @click='addFeedbackPharmacyDialog'>
                             Add Feedback
                             </v-btn>
+                            <v-btn
+                            color="primary"
+                            @click='addComplaintPharmacyDialog'>
+                            Add Complaint
+                            </v-btn>
                         </v-card-actions>
                         
                     </v-card>   
@@ -202,6 +219,34 @@
             </v-card>
         </v-dialog>
 
+        <!-- Dermatologist complaint dialog -->
+        <v-dialog v-model='dermatologistComplaintDialog' max-width="50%">
+            <v-card shaped>
+                <v-toolbar dark color='primary'>
+                    <v-toolbar-title>Dermatologist Complaint</v-toolbar-title>
+                </v-toolbar>
+                <v-row>
+                    <v-textarea
+                    class='ma-4'
+                    outlined
+                    rows="5"
+                    row-height="15"
+                    no-resize
+                    counter
+                    label="Your Complaint(min 10 characters)"
+                    v-model='complaintDermatologist'
+                    ></v-textarea>
+                </v-row>
+                <v-card-actions class='justify-center'>
+                    <v-btn
+                    color="primary"
+                    @click='addComplaintDermatologist'>
+                    Confirm
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
         <!-- Pharmacist dialog -->
         <v-dialog v-model='pharmacistFeedbackDialog' max-width="50%">
             <v-card shaped>
@@ -231,7 +276,37 @@
                 <v-card-actions class='justify-center'>
                     <v-btn
                     color="primary"
-                    @click='addFeedbackPharmacist'>
+                    @click='addComplaintPharmacist'>
+                    Confirm
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        
+        <!-- Dermatologist complaint dialog -->
+        <v-dialog v-model='pharmacistComplaintDialog' max-width="50%">
+            <v-card shaped>
+                <v-toolbar dark color='primary'>
+                    <v-toolbar-title>Pharmacist Complaint</v-toolbar-title>
+                </v-toolbar>
+                <v-row>
+                    <v-textarea
+                    class='ma-4'
+                    outlined
+                    rows="5"
+                    row-height="15"
+                    no-resize
+                    counter
+                    label="Your Complaint(min 10 characters)"
+                    v-model='complaintPharmacist'
+                    ></v-textarea>
+                </v-row>
+                <v-card-actions class='justify-center'>
+                    <v-btn
+                    color="primary"
+                    @click='addComplaintPharmacist'
+                    v-if='complaintPharmacist.length >= 10'>
                     Confirm
                     </v-btn>
                 </v-card-actions>
@@ -309,6 +384,34 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <!-- Pharmacy complaint dialog -->
+        <v-dialog v-model='pharmacyComplaintDialog' max-width="50%">
+            <v-card shaped>
+                <v-toolbar dark color='primary'>
+                    <v-toolbar-title>Pharmacy Complaint</v-toolbar-title>
+                </v-toolbar>
+                <v-row>
+                    <v-textarea
+                    class='ma-4'
+                    outlined
+                    rows="5"
+                    row-height="15"
+                    no-resize
+                    label="Your Complaint(min 10 characters)"
+                    v-model='complaintPharmacy'
+                    counter
+                    ></v-textarea>
+                </v-row>
+                <v-card-actions class='justify-center'>
+                    <v-btn
+                    color="primary"
+                    @click='addComplaintPharmacy'>
+                    Confirm
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </div>
 </template>
@@ -334,6 +437,8 @@
                 dermatologistFeedbackDialog: false,
                 ratingDermatologist: 1,
                 commentDermatologist: '',
+                dermatologistComplaintDialog: false,
+                complaintDermatologist: '',
                 //Pharmacists
                 pharmacistsList: [],
                 selectedPharmacist: [],
@@ -345,6 +450,8 @@
                 pharmacistFeedbackDialog: false,
                 ratingPharmacist: 1,
                 commentPharmacist: '',
+                pharmacistComplaintDialog: false, 
+                complaintPharmacist: '',
                 //Medicine
                 medicineList: [],
                 selectedMedicine: [],
@@ -367,6 +474,8 @@
                 pharmacyFeedbackDialog: false,
                 ratingPharmacy: 1,
                 commentPharmacy: '',
+                pharmacyComplaintDialog: false,
+                complaintPharmacy: ''
             }
         },
         mounted(){
@@ -429,11 +538,21 @@
                 this.ratingDermatologist = 1;
                 this.commentDermatologist = '';
             },
+            addComplaintDermatologistDialog: function()
+            {
+                this.dermatologistComplaintDialog = true;
+                this.complaintDermatologist = '';
+            },
             addFeedbackPharmacistDialog: function()
             {
                 this.pharmacistFeedbackDialog = true;
                 this.ratingPharmacist = 1;
                 this.commentPharmacist = '';
+            },
+            addComplaintPharmacistDialog: function()
+            {
+                this.pharmacistComplaintDialog = true;
+                this.complaintPharmacist = '';
             },
             addFeedbackMedicineDialog: function()
             {
@@ -447,10 +566,14 @@
                 this.ratingPharmacy = 1;
                 this.commentPharmacy = ''
             },
+            addComplaintPharmacyDialog: function()
+            {
+                this.pharmacyComplaintDialog = true;
+                this.complaintPharmacy = '';
+            },
             addFeedbackDermatologist: function()
             {
-                console.log(this.ratingDermatologist);
-                console.log(this.commentDermatologist);
+
                 client({
                     method:'POST',
                     url: 'feedback/employee',
@@ -532,7 +655,61 @@
                 }, (error) =>{
                     
                 })
-            }
+            },
+            addComplaintDermatologist: function()
+            {
+                const vm = this;
+                console.log(this.selectedDermatologist);
+                client({
+                    method: 'POST',
+                    url: 'complaint/create-employee-complaint',
+                    data:{
+                        body: vm.complaintDermatologist,
+                        patient: null,
+                        employeeId: vm.selectedDermatologist[0].employeeId
+                        
+                    }
+                })
+                .then((response) => {
+                    vm.dermatologistComplaintDialog = false;
+                    vm.selectedDermatologist = [];
+                    vm.complaintDermatologist = '';
+                }, (error) => {
+
+                })
+            },
+            addComplaintPharmacist: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'complaint/create-employee-complaint',
+                    data:{
+                        body: this.complaintPharmacist,
+                        employeeId: this.selectedPharmacist[0].employeeId
+                    }
+                })
+                .then((response) => {
+                    this.pharmacistComplaintDialog = false;
+                    this.selectedPharmacist = [];
+                    this.complaintPharmacist = '';
+                })
+            },
+            addComplaintPharmacy: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'complaint/create-pharmacy-complaint',
+                    data:{
+                        body: this.complaintPharmacy,
+                        pharmacyId: this.selectedPharmacy[0].pharmacyId
+                    }
+                })
+                .then((response) => {
+                    this.pharmacyComplaintDialog = false;
+                    this.selectedPharmacy = [];
+                    this.complaintPharmacy = '';
+                })
+            },
         }
     }
 </script>
