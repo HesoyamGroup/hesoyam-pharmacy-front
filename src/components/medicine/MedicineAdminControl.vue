@@ -4,6 +4,12 @@
                 <v-card>
                     <v-toolbar dark color="primary">
                         <v-toolbar-title> Medicine search </v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-btn icon large @click="closeEvent()"> 
+                            <v-icon color="red">
+                                mdi-close-box
+                            </v-icon>
+                        </v-btn>
                     </v-toolbar>
 
                     <v-card-text>
@@ -69,7 +75,7 @@
                                                 </th>
 
                                                 <th>
-                                                    Find medicine
+                                                    Delete
                                                 </th>
                                             </template>
                                             <template v-slot:item="row">
@@ -110,8 +116,8 @@
 
                                                     <td>
                                                         <v-layout justify-center>
-                                                            <v-btn color="primary" large @click="getPharmaciesWithMedicine(row.item)">
-                                                                Find it!
+                                                            <v-btn color="red" large @click="deleteMedicine(row.item)">
+                                                                Delete
                                                             </v-btn>
                                                         </v-layout>
                                                     </td>
@@ -129,6 +135,7 @@
                                             </template>
                                         </v-data-table>
                                 </v-container>
+
                             </v-row>
                         </v-container>     
                     </v-card-text>
@@ -212,43 +219,8 @@
                 </v-card>
             </v-dialog>
 
+            <v-snackbar v-model="showError" :timeout="2000" color="red">{{error}}</v-snackbar>
 
-
-             <v-dialog v-model="locateMedicineDialog" max-width="600">
-                <v-card>
-                    <v-toolbar color="primary">
-                        <v-toolbar-title>Pharmacies with: 
-                        <span v-if="selectedMedicine">{{this.selectedMedicine.name}}
-                        </span></v-toolbar-title>
-                    </v-toolbar>
-
-                    <v-card-text>
-                        <v-list dense>
-                            <v-subheader class="font-weight-black">Pharmacies</v-subheader>
-                            <v-subheader v-if="medicineLocations.length == 0">No pharmacies with selected medicine.</v-subheader>
-                            <v-list-item-group color="primary" >
-                            <v-list-item  v-for="(item, index) in medicineLocations" v-bind:key="index" @click="visitPharmacy(item)">
-                                <v-list-item-content>
-                                        <v-row>
-                                            <v-col>
-                                                {{item.name}}
-                                            </v-col>
-                                            <v-col>
-                                                <div v-if="item.price.hasDiscount" class="text-decoration-line-through red--text mr-1">{{item.price.currentPrice}}</div>
-                                                <div v-if="item.price.hasDiscount" class="green--text" >{{item.price.discountedPrice}}</div>
-                                                <div v-if="!item.price.hasDiscount" >{{item.price.currentPrice}}</div>
-                                            </v-col>
-                                            <v-col>
-                                                <span>{{item.address.addressLine}}</span>, <span>{{item.address.city.cityName}}</span>
-                                            </v-col>
-                                        </v-row>
-                                </v-list-item-content>
-                            </v-list-item>
-                            </v-list-item-group>
-                        </v-list>
-                    </v-card-text>
-                </v-card>
-            </v-dialog>
     </div>
 </template>
 
@@ -258,12 +230,15 @@
     import {client} from '@/client/axiosClient.js';
 
     export default {
-        name: 'browse-medicine',
+        name: 'medicine-admin-control',
         mounted(){
             this.submitSearchQuery();
         },
+        props: ['refresh'],
         data(){
             return {
+                showError: false,
+                error: '',
                 search:{
                     medicineTypes: [
                         'POWDER',
@@ -304,8 +279,27 @@
             }
         },
         methods: {
-            visitPharmacy(item){
-                setTimeout(() => { this.$router.push({path: `/pharmacy/${item.id}`})}, 200);
+            closeEvent(){
+                this.$emit('closeDialogEvent');
+            },
+            deleteMedicine(medicine){
+                client({
+                    method: 'DELETE',
+                    url: `medicine/delete/${medicine.id}`
+                }).then((response) => {
+                    this.submitSearchQuery(); //Refresh with new data.
+                }, (error) => {
+                    let status = error.response.status;
+                    if(status == '400'){
+                        this.error = 'Medicine is already in use, can\'t be deleted now.';
+                    }else if(status == '404'){
+                        this.error = 'Medicine could not be found. Perhaps it\'s already deleted?';
+                    }else{
+                        this.error = 'Try again';
+                    }
+                    this.showError = true;
+
+                });
             },
             getMedicineSpecificationClicked(medicine){
                 this.selectedMedicine = medicine;
@@ -319,37 +313,6 @@
                 }, (error) => {
                     console.log('An error occured during medicine specification retrieval.');
                 });
-            },
-            getPharmaciesWithMedicine(medicine){
-                this.selectedMedicine = medicine;
-                this.locateMedicineDialog = true;
-
-                client({
-                    method: 'GET',
-                    url: `/pharmacy/medicine-${this.selectedMedicine.id}`
-                }).then( (response) => {
-                    let response_data = response.data;
-                    for(let item of response_data){
-                        item.price = {
-                            currentPrice: 0,
-                            discountedPrice: 0,
-                            hasDiscount: false
-                        };
-                    }
-                    this.medicineLocations = response_data;
-                    for(let item of this.medicineLocations){
-                        client({
-                            method: 'GET',
-                            url: `medicine/price/${item.id}/${this.selectedMedicine.id}`
-                        }).then((response) => {
-                            item.price=response.data;
-                        });
-                    }
-                    
-                    
-                }, (error) => {
-                    console.log('An error occured during pharmacy retrievals.');
-                })
             },
             resetSearchForm(){
                 let form = this.search.form;
@@ -413,6 +376,11 @@
             },
             canGoBackPagination(){
                 return this.page > 1;
+            }
+        },
+        watch:{
+            refresh: function(){
+                this.submitSearchQuery();
             }
         }
     }

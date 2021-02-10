@@ -13,7 +13,11 @@
         {{userDTO.pharmacyName}}
       </h2>
     </v-row>
-    <v-btn plain @click="logout()">Logout</v-btn>
+
+    <v-row justify="left">
+      <v-btn plain to="/home-employee" class="home-nav" color="indigo lighten-2">Home <v-icon>mdi-home</v-icon></v-btn>
+    </v-row>
+    
     <v-tabs
       v-model="tab"
       background-color="transparent"
@@ -130,6 +134,10 @@
     
     .basil2--text {
         color: #7986CB;
+    }
+
+    .home-nav{
+      margin-left: 5%;
     }
 
 </style>
