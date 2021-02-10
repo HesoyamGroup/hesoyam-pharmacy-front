@@ -2,9 +2,9 @@
 <div>
     <v-row>    
       <v-card>
-        <v-card-title>
+        <!-- <v-card-title>
           <span class="headline">Submit a vacation request!</span>
-        </v-card-title>
+        </v-card-title> -->
         <v-card-text>
           <v-container>
             <v-row>
@@ -109,8 +109,10 @@ export default {
                },
             })
             .then((request) => {
+              if(response.data){
                 this.snackbar = true;
                 this.snackbarText = response.data;
+              }
             })
         },
     }

@@ -27,14 +27,14 @@
       >
         Continue
       </v-btn>
-      <v-btn plain>
-        <router-link to="/pharmacist" class="cancel-btn" color="indigo lighten-2" v-if="role==='ROLE_PHARMACIST'">
+      <!-- <v-btn plain> -->
+        <!-- <router-link to="/pharmacist" class="cancel-btn" color="indigo lighten-2" v-if="role==='ROLE_PHARMACIST'">
         Cancel
         </router-link>
         <router-link to="/dermatologist" class="cancel-btn" color="indigo lighten-2" v-if="role==='ROLE_DERMATOLOGIST'">
         Cancel
-        </router-link>
-      </v-btn>
+        </router-link> -->
+      <!-- </v-btn> -->
     </v-stepper-content>
     <v-stepper-step
       :complete="e6 > 2"
@@ -45,7 +45,8 @@
     </v-stepper-step>
     <v-stepper-content step="2">
 
-      <v-autocomplete :items="patientsFixed" item-text="email" v-model="selectedPatient" label="Select patient" ></v-autocomplete>
+      <v-autocomplete :items="patientsFixed" item-text="email" v-model="selectedPatient" label="Select patient" 
+      ref="selectedPatient" :rules="[() => !!selectedPatient || 'This field is required']"></v-autocomplete>
 
       <v-btn
         color="indigo lighten-2"
@@ -54,14 +55,14 @@
       >
         Continue
       </v-btn>
-      <v-btn plain>
+      <!-- <v-btn plain>
         <router-link to="/pharmacist" class="cancel-btn" color="indigo lighten-2" v-if="role==='ROLE_PHARMACIST'">
         Cancel
         </router-link>
         <router-link to="/dermatologist" class="cancel-btn" color="indigo lighten-2" v-if="role==='ROLE_DERMATOLOGIST'">
         Cancel
         </router-link>
-      </v-btn>
+      </v-btn> -->
     </v-stepper-content>
 
     <v-stepper-step
@@ -154,7 +155,7 @@
           >
             Book
           </v-btn>
-          <v-btn plain>
+          <!-- <v-btn plain>
            <router-link to="/pharmacist" class="cancel-btn" color="indigo lighten-2" v-if="role==='ROLE_PHARMACIST'">
                 Cancel
                 </router-link>
@@ -162,7 +163,7 @@
                 Cancel
             </router-link>
             
-        </v-btn>
+        </v-btn> -->
         </v-card-actions>
       </v-card>
     
@@ -235,13 +236,12 @@ export default {
     },
     methods: {
         bookAppointment: function(){
-            alert("HERE");
           var x = (new Date()).getTimezoneOffset() * 60000; 
           client({
             url: 'appointment/book-new-appointment',
             method: 'POST',
             data: {
-              patientEmail: this.selectedPatient.email,
+              patientEmail: this.selectedPatient,
               from: (new Date(new Date(this.datePicker + ' ' + this.e7) - x)).toISOString().slice(0,-1),
               to: (new Date(new Date(this.datePicker + ' ' + this.e8) - x)).toISOString().slice(0,-1),
               pharmacyId: this.selectedPharmacy.id,

@@ -87,6 +87,10 @@ export default {
             }).then( (response) => {
                 this.saveTokenDataToLocalStorage(response.data);
                 this.form.login.successful = true;
+                alert(localStorage.user_role)
+                if(localStorage.user_role === 'ROLE_PHARMACIST' || localStorage.user_role === 'ROLE_DERMATOLOGIST'){
+                    setTimeout(() => { this.$router.push({path: '/home-employee'})}, 2000);    
+                }
                 setTimeout(() => { this.$router.push({path: '/'})}, 2000);
             }, (error) => {
                 if(error.response.status == '428'){
