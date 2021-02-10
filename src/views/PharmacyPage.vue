@@ -1,6 +1,6 @@
 <template>
 
-    <div class="ma-2">
+    <div class="ma-5">
         <v-row>
             <v-col>
                 <pharmacy-info v-model="pharmacy" />
