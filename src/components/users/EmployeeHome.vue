@@ -1,16 +1,18 @@
 <template>
   <div>
     <br>
+    <!-- <v-row justify="center"> -->
     <v-row justify="center">
     <h1 class="welcome">WELCOME!</h1>
     </v-row>
     <v-row justify="left">
-    <v-btn plain color="indigo lighten-2" @click="drawer = true"><v-icon>mdi-menu</v-icon></v-btn>
+    <v-btn class="profile-nav" plain v-if="role==='ROLE_PHARMACIST'" to="/pharmacist"><v-avatar color="indigo lighten-2"><span class="white-text">{{firstName.substring(0,1)}}{{lastName.substring(0,1)}}</span></v-avatar></v-btn>
+    <v-btn class="profile-nav" plain v-if="role==='ROLE_DERMATOLOGIST'" to="/dermatologist"><v-avatar color="indigo lighten-2"><span class="white-text">{{firstName.substring(0,1)}}{{lastName.substring(0,1)}}</span></v-avatar></v-btn>
     </v-row>
     <br>
 
     <!-- DRAWER -->
-    <v-navigation-drawer
+    <!-- <v-navigation-drawer
       v-model="drawer"
       absolute
       temporary
@@ -104,9 +106,39 @@
     <br>
     <VacationRequestCreation />
     </v-row>
-  </div>
+  </div> -->
+  <v-row justify="center" class="recommendation-text">
+  <h2 class="welcome">Take a look at your tasks for today!</h2>
+  </v-row>
+  <v-row justify="center" class="list-item">
+    
+    <WorkCalendar class="calendar"/>
+  </v-row>
 
+  <v-divider inset></v-divider>
+  <v-row justify="center" class="recommendation-text">
+  <h2 class="welcome">Search for patients and start/cancel appointments!</h2>
+  </v-row>
+  <v-row justify="center" class="list-item">
+    <SearchUsers />
+  </v-row>
 
+  <v-divider inset></v-divider>
+  <v-row justify="center" class="recommendation-text">
+  <h2 class="welcome">Book a new appointment for your patients!</h2>
+  </v-row>
+  <v-row justify="center" class="list-item">
+    <BookNewAppointment />
+  </v-row>
+
+  <v-divider inset></v-divider>
+  <v-row justify="center" class="recommendation-text">
+  <h2 class="welcome">Request some time off!</h2>
+  </v-row>
+  <v-row justify="center" class="list-item">
+    <br>
+    <VacationRequestCreation />
+  </v-row>
   </div>
 </template>
 
@@ -171,9 +203,30 @@
     }
     .welcome{
       color: #7986CB;
+      justify-items: center;
     }
     .vacation-request{
       margin-bottom: 5%;
       margin-top: 5%;
+    }
+
+    .list-item{
+      margin: 10%;
+      max-width: 100%;
+    }
+
+    .recommendation-text{
+      margin-top: 5%;
+      margin-bottom: 5%;
+    }
+
+    .calendar{
+      width: 1000px;
+    }
+    .white-text{
+      color: white;
+    }
+    .profile-nav{
+      margin-left: 5%;
     }
 </style>

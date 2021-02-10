@@ -15,7 +15,7 @@
     </v-row>
 
     <v-row justify="left">
-      <v-btn plain to="/home-employee">Home <v-icon>mdi-home</v-icon></v-btn>
+      <v-btn plain to="/home-employee" class="home-nav" color="indigo lighten-2">Home <v-icon>mdi-home</v-icon></v-btn>
     </v-row>
     
     <v-tabs
@@ -134,6 +134,10 @@
     
     .basil2--text {
         color: #7986CB;
+    }
+
+    .home-nav{
+      margin-left: 5%;
     }
 
 </style>
