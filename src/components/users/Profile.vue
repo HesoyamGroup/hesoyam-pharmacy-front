@@ -194,12 +194,20 @@
                             dark>
                                 <v-toolbar-title>Appointments</v-toolbar-title>
                             </v-toolbar>
-                            <v-tabs>
+                            <v-tabs
+                                fixed-tabs
+>
                                 <v-tab>
                                     Checkups
                                 </v-tab>
                                 <v-tab>
                                     Counselings
+                                </v-tab>
+                                <v-tab>
+                                    Past Checkups
+                                </v-tab>
+                                <v-tab>
+                                    Past Counselings
                                 </v-tab>
                                 <v-tab-item>
                                     <v-card flat>
@@ -231,7 +239,7 @@
                                             v-model='futureCounselingSelected'
                                             :items='futureCounselings'
                                             :headers='counselingHeaders'
-                                            no-data-text="You have no upcoming checkups"
+                                            no-data-text="You have no upcoming counselings"
                                             :single-select="singleSelectCounseling"
                                             show-select
                                             return-object
@@ -247,6 +255,26 @@
                                                 Cancel Counseling
                                             </v-btn>
                                         </v-card-actions>
+                                    </v-card>
+                                </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <v-data-table
+                                        :items='pastCheckups'
+                                        :headers='checkupsHeaders'
+                                        no-data-text="You have no past checkups"
+                                        >
+                                        </v-data-table>
+                                    </v-card>
+                                </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <v-data-table
+                                            :items='pastCounselings'
+                                            :headers='counselingHeaders'
+                                            no-data-text="You have no past counselings"
+                                            >
+                                        </v-data-table>
                                     </v-card>
                                 </v-tab-item>
                             </v-tabs>
@@ -654,6 +682,7 @@ export default {
                 ],
                 singleSelectCheckups: true,
                 futureCheckupSelected: [],
+                pastCheckups: [],
                 //Counseling view and cancellation
                 futureCounselings: [],
                 counselingHeaders: [
@@ -665,6 +694,7 @@ export default {
                 ],
                 singleSelectCounseling: true,
                 futureCounselingSelected: [],
+                pastCounselings: [],
                 //Loyalty Program
                 loyaltyProgram:{},
                 
@@ -784,8 +814,56 @@ export default {
             this.getFutureCheckups();
             this.getFutureCounselings();
             this.getLoyaltyProgram();
+            this.getPastCheckups();
+            this.getPastCounselings();
         },
         methods:{
+            getPastCounselings: function()
+            {
+                const vm = this;
+                client({
+                method: 'GET',
+                url: 'counseling/past/patient'
+                })
+                .then((response) => {
+                    vm.pastCounselings = response.data;
+                    
+                    if(vm.pastCounselings.length > 0)
+                    {
+                        for(let appointment of vm.pastCounselings)
+                        {
+                            appointment.range.to = DateFormatter.toAppointmentDateTime(appointment.range.from, appointment.range.to);
+                            appointment.range.from = DateFormatter.toAppointmentDate(appointment.range.from);
+                        }
+                    } 
+
+                }, (error) => {
+
+                })
+            },
+            getPastCheckups: function()
+            {
+                const vm = this;
+                client({
+                method: 'GET',
+                url: 'checkup/past/patient'
+                })
+                .then((response) => {
+                    vm.pastCheckups = response.data;
+                    
+                    if(vm.pastCheckups.length > 0)
+                    {
+                        for(let appointment of vm.pastCheckups)
+                        {
+                            appointment.range.to = DateFormatter.toAppointmentDateTime(appointment.range.from, appointment.range.to);
+                            appointment.range.from = DateFormatter.toAppointmentDate(appointment.range.from);
+                        }
+                    } 
+
+                }, (error) => {
+
+                })
+            },
             getLoyaltyProgram: function()
             {
                 client({
