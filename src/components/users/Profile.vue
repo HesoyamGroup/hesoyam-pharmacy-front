@@ -186,7 +186,7 @@
                             </v-card-actions>
                         </v-card>
                     </v-col>
-                    <v-col>
+                    <v-col cols="4">
                         <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
                             <v-toolbar 
                             flat
@@ -195,8 +195,7 @@
                                 <v-toolbar-title>Appointments</v-toolbar-title>
                             </v-toolbar>
                             <v-tabs
-                                fixed-tabs
->
+                                fixed-tabs>
                                 <v-tab>
                                     Checkups
                                 </v-tab>
@@ -309,25 +308,7 @@
                             dark>
                                 <v-toolbar-title>Other Options</v-toolbar-title>
                             </v-toolbar>
-                            <v-card-actions class='justify-center'>
-                                <v-btn
-                                color='primary'
-                                @click='toBrowsePharmaciesPage'>
-                                    Browse Pharmacies
-                                </v-btn>
-                                <v-btn
-                                color='primary'
-                                @click='toFeedbackPage'>
-                                    Feedback
-                                </v-btn>
-                            </v-card-actions>
-                            <v-card-actions class='justify-center'>
-                                <v-btn
-                                color='primary'
-                                @click='toCounselingBrowse'>
-                                    Pharmacist Counseling
-                                </v-btn>
-                            </v-card-actions>
+                            
                         </v-card>
                     </v-col>
                 </v-row>
