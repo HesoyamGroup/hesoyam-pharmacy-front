@@ -47,14 +47,16 @@
                         item-key="employeeId">
                         </v-data-table>
                         <v-card-actions class="justify-center"
-                        v-if='selectedDermatologist.length > 0'>
+                        >
                             <v-btn
                             color="primary"
-                            @click='addFeedbackDermatologistDialog'>
+                            @click='addFeedbackDermatologistDialog'
+                            v-if='selectedDermatologist.length > 0' >
                             Add Feedback
                             </v-btn>
                             <v-btn
                             color="primary"
+                            v-if='selectedDermatologist.length > 0'
                             @click='addComplaintDermatologistDialog'>
                             Add Complaint
                             </v-btn>
@@ -230,14 +232,15 @@
                     rows="5"
                     row-height="15"
                     no-resize
-                    label="Your Complaint"
+                    counter
+                    label="Your Complaint(min 10 characters)"
                     v-model='complaintDermatologist'
                     ></v-textarea>
                 </v-row>
                 <v-card-actions class='justify-center'>
                     <v-btn
                     color="primary"
-                    @click='addFeedbackDermatologist'>
+                    @click='addComplaintDermatologist'>
                     Confirm
                     </v-btn>
                 </v-card-actions>
@@ -294,14 +297,16 @@
                     rows="5"
                     row-height="15"
                     no-resize
-                    label="Your Complaint"
+                    counter
+                    label="Your Complaint(min 10 characters)"
                     v-model='complaintPharmacist'
                     ></v-textarea>
                 </v-row>
                 <v-card-actions class='justify-center'>
                     <v-btn
                     color="primary"
-                    @click='addComplaintPharmacist'>
+                    @click='addComplaintPharmacist'
+                    v-if='complaintPharmacist.length >= 10'>
                     Confirm
                     </v-btn>
                 </v-card-actions>
@@ -393,8 +398,9 @@
                     rows="5"
                     row-height="15"
                     no-resize
-                    label="Your Complaint"
+                    label="Your Complaint(min 10 characters)"
                     v-model='complaintPharmacy'
+                    counter
                     ></v-textarea>
                 </v-row>
                 <v-card-actions class='justify-center'>
@@ -567,8 +573,7 @@
             },
             addFeedbackDermatologist: function()
             {
-                console.log(this.ratingDermatologist);
-                console.log(this.commentDermatologist);
+
                 client({
                     method:'POST',
                     url: 'feedback/employee',
@@ -650,7 +655,61 @@
                 }, (error) =>{
                     
                 })
-            }
+            },
+            addComplaintDermatologist: function()
+            {
+                const vm = this;
+                console.log(this.selectedDermatologist);
+                client({
+                    method: 'POST',
+                    url: 'complaint/create-employee-complaint',
+                    data:{
+                        body: vm.complaintDermatologist,
+                        patient: null,
+                        employeeId: vm.selectedDermatologist[0].employeeId
+                        
+                    }
+                })
+                .then((response) => {
+                    vm.dermatologistComplaintDialog = false;
+                    vm.selectedDermatologist = [];
+                    vm.complaintDermatologist = '';
+                }, (error) => {
+
+                })
+            },
+            addComplaintPharmacist: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'complaint/create-employee-complaint',
+                    data:{
+                        body: this.complaintPharmacist,
+                        employeeId: this.selectedPharmacist[0].employeeId
+                    }
+                })
+                .then((response) => {
+                    this.pharmacistComplaintDialog = false;
+                    this.selectedPharmacist = [];
+                    this.complaintPharmacist = '';
+                })
+            },
+            addComplaintPharmacy: function()
+            {
+                client({
+                    method: 'POST',
+                    url: 'complaint/create-pharmacy-complaint',
+                    data:{
+                        body: this.complaintPharmacy,
+                        pharmacyId: this.selectedPharmacy[0].pharmacyId
+                    }
+                })
+                .then((response) => {
+                    this.pharmacyComplaintDialog = false;
+                    this.selectedPharmacy = [];
+                    this.complaintPharmacy = '';
+                })
+            },
         }
     }
 </script>
