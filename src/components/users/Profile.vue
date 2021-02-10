@@ -253,6 +253,56 @@
                         </v-card>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols='4'>
+                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
+                            <v-toolbar dark color="primary">
+                                <v-toolbar-title>Loyalty Program - {{loyaltyProgram.categoryName}}</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text class="ma-5">
+                            <p class="display-1 text--primary">
+                                Collected Points - {{loyaltyProgram.points}}
+                            </p>
+                            <p class="display-1 text--primary">
+                                Discount in this Category - {{loyaltyProgram.discount}}%
+                            </p>
+                            <p class="display-1 text--primary">
+                                Penalty Points - {{loyaltyProgram.penaltyPoints}}/3
+                            </p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+
+                    <v-col cols="4">
+                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped>
+                            <v-toolbar 
+                            flat
+                            color='primary'
+                            dark>
+                                <v-toolbar-title>Other Options</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                color='primary'
+                                @click='toBrowsePharmaciesPage'>
+                                    Browse Pharmacies
+                                </v-btn>
+                                <v-btn
+                                color='primary'
+                                @click='toFeedbackPage'>
+                                    Feedback
+                                </v-btn>
+                            </v-card-actions>
+                            <v-card-actions class='justify-center'>
+                                <v-btn
+                                color='primary'
+                                @click='toCounselingBrowse'>
+                                    Pharmacist Counseling
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
+                </v-row>
 
                 <!-- edit information dialog -->
                 <v-dialog v-model='infoOverlay' max-width="20%">
@@ -616,7 +666,7 @@ export default {
                 singleSelectCounseling: true,
                 futureCounselingSelected: [],
                 //Loyalty Program
-                value:69,
+                loyaltyProgram:{},
                 
                 //Rules
                 rules: {
@@ -733,8 +783,21 @@ export default {
             // patient's future checkups
             this.getFutureCheckups();
             this.getFutureCounselings();
+            this.getLoyaltyProgram();
         },
         methods:{
+            getLoyaltyProgram: function()
+            {
+                client({
+                    method: 'GET',
+                    url: 'loyalty/patient'
+                })
+                .then((response) => {
+                    this.loyaltyProgram = response.data;
+                }, (error) => {
+
+                })
+            },
             //Get all cities in selected country
             getCities: function(){
                 const vm = this;
@@ -1009,7 +1072,23 @@ export default {
                     this.futureCheckupSelected = [];
                     this.getFutureCheckups();
                 })
+            },
+            toBrowsePharmaciesPage: function()
+            {
+                var url = '../pharmacy/all';
+                window.location.href=url;
+            },
+            toFeedbackPage: function()
+            {
+                var url = '../feedback';
+                window.location.href=url;
+            },
+            toCounselingBrowse: function()
+            {
+                var url = '../counseling-reservation';
+                window.location.href=url;
             }
+
         }
         
 
