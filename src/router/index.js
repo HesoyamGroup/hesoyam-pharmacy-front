@@ -185,7 +185,22 @@ const routes = [
   {
     path: '/pharmacy/:id',
     name: 'Pharmacy',
-    component: PharmacyPage
+    component: PharmacyPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        client({
+          method: 'GET',
+          url: 'administrator/pharmacy/id'
+        }).then((response) => {
+          let pharmacyId = response.data;
+          if(to.params.id == pharmacyId)
+            next();
+          else
+            router.push({path: '/pharmacy/' + pharmacyId});
+        }, (error) => {});
+      }
+    }
   },
   {
     path: '/pharmacists',
@@ -413,6 +428,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach( async (to, from, next) => {
+  document.title = to.meta.title || 'Hesoyam Pharmacy';
   //Before each routing, check user authentication (token)
   UserService.validateAuthentication().then( (isAuthenticationValid) => {
       if(!isAuthenticationValid){

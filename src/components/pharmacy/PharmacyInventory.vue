@@ -11,6 +11,10 @@
             :expanded.sync="expanded"
             class="elevation-1 ma-5">
 
+            <template v-slot:item.actions="{item}">
+                <v-btn @click="remove(item)" :disabled="item.reserved > 0" color="red" dark>Remove</v-btn>
+            </template>
+
             <template v-slot:expanded-item="{ headers, item }">
                 <td :colspan="headers.length">
                     <div>
@@ -53,6 +57,11 @@ export default {
                     value: 'reserved'
                 },
                 {
+                    text: 'Remove',
+                    value: 'actions',
+                    sortable: false
+                },
+                {
                     text: 'Price List',
                     value: 'data-table-expand'
                 }
@@ -68,7 +77,7 @@ export default {
             let pharmacyId = this.$route.params.id;
             client({
                 method: 'GET',
-                url: 'inventory-item/pharmacy/' + pharmacyId
+                url: '/inventory-item/pharmacy/' + pharmacyId
             }).then((response) => {
                 let iitems = response.data;
 
@@ -80,9 +89,17 @@ export default {
                 }
 
                 this.items = iitems;
-            }, (error) => {
-
-            });
+            }, (error) => {});
+        },
+        remove(item){
+            client({
+                method: 'DELETE',
+                url: '/inventory-item/' + item.id
+            }).then((response) => {
+                alert('Inventory item successfully removed');
+                let index = this.items.findIndex(i => i.id == item.id);
+                this.items.splice(index, 1);
+            })
         },
         fixDate(date){
             return new Date(date[0] + '-' + date[1] + '-' + date[2]).toISOString().substring(0, 10);
