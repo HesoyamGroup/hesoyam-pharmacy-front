@@ -93,35 +93,6 @@
                         </v-card>
                     </v-col>
                     
-                    
-                    <v-col v-if='false' class="d-flex">
-                        <v-card class='elevation-12 ma-4 flex-grow-1' shaped > 
-                            <v-toolbar dark color = 'primary'>
-                                <v-toolbar-title>Loyalty Program - Drug dealer</v-toolbar-title>
-                            </v-toolbar>
-                                <v-container >
-                                    <v-row
-                                        class="fill-height"
-                                        align-content="center"
-                                        justify="center"
-                                    >
-                                        <v-col class="subtitle-1 text-center" cols="12">
-                                        You are 150 points away from getting to next level
-                                        </v-col>
-                                        <v-col cols="5">
-                                        <v-progress-circular
-                                            :rotate="90"
-                                            :size="150"
-                                            :width="30"
-                                            :value="value"
-                                            color="red"
-                                            >    
-                                        </v-progress-circular>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                        </v-card>
-                    </v-col>
                     <v-col cols='4'>
                         <v-card class='elevation-12 ma-4 mb-1 flex-grow-1' shaped>
                             <v-toolbar dark color='primary'>
@@ -171,6 +142,7 @@
                             <v-data-table
                             :headers='medicineHeaders'
                             :items='medicineList'
+                            item-key="medicineId"
                             :items-per-page="5"
                             :search="searchMedicine"
                             no-data-text="You have no reserved medicine!">
@@ -502,6 +474,7 @@
                             :items='cancelableMedicine'
                             :items-per-page="5"
                             :search="searchMedicineCancelDialog"
+                            item-key="medicineReservationItemList[0].id"
                             show-select
                             :single-select='singleSelectCancellation'
                             v-model='selectedCancelReservationList'
@@ -974,26 +947,35 @@ export default {
             },
             cancelReservation: function()
             {
+                console.log(this.selectedCancelReservationList);    
                 client({
                     method: 'POST',
                     url: 'medicine-reservation/cancel-reservation',
                     data:{
-                        id: this.selectedCancelReservationList[0].id
+                        id: this.selectedCancelReservationList[0].id,
+                        pharmacyId: this.selectedCancelReservationList[0].pharmacyId,
+                        reservationCode: this.selectedCancelReservationList[0].reservationCode,
+                        medicineId: this.selectedCancelReservationList[0].medicineReservationItemList[0].medicine.id 
+
                     }
                 })
                 .then((response) => {
-                    for (var i in this.allMedicine) 
-                    {
-                        if (this.allMedicine[i].id == response.data) 
-                        {
-                            this.allMedicine[i].medicineReservationStatus = 'CANCELLED';
-                            break;
-                        }
-                    }
                     this.getAllMedicine();
                     this.selectedCancelReservationList = [];
-                    this.showCancelDialog = false;                 
-                },(error)=>{
+                    this.showCancelDialog = false;
+                    const vm = this;
+                    client({
+                        method: 'GET',
+                        url: 'medicine-reservation/get-reservations'
+                    })
+                    .then((response) => {
+                        vm.medicineList = response.data;
+                        vm.allMedicine = response.data;
+                        vm.cancelableMedicine = response.data.filter(obj=>obj.medicineReservationStatus==='CREATED')
+                    }, (error) => {
+
+                    })                 
+                        },(error)=>{
 
                 })
             },
