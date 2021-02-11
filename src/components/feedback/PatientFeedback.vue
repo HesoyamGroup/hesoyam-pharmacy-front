@@ -412,6 +412,20 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-snackbar
+        v-model='successSnackbar'
+        :timeout="2000"
+        color='success'>
+            Successfully Done!
+        </v-snackbar>
+
+        <v-snackbar
+        v-model="errorSnackbar"
+        :timeout="2000"
+        color='error'>
+            Oh no! There was some error! :(
+        </v-snackbar>
     </v-container>
 </div>
 </template>
@@ -424,6 +438,9 @@
         name:'PatientFeedback',
         data(){
             return{
+                //snackbars
+                successSnackbar: false, 
+                errorSnackbar: false,
                 //Single select is for all data tables
                 singleSelect: true,
                 //Dermatologists
@@ -589,6 +606,9 @@
                     this.selectedDermatologist[0].averageRating = response.data;
                     this.dermatologistFeedbackDialog = false;
                     this.selectedDermatologist = [];
+                    this.successSnackbar = true;
+                }, (error) => {
+                    this.errorSnackbar = true;
                 })
             },
             addFeedbackPharmacist: function()
@@ -610,8 +630,9 @@
                     this.selectedPharmacist[0].averageRating = response.data;
                     this.pharmacistFeedbackDialog = false;
                     this.selectedPharmacist = [];
+                    this.successSnackbar = true;
                 }, (error) =>{
-
+                    this.errorSnackbar = true;
                 })
             },
             addFeedbackMedicine: function()
@@ -631,8 +652,9 @@
                     this.selectedMedicine[0].averageRating = response.data;
                     this.medicineFeedbackDialog = false;
                     this.selectedMedicine = [];
+                    this.successSnackbar = true;
                 }, (error) =>{
-
+                    this.errorSnackbar = true;
                 })
             },
             addFeedbackPharmacy: function()
@@ -652,8 +674,9 @@
                     this.selectedPharmacy[0].averageRating = response.data;
                     this.pharmacyFeedbackDialog = false;
                     this.selectedPharmacy = [];
+                    this.successSnackbar = true;
                 }, (error) =>{
-                    
+                    this.errorSnackbar = true;
                 })
             },
             addComplaintDermatologist: function()
@@ -674,8 +697,9 @@
                     vm.dermatologistComplaintDialog = false;
                     vm.selectedDermatologist = [];
                     vm.complaintDermatologist = '';
+                    this.successSnackbar = true;
                 }, (error) => {
-
+                    this.errorSnackbar = true;
                 })
             },
             addComplaintPharmacist: function()
@@ -692,6 +716,9 @@
                     this.pharmacistComplaintDialog = false;
                     this.selectedPharmacist = [];
                     this.complaintPharmacist = '';
+                    this.successSnackbar = true;
+                }, (error) => {
+                    this.errorSnackbar = true;
                 })
             },
             addComplaintPharmacy: function()
@@ -708,6 +735,9 @@
                     this.pharmacyComplaintDialog = false;
                     this.selectedPharmacy = [];
                     this.complaintPharmacy = '';
+                    this.successSnackbar = true;
+                }, (error) => {
+                    this.errorSnackbar = true;
                 })
             },
         }

@@ -543,6 +543,20 @@
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
+
+                <v-snackbar
+                v-model='successSnackbar'
+                :timeout="2000"
+                color='success'>
+                    Successfully Done!
+                </v-snackbar>
+
+                <v-snackbar
+                v-model="errorSnackbar"
+                :timeout="2000"
+                color='error'>
+                    Oh no! There was some error! :(
+                </v-snackbar>
     </v-container>
     
 </div>
@@ -559,6 +573,9 @@ export default {
         name: 'Profile',
         data(){
             return {
+                //snackbar
+                successSnackbar: false,
+                errorSnackbar: false,
                 //User Addres and Editing
                 address:{
                     city:{
@@ -864,8 +881,9 @@ export default {
                     this.selectedCountry = null;
                     this.addressLine = '';
                     this.showAddressCard = false;
+                    this.successSnackbar = true;
                 }, (error) => {
-
+                    this.errorSnackbar = true;
                 })
 
             },
@@ -884,8 +902,9 @@ export default {
                 .then((response)=>{
                     this.userDTO = Object.assign(this.userDTO, this.form.userEdit);
                     this.infoOverlay = !this.infoOverlay;
+                    this.successSnackbar = true;
                 }, (error)=>{
-
+                    this.errorSnackbar = true;
                 })
             },
             cancelUserEdit: function()
@@ -906,9 +925,9 @@ export default {
                     }
                 })
                 .then((response) => {
-                    
+                    this.successSnackbar = true;
                 },(error)=>{
-
+                    this.errorSnackbar = true;
                 })
                 
             },            
@@ -964,6 +983,7 @@ export default {
                     this.selectedCancelReservationList = [];
                     this.showCancelDialog = false;
                     const vm = this;
+                    this.successSnackbar = true;
                     client({
                         method: 'GET',
                         url: 'medicine-reservation/get-reservations'
@@ -975,8 +995,8 @@ export default {
                     }, (error) => {
 
                     })                 
-                        },(error)=>{
-
+                },(error)=>{
+                    this.errorSnackbar = true;
                 })
             },
             //Allergies 
@@ -1001,8 +1021,9 @@ export default {
                     .then((response) => {
                         vm.notAllergicTo = response.data;
                     })
+                    this.successSnackbar = true;
                 },(error) => {
-
+                    this.errorSnackbar = true;
                 })
                 
             },
@@ -1027,6 +1048,7 @@ export default {
                     })
                     .then((response) => {
                         vm.notAllergicTo = response.data;
+                        this.successSnackbar = true;
                     })
                 })
             },
@@ -1068,6 +1090,9 @@ export default {
                 .then((response) => {
                     this.futureCounselingSelected = [];
                     this.getFutureCounselings();
+                    this.successSnackbar = true
+                }, (error) => {
+                    this.errorSnackbar = true;
                 })
             },
             //Checkups
@@ -1112,6 +1137,9 @@ export default {
                 .then((response) => {
                     this.futureCheckupSelected = [];
                     this.getFutureCheckups();
+                    this.successSnackbar = true;
+                }, (error) =>{
+                    this.errorSnackbar = true;
                 })
             },
             toBrowsePharmaciesPage: function()

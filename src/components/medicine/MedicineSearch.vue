@@ -100,6 +100,20 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
+
+            <v-snackbar
+            v-model="successfullyReserved"
+            :timeout="2000"
+            color="success">
+                Successfully Reserved!
+            </v-snackbar>
+
+            <v-snackbar
+            v-model="errorReserved"
+            :timeout="2000"
+            color='error'>
+                Error while reserving!
+            </v-snackbar>
     </v-container>
 </div>
 </template>
@@ -112,6 +126,9 @@ export default {
     name: 'MedicineSearch',
     data(){
         return {
+            //snackbars
+            successfullyReserved: false,
+            errorReserved: false,
             //Search Bar
             allMedicine:[],
             selectedMedicine:{},
@@ -217,9 +234,9 @@ export default {
                 }
             })
             .then((response)=>{
-
+                this.successfullyReserved = true;
             }, (error) => {
-
+                this.errorReserved = true;
             })
 
             this.resetPage();
