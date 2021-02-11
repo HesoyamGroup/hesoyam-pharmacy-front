@@ -74,18 +74,38 @@ const routes = [
   {
     path: '/feedback',
     component: PatientFeedbackPage,
-    //TODO: dodati ko moze da vidi
+    beforeEnter: function(to, from, next){
+      if(!UserService.isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        let user = UserService.getLoggedUserData();
+        if(user.userRole == 'PATIENT'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+      }
+    }
   },
 
   {
     path: '/profile', 
     component: ProfilePage,
     beforeEnter: function(to, from, next){
+
       if(!UserService.isUserLoggedIn()){
         router.push({path: '/login'});
       }
       else{
-        next();
+        let user = UserService.getLoggedUserData();
+        if(user.userRole == 'PATIENT'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
       }
     }
   },
@@ -111,10 +131,26 @@ const routes = [
   {
     path: '/medicine-search',
     component: MedicineSearchPage,
+    
   },
   {
     path: '/counseling-reservation',
-    component: CounselingReservationPage
+    component: CounselingReservationPage, 
+    beforeEnter: function(to, from, next){
+
+      if(!UserService.isUserLoggedIn()){
+        router.push({path: '/login'});
+      }
+      else{
+        let user = UserService.getLoggedUserData();
+        if(user.userRole == 'PATIENT'){
+          next();
+        }
+        else{
+          router.push({path: '/'});
+        }
+      }
+    }
   },
   {
     path: '/about',
