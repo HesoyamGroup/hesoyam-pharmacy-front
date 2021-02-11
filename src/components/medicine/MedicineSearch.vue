@@ -205,29 +205,19 @@ export default {
         },
         reserveMedicine: function()
         {
+            console.log(this.selectedMedicine);
+            console.log(this.selectedPharmacy[0].id);
             client({
                 method: 'POST',
                 url: 'medicine-reservation/create',
                 data:{
                     pickUpDate: this.selectedDate+" 23:59:59",
-                    medicineReservationItemList: [{quantity: 1, medicine:{id: this.selectedMedicine.id}}]
-                }
-            })
-            .then((response)=>{
-
-            }, (error) => {
-
-            })
-
-            client({
-                method: 'POST',
-                url: 'inventory-item/reserve-inventory-item',
-                data:{
                     pharmacyId: this.selectedPharmacy[0].id,
                     medicineId: this.selectedMedicine.id
                 }
             })
             .then((response)=>{
+
             }, (error) => {
 
             })
