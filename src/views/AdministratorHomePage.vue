@@ -62,7 +62,14 @@
                         </v-card-text>
                     </v-card>
                 </v-col>
-                <v-col></v-col>
+                <v-col>
+                    <v-card to="/report" color="amber" dark>
+                        <v-card-title>Reports</v-card-title>
+                        <v-card-text>
+                            <v-icon size="100">mdi-chart-line</v-icon>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
                 <v-col></v-col>
             </v-row>
         </v-card-text>
