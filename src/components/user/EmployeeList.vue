@@ -42,6 +42,10 @@
             </v-toolbar>
             </template>
 
+            <template v-slot:item.profile="{item}">
+                <v-btn plain :to="'/' + type + '/' + item.id"><v-icon>mdi-account</v-icon></v-btn>
+            </template>
+
             <template v-slot:item.rating="{ item }">
                 <v-chip
                     :color="getColor(item.rating)"
@@ -200,6 +204,7 @@ export default {
         employeeHeaders(){
             if(this.type == 'pharmacist'){
                 return [
+                    {text: '', value: 'profile', sortable: false},
                     {
                         text: 'First Name',
                         align: 'start',
@@ -212,6 +217,7 @@ export default {
             }
             else if(this.type == 'dermatologist'){
                 let dermatologistHeaders = [
+                    {text: '', value: 'profile', sortable: false},
                     {
                         text: 'First Name',
                         align: 'start',
@@ -222,7 +228,7 @@ export default {
                     { text: 'Pharmacies', value: 'data-table-expand' }
                 ];
                 if(this.userRole == 'ADMINISTRATOR')
-                    dermatologistHeaders.push({text: 'Remove', value: 'remove'})
+                    dermatologistHeaders.push({text: 'Remove', value: 'remove', sortable: false})
                 return dermatologistHeaders;
             }
         }

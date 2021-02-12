@@ -1,35 +1,39 @@
 <template>
     <div class="register-user">
-        <v-row>
-            <v-col>
-                <v-card flat class="ma-5">
-                    <v-card-title>Register pharmacist</v-card-title>
-                    <v-card-text>
-                        <v-form v-model="form.isFormValid">
-                            <v-text-field v-model="form.firstName" :rules="form.rules.firstNameRules" label="First Name" prepend-icon="mdi-account"></v-text-field>
-                            <v-text-field v-model="form.lastName" :rules="form.rules.lastNameRules" label="Last Name" prepend-icon="mdi-account"></v-text-field>
-                            <v-select v-model="form.gender" :rules="form.rules.genderRules" :items="form.genders" label="Gender" prepend-icon="mdi-gender-male-female"></v-select>
-                            <v-text-field v-model="form.password" :rules="form.rules.passwordRules" label="Password" type="password" prepend-icon="mdi-lock"> </v-text-field>
-                            <v-text-field v-model="form.confirmPassword" :rules="form.rules.confirmPasswordRules" label="Confirm password" type="password" prepend-icon="mdi-lock"> </v-text-field>
-                            <v-text-field :disabled="form.disableUserInteraction" v-model="form.email" :rules="form.rules.emailRules" name="email" label="Email address" type="text" prepend-icon="mdi-email"> </v-text-field>
-                            <v-text-field :disabled="form.disableUserInteraction" v-model="form.phone" :rules="form.rules.phoneNumberRules" name="phone" label="Phone number" type="text" prepend-icon="mdi-cellphone"> </v-text-field>
+        <v-card flat class="ma-5">
+            <v-card-title>
+                <div>Register pharmacist</div>
+                <v-spacer></v-spacer>
+                <v-btn  class="confirmButton" :disabled="!isValid" @click="createUserAccount()" color="primary">Register</v-btn>
+            </v-card-title>
+            <v-card-text>
+                <v-row>
+                    <v-col>
+                        <v-card flat class="ma-5">
+                            <v-card-title>Personal information</v-card-title>
+                            <v-card-text>
+                                <v-form v-model="form.isFormValid">
+                                    <v-text-field v-model="form.firstName" :rules="form.rules.firstNameRules" label="First Name" prepend-icon="mdi-account"></v-text-field>
+                                    <v-text-field v-model="form.lastName" :rules="form.rules.lastNameRules" label="Last Name" prepend-icon="mdi-account"></v-text-field>
+                                    <v-select v-model="form.gender" :rules="form.rules.genderRules" :items="form.genders" label="Gender" prepend-icon="mdi-gender-male-female"></v-select>
+                                    <v-text-field v-model="form.password" :rules="form.rules.passwordRules" label="Password" type="password" prepend-icon="mdi-lock"> </v-text-field>
+                                    <v-text-field v-model="form.confirmPassword" :rules="form.rules.confirmPasswordRules" label="Confirm password" type="password" prepend-icon="mdi-lock"> </v-text-field>
+                                    <v-text-field :disabled="form.disableUserInteraction" v-model="form.email" :rules="form.rules.emailRules" name="email" label="Email address" type="text" prepend-icon="mdi-email"> </v-text-field>
+                                    <v-text-field :disabled="form.disableUserInteraction" v-model="form.phone" :rules="form.rules.phoneNumberRules" name="phone" label="Phone number" type="text" prepend-icon="mdi-cellphone"> </v-text-field>
 
-                            <v-select :disabled="form.disableUserInteraction" :rules="form.countryRules" item-text="countryName" item-value="id" @change="onCountryChanged()" v-model="form.selectedCountry" :items="form.countries" label="Country" prepend-icon="mdi-map-marker"></v-select>
-                            <v-select v-model="form.selectedCity" item-text="cityName" item-value="id" :rules="form.rules.cityRules" :disabled="form.forbidCitySelection || form.disableUserInteraction"  :items="form.cities"  label="City" prepend-icon="mdi-city"> </v-select>
-                            <v-text-field :disabled="form.disableUserInteraction" v-model="form.addressLine" :rules="form.rules.addressLineRules" label="Address line"> </v-text-field>
-                        </v-form>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-            <v-col>
-                <shift-picker v-model="shifts"></shift-picker>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-spacer></v-spacer>
-            <v-btn  class="confirmButton" :disabled="!isValid" @click="createUserAccount()" color="primary">Register account</v-btn>
-            <v-spacer></v-spacer>
-        </v-row>
+                                    <v-select :disabled="form.disableUserInteraction" :rules="form.countryRules" item-text="countryName" item-value="id" @change="onCountryChanged()" v-model="form.selectedCountry" :items="form.countries" label="Country" prepend-icon="mdi-map-marker"></v-select>
+                                    <v-select v-model="form.selectedCity" item-text="cityName" item-value="id" :rules="form.rules.cityRules" :disabled="form.forbidCitySelection || form.disableUserInteraction"  :items="form.cities"  label="City" prepend-icon="mdi-city"> </v-select>
+                                    <v-text-field :disabled="form.disableUserInteraction" v-model="form.addressLine" :rules="form.rules.addressLineRules" label="Address line"> </v-text-field>
+                                </v-form>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col>
+                        <shift-picker v-model="shifts"></shift-picker>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+        </v-card>
     </div>
 </template>
 
