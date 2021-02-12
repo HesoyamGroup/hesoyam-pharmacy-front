@@ -79,7 +79,7 @@
                                         </v-row>
 
                                         <v-row>
-                                            <v-text-field v-model="membership.form.minPoints" label="Minimum points" type="number" min="0" prepend-icon="mdi-sale" append-icon="mdi-percent" :rules="membership.rules.minPointsRules"> </v-text-field>
+                                            <v-text-field v-model="membership.form.minPoints" label="Minimum points" type="number" min="0" prepend-icon="mdi-sale" :rules="membership.rules.minPointsRules"> </v-text-field>
                                         </v-row>
 
                                         <v-row>
@@ -204,7 +204,8 @@
 
                         <v-row>
                             <v-subheader class="red--text" v-if="membership.editError">
-                                Name must be unique and membership min points must be unique.
+                                {{membership.editErrorText}}
+                                
                             </v-subheader>
                         </v-row>
                     </v-container>
@@ -269,6 +270,7 @@
                         loyaltyProgramConfig: null
                     },
                     editError: false,
+                    editErrorText: '',
                     dialog: false,
                     edited: null,
                     edit: false,
@@ -285,7 +287,7 @@
                         ],
                         minPointsRules: [
                             min => !!min || 'Minimum points rule must be specified.',
-                            min => (!isNaN(parseFloat(min)) && min > 0) || 'Minimum points must be a non-negative number.'
+                            min => (!isNaN(parseFloat(min)) && min >= 0) || 'Minimum points must be a non-negative number.'
                         ],
                         membershipNameRules: [
                             name => !!name || 'Name must be specified.',
@@ -393,6 +395,7 @@
             updateMembership(){
                     //do whatever ou need to do
                 this.membership.editError = false;
+                this.membership.editErrorText = '';
                 client({
                     method: 'POST',
                     url: 'loyalty/membership/update',
@@ -405,6 +408,13 @@
                     this.membership.editError = false;
                 }, (error) => {
                     this.membership.editError=true;
+                    if(error.response.status == '412'){
+                        this.membership.editErrorText = 'It has been already updated by someone else. Try again!';
+                        this.refreshMemberships();
+                    }else{
+                        this.membership.editErrorText = 'Name must be unique and membership min points must be unique.';
+                        this.refreshMemberships();
+                    }
 
                     // Object.assign(this.membership.edited, this.membership.backup);
                     // this.membership.dialog=false;
@@ -455,8 +465,13 @@
                     this.config.success = true;
                 }, (error) => {
                     console.log('An error occured during config update.');
-                    this.config.disableInteraction = true;
-                    this.config.error = 'Bad request.',
+                    this.config.disableInteraction = false;
+                    if(error.response.status == '412'){
+                        this.config.error = 'Config already updated by someone else :( Try again.';
+                    }else{
+                        this.config.error = 'Bad request.';
+                    }
+                    
                     this.config.errorOccured = true;
                     this.config.success = false;
                 });
