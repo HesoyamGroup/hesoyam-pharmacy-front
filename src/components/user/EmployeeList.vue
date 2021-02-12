@@ -1,11 +1,15 @@
 <template>
     <div>
-        <v-card>
+        <v-card flat class="ma-5">
             <v-card-title>
-                {{tableTitle}}
+                <div>{{tableTitle}}</div>
                 <v-spacer></v-spacer>
-                <v-text-field class="mt-5 mr-1" label="First Name" v-model="firstName"></v-text-field>
-                <v-text-field class="mt-5 mr-1" label="Last Name" v-model="lastName"></v-text-field>
+                <v-btn v-if="userRole == 'ADMINISTRATOR'" to="/pharmacist-new" color="green" dark>New</v-btn>
+            </v-card-title>
+
+            <v-card-title>
+                <v-text-field class="mt-5 mr-3" label="First Name" v-model="firstName"></v-text-field>
+                <v-text-field class="mt-5 mr-3" label="Last Name" v-model="lastName"></v-text-field>
                 <v-btn @click="search">Search</v-btn>
             </v-card-title>
      
@@ -72,6 +76,7 @@
 
 <script>
 import {client} from '@/client/axiosClient';
+import * as UserService from '@/service/UserService';
 
 export default {
     //Props:
@@ -100,11 +105,14 @@ export default {
                     text: 'Rating',
                     value: 'rating'
                 }
-            ]
+            ],
+            userRole: ''
         }
     },
     mounted(){
         this.fetchEmployees();
+        let user = UserService.getLoggedUserData();
+        this.userRole = user.userRole;
     },
     methods:{
         fetchEmployees(){
