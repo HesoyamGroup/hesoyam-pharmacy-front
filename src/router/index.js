@@ -57,7 +57,7 @@ const routes = [
     component: LoginPage,
     beforeEnter: function(to, from, next){
       if(UserService.isUserLoggedIn()){
-        router.push({path: '/'});
+        router.push({path: '/'}).catch(()=>{});
       }else{
         next();
       }
@@ -69,7 +69,7 @@ const routes = [
     component: RegisterPage,
     beforeEnter: function(to, from, next){
       if(UserService.isUserLoggedIn()){
-        router.push({path: '/'});
+        router.push({path: '/'}).catch(()=>{});
       }else{
         next();
       }

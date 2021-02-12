@@ -18,6 +18,8 @@
       
 
       <v-spacer></v-spacer>
+      <v-btn  plain to="/login">Login</v-btn>
+      <v-btn  plain to="/register">Register</v-btn>
       <v-btn @click="logout()" plain to="/login"><div class="mr-3">Log out</div><v-icon>mdi-logout</v-icon></v-btn>
 
     </v-app-bar>
@@ -45,15 +47,13 @@ export default {
   components: {
     HelloWorld,
   },
-
   data: () => ({
-    //
   }),
   methods:{
     logout(){
       UserService.clearUserData();
     }
-  }
+  },
 };
 </script>
 <style scoped>
