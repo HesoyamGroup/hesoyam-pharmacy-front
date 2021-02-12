@@ -198,7 +198,7 @@ export default {
                 method: 'POST',
                 url: 'medicine-reservation/cancel-pickup',
                 data: {
-                    responseCode: code
+                    reservationCode: code
                 }
             })
             .then((response) => {
