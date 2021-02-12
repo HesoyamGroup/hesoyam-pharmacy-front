@@ -1,5 +1,5 @@
 <template>
-    <HandOutMedicine />
+    <HandOutMedicine class="main-container"/>
 </template>
 
 <script>
@@ -12,3 +12,8 @@ export default {
         }
 }
 </script>
+<style scoped>
+    .main-container{
+        margin: 5%;
+    }
+</style>

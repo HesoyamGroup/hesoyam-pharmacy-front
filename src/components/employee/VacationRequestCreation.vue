@@ -2,9 +2,10 @@
 <div>
     <v-row>    
       <v-card>
-        <!-- <v-card-title>
-          <span class="headline">Submit a vacation request!</span>
-        </v-card-title> -->
+        <v-card-title class="title">
+          <!-- <span class="headline">Submit a vacation request!</span> -->
+          <h1>Submit a vacation request!</h1>
+        </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
@@ -124,5 +125,9 @@ export default {
     }
     h1{
         justify-content: center;
+        color: grey;
+    }
+    .title{
+      justify-content: center;
     }
 </style>
