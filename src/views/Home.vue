@@ -1,6 +1,11 @@
 <template>
   <div class="home">
     <administrator-home-page v-if="isAdministrator"></administrator-home-page>
+    <!--
+    <patient-home-page v-if="isPatient"></patient-home-page>
+    ...
+    ...
+      -->
   </div>
 </template>
 
@@ -26,6 +31,15 @@ export default {
   computed:{
     isAdministrator(){
       return this.userRole == 'ADMINISTRATOR';
+    },
+    isPatient(){
+      return this.userRole == 'PATIENT';
+    },
+    isUnauthorized(){
+      return this.userRole == '';
+    },
+    isSysAdmin(){
+      return this.userRole == 'SYS_ADMIN';
     }
   }
 }
