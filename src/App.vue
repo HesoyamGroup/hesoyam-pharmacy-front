@@ -56,7 +56,7 @@ export default {
 </script>
 <style scoped>
   .v-main{
-    margin-bottom: 30px;
+    margin-bottom: 50px;
   }
   .v-app-bar{
     z-index: 2000 !important ;
