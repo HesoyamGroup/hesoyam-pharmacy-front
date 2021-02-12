@@ -13,7 +13,9 @@
             <div class="ml-3">Hesoyam Pharmacy</div>
         </v-btn>
       </v-toolbar-title>
+      <v-btn to="/browse-medicine" plain>Browse medicine</v-btn>
       <v-btn to="/about" plain>About</v-btn>
+      
 
       <v-spacer></v-spacer>
       <v-btn @click="logout()" plain to="/login"><div class="mr-3">Log out</div><v-icon>mdi-logout</v-icon></v-btn>

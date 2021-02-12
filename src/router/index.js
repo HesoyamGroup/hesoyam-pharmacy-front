@@ -124,7 +124,16 @@ const routes = [
   },
   {
     path:'/supplier-profile',
-    component: SupplierPage
+    component: SupplierPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'SUPPLIER'){
+        next();
+      }
+      else{
+        router.push({path: '/login'});
+      }
+    }
   },
   {
     path:'/browse-medicine',

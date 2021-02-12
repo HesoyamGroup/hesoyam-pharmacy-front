@@ -406,6 +406,7 @@
                     this.membership.edited = null;
                     this.membership.edit = false; 
                     this.membership.editError = false;
+                    this.refreshMemberships();
                 }, (error) => {
                     this.membership.editError=true;
                     if(error.response.status == '412'){
