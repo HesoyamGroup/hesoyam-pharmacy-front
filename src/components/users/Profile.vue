@@ -280,7 +280,34 @@
                             dark>
                                 <v-toolbar-title>Other Options</v-toolbar-title>
                             </v-toolbar>
-                            
+                            <v-card-actions >
+                                <v-row class='justify-center ma-6'>
+                                    <v-btn
+                                    class='ma-3'
+                                    color='primary'
+                                    @click='allPharmaciesButton'>
+                                    All Pharmacies
+                                    </v-btn>
+                                    <v-btn
+                                    class='ma-3'
+                                    color='primary'
+                                    @click='feedbackButton'>
+                                    Feedback
+                                    </v-btn>
+                                    <v-btn
+                                    class='ma-3'
+                                    color='primary'
+                                    @click='counselingReservationButton'>
+                                    Counseling Reservation
+                                    </v-btn>
+                                    <v-btn
+                                    class='ma-3'
+                                    color='primary'
+                                    @click='eprescriptionButton'>
+                                    ePrescription
+                                    </v-btn>
+                                </v-row>
+                            </v-card-actions>
                         </v-card>
                     </v-col>
                 </v-row>
@@ -789,6 +816,22 @@ export default {
             this.getPastCounselings();
         },
         methods:{
+            allPharmaciesButton: function()
+            {
+                window.location.href = '../pharmacy/all';
+            },
+            feedbackButton: function()
+            {
+                window.location.href = '../feedback';
+            },
+            counselingReservationButton: function()
+            {
+                window.location.href = '../counseling-reservation';
+            },
+            eprescriptionButton: function()
+            {
+                window.location.href = '../eprescription';
+            },
             getPastCounselings: function()
             {
                 const vm = this;
