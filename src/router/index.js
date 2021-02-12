@@ -30,6 +30,7 @@ import PatientFeedbackPage from '../views/PatientFeedbackPage.vue'
 import OrdersPage from '../views/OrdersPage.vue'
 import NotFoundPage from '../views/NotFoundPage.vue'
 import EmployeeHomePage from '../views/EmployeeHomePage.vue'
+import PharmacistRegisterPage from '../views/PharmacistRegisterPage.vue'
 
 
 import GraphicalReports from '../components/report/GraphicalReports.vue'
@@ -100,7 +101,7 @@ const routes = [
       }
       else{
         let user = UserService.getLoggedUserData();
-        if(user.userRole == 'PATIENT'){
+        if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
           next();
         }
         else{
@@ -235,7 +236,8 @@ const routes = [
           else
             router.push({path: '/pharmacy/' + pharmacyId});
         }, (error) => {});
-      }
+      } else
+        next();
     }
   },
   {
@@ -252,7 +254,18 @@ const routes = [
         }
     }
   },
-
+  {
+    path: '/pharmacist-new',
+    name: 'PharmacistRegisterPage',
+    component: PharmacistRegisterPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
+        next();
+      } else
+        router.push({path: '/'});
+    }
+  },
   {
     path: '/searchusers',
     name: 'SearchUsers',
