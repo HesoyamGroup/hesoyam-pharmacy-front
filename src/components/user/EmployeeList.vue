@@ -4,7 +4,8 @@
             <v-card-title>
                 <div>{{tableTitle}}</div>
                 <v-spacer></v-spacer>
-                <v-btn v-if="userRole == 'ADMINISTRATOR'" to="/pharmacist-new" color="green" dark>New</v-btn>
+                <v-btn v-if="userRole == 'ADMINISTRATOR' && type == 'pharmacist'" to="/pharmacist-new" color="green" dark>New</v-btn>
+                <v-btn v-if="userRole == 'ADMINISTRATOR' && type == 'dermatologist'" to="/dermatologists/management" color="green" dark>Management</v-btn>
             </v-card-title>
 
             <v-card-title>
