@@ -16,8 +16,10 @@
     </v-card>
     <v-card color="deep-orange lighten-5" class="ma-5">
       <v-card-title>
+        <v-spacer></v-spacer>
         <v-icon>mdi-account</v-icon>
         <div class="ml-3">Authors</div>
+        <v-spacer></v-spacer>
       </v-card-title>
       <v-card-text>
         <v-row>
