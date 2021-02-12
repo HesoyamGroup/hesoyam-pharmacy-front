@@ -4,6 +4,7 @@
     <sys-admin-profile-page v-if="isSysAdmin"></sys-admin-profile-page>
     <supplier-page v-if="isSupplier"></supplier-page>
     <profile-page v-if="isPatient"></profile-page>
+    <employee-home-page v-if="isEmployee"></employee-home-page>
   </div>
 </template>
 
@@ -11,6 +12,7 @@
 // @ is an alias to /src
 import AdministratorHomePage from './AdministratorHomePage.vue';
 import SysAdminProfilePage from './SysAdminProfilePage.vue';
+import EmployeeHomePage from './EmployeeHomePage.vue'
 import SupplierPage from './SupplierPage.vue';
 import ProfilePage from './ProfilePage.vue';
 
@@ -22,7 +24,8 @@ export default {
     AdministratorHomePage,
     SysAdminProfilePage,
     SupplierPage,
-    ProfilePage
+    ProfilePage,
+    EmployeeHomePage
   },
   data: function(){
     return{
@@ -48,6 +51,9 @@ export default {
     },
     isSupplier(){
       return this.userRole == 'SUPPLIER';
+    },
+    isEmployee(){
+      return this.userRole == 'PHARMACIST' || this.userRole == 'DERMATOLOGIST';
     }
   }
 }

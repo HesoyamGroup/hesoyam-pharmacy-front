@@ -13,10 +13,6 @@
         {{userDTO.pharmacyName}}
       </h2>
     </v-row>
-
-    <v-row justify="left">
-      <v-btn plain to="/home-employee" class="home-nav" color="indigo lighten-2">Home <v-icon>mdi-home</v-icon></v-btn>
-    </v-row>
     
     <v-tabs
       v-model="tab"

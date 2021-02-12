@@ -32,6 +32,9 @@ import NotFoundPage from '../views/NotFoundPage.vue'
 import EmployeeHomePage from '../views/EmployeeHomePage.vue'
 import PharmacistRegisterPage from '../views/PharmacistRegisterPage.vue'
 import DermatologistsManagementPage from '../views/DermatologistsManagementPage.vue'
+import BookNewAppointmentPage from '../views/BookNewAppointmentPage.vue'
+import VacationRequestCreationPage from '../views/VacationRequestCreationPage.vue'
+import WorkCalendarPage from '../views/WorkCalendarPage.vue'
 
 
 import GraphicalReports from '../components/report/GraphicalReports.vue'
@@ -132,6 +135,32 @@ const routes = [
       }
       else{
         router.push({path: '/login'});
+      }
+    }
+  },
+  {
+    path:'/vacation-request-creation',
+    component: VacationRequestCreationPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST' || this.userRole == 'DERMATOLOGIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path:'/work-calendar',
+    component: WorkCalendarPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST' || this.userRole == 'DERMATOLOGIST'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
       }
     }
   },
@@ -453,6 +482,20 @@ const routes = [
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/book-new-appointment',
+    name: 'BookNewAppointmentPage',
+    component: BookNewAppointmentPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'PHARMACIST' || user.userRole == 'DERMATOLOGIST'){
         next();
       }
       else{
