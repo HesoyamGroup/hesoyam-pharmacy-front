@@ -42,13 +42,17 @@
             </v-toolbar>
             </template>
 
+            <template v-slot:item.profile="{item}">
+                <v-btn plain :to="'/' + type + '/' + item.id"><v-icon>mdi-account</v-icon></v-btn>
+            </template>
+
             <template v-slot:item.rating="{ item }">
-            <v-chip
-                :color="getColor(item.rating)"
-                dark
-            >
-                {{ item.rating }}
-            </v-chip>
+                <v-chip
+                    :color="getColor(item.rating)"
+                    dark
+                >
+                    {{ item.rating }}
+                </v-chip>
             </template>
 
             <template v-slot:expanded-item="{ headers, item }">
@@ -70,6 +74,23 @@
                 </td>
             </template>
 
+            <template v-slot:item.remove="{item}">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                        @click="removeDermatologist(item)"
+                        color="red"
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        >
+                        Remove
+                        </v-btn>
+                    </template>
+                    <span>Remove from my pharmacy</span>
+                </v-tooltip>
+            </template>
+            
             </v-data-table>
         </v-card>
     </div>
@@ -137,9 +158,7 @@ export default {
                 }
             }).then((response) =>{
                 this.employees = response.data;
-            }, (error) => {
-
-            })
+            }, (error) => {});
         },
         getColor (calories) {
             if (calories >= 4) return 'green'
@@ -154,6 +173,22 @@ export default {
                 employee.pharmacies.forEach(ph => ph.name.toLowerCase().indexOf(pharmacyName.toLowerCase()) !== -1 ? result = true : {});
             
             return result;
+        },
+        removeDermatologist(dermatologist){
+            client({
+                method: 'DELETE',
+                url: '/dermatologist/' + dermatologist.id
+            }).then((response) => {
+                let index = this.employees.findIndex(derm => derm.id == dermatologist.id);
+                if(index != -1)
+                    this.employees.splice(index, 1);
+            }, (error) => {
+                switch(error.response.status){
+                    case 404: alert('Selected dermatologist cannot be found.'); break;
+                    case 409: alert('Dermatologist has scheduled appointments'); break;
+                    case 400: alert('Dermatologist is already removed from pharmacy'); break;
+                }
+            });
         }
     },
     computed: {
@@ -169,6 +204,7 @@ export default {
         employeeHeaders(){
             if(this.type == 'pharmacist'){
                 return [
+                    {text: '', value: 'profile', sortable: false},
                     {
                         text: 'First Name',
                         align: 'start',
@@ -179,8 +215,9 @@ export default {
                     { text: 'Pharmacy', value: 'pharmacy.name'}
                 ]
             }
-            else{
-                return [
+            else if(this.type == 'dermatologist'){
+                let dermatologistHeaders = [
+                    {text: '', value: 'profile', sortable: false},
                     {
                         text: 'First Name',
                         align: 'start',
@@ -189,7 +226,10 @@ export default {
                     { text: 'Last Name', value: 'lastName' },
                     { text: 'Rating', value: 'rating' },
                     { text: 'Pharmacies', value: 'data-table-expand' }
-                ]
+                ];
+                if(this.userRole == 'ADMINISTRATOR')
+                    dermatologistHeaders.push({text: 'Remove', value: 'remove', sortable: false})
+                return dermatologistHeaders;
             }
         }
     }
