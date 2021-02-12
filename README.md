@@ -18,6 +18,12 @@
 
 ## How to run
 
+### Environment variables
+
+Make sure you set the following environment variable in the [.env](.env) file:
+
+- `VUE_APP_API_BASE_URL` - Backend API BASE URL (Local dev: `http://localhost:55555/`)
+
 ### Prerequisites
 
 It is necessary that you have the following software installed:
@@ -45,11 +51,6 @@ npm run build
 #### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-## Environment variables
-
-Make sure you set the following environment variable in the [.env](.env) file:
-
-`VUE_APP_API_BASE_URL` - Backend API BASE URL (Local dev: `http://localhost:55555/`)
 
 ## Backend project
 
