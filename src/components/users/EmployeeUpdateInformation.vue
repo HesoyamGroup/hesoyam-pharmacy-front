@@ -45,7 +45,7 @@
                   :disabled="personalEditingDisabled"
                 ></v-text-field>
                 
-                <v-autocomplete
+                <!-- <v-autocomplete
                     ref="country"
                     v-model="user.country"
                     :rules="[() => !!country || 'This field is required']"
@@ -84,7 +84,7 @@
                     required
                     prepend-icon="mdi-home-city"
                     :disabled="personalEditingDisabled"
-                ></v-text-field>
+                ></v-text-field> -->
                 </v-card-text>
                 <v-divider class="mt-12"
                 v-if="!personalEditingDisabled"></v-divider>
