@@ -31,6 +31,7 @@ import OrdersPage from '../views/OrdersPage.vue'
 import NotFoundPage from '../views/NotFoundPage.vue'
 import EmployeeHomePage from '../views/EmployeeHomePage.vue'
 import PharmacistRegisterPage from '../views/PharmacistRegisterPage.vue'
+import DermatologistsManagementPage from '../views/DermatologistsManagementPage.vue'
 
 
 import GraphicalReports from '../components/report/GraphicalReports.vue'
@@ -302,6 +303,20 @@ const routes = [
     beforeEnter: function(to, from, next){
       let user = UserService.getLoggedUserData();
       if(user.userRole == 'PATIENT' || user.userRole == 'ADMINISTRATOR'){
+        next();
+      }
+      else{
+        router.push({path: '/'});
+      }
+    }
+  },
+  {
+    path: '/dermatologists/management',
+    name: 'DermatologistsManagementPage',
+    component: DermatologistsManagementPage,
+    beforeEnter: function(to, from, next){
+      let user = UserService.getLoggedUserData();
+      if(user.userRole == 'ADMINISTRATOR'){
         next();
       }
       else{
