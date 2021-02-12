@@ -3,11 +3,7 @@
     <administrator-home-page v-if="isAdministrator"></administrator-home-page>
     <sys-admin-profile-page v-if="isSysAdmin"></sys-admin-profile-page>
     <supplier-page v-if="isSupplier"></supplier-page>
-    <!--
-    <patient-home-page v-if="isPatient"></patient-home-page>
-    ...
-    ...
-      -->
+    <profile-page v-if="isPatient"></profile-page>
   </div>
 </template>
 
@@ -16,6 +12,8 @@
 import AdministratorHomePage from './AdministratorHomePage.vue';
 import SysAdminProfilePage from './SysAdminProfilePage.vue';
 import SupplierPage from './SupplierPage.vue';
+import ProfilePage from './ProfilePage.vue';
+
 import * as UserService from '@/service/UserService';
 
 export default {
@@ -23,7 +21,8 @@ export default {
   components: {
     AdministratorHomePage,
     SysAdminProfilePage,
-    SupplierPage
+    SupplierPage,
+    ProfilePage
   },
   data: function(){
     return{
